@@ -13,5 +13,10 @@ namespace Rutinas
         {
 
         }
+
+        protected void btnentrar_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
