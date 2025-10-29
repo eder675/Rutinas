@@ -3,7 +3,7 @@
     background: #f2f2f2;
     display: flex;
     justify-content: center;
-    padding: 40px;
+    padding: 50px;
     background-image: url('media/IngenioLaCabana.jpg'); /* Cambia esto por la ruta de tu imagen */
     background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
     background-repeat: no-repeat; /* Evita que la imagen se repita */
@@ -11,6 +11,8 @@
     background-attachment: fixed;
 
 }
+
+
 
 .CONTENEDOR {
     background-position: 0% 0%;
@@ -22,4 +24,27 @@
     background-image: none;
     background-repeat: repeat;
     background-attachment: scroll;
+}
+
+footer {
+    text-align: center;
+    background-color: #333;
+    color: white;
+    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contenedor-servicios {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    form {
+        width: 80%;
+    }
 }

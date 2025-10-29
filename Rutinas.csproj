@@ -71,6 +71,7 @@
     <Content Include="Login.aspx" />
     <Content Include="media\IngenioLaCabana.jpg" />
     <Content Include="styles.css" />
+    <Content Include="styles2.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
