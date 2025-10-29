@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Rutinas
 {
@@ -11,24 +7,43 @@ namespace Rutinas
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            UnobtrusiveValidationMode= UnobtrusiveValidationMode.None;
+            UnobtrusiveValidationMode = UnobtrusiveValidationMode.None;
         }
 
         protected void btnentrar_Click(object sender, EventArgs e)
         {
-            
-            string script = "";
+            Page.Validate();
+
+            string mensaje = "";
+            string colorFondo = "";
             if (Page.IsValid)
-           {
-                 script = "alert('¡Bienvenido a Rutinas!');";
+            {
+                mensaje = "✅ ¡Validaciones correctas! Datos listos para procesar.";
+                colorFondo = "#4CAF50";
 
+            }
+            else
+            {
+                mensaje = "⚠️ No se cumplió la validación. Revisa los mensajes de error.";
+                colorFondo = "#f44336"; 
 
-           }
-           else {
-                 script = "alert('¡Error en la validación!');";
-
-           }
-           ScriptManager.RegisterStartupScript(this, GetType(),"MostrarMensajeValidacion", script, true);
+            }
+            string script = @"
+        var div = document.getElementById('divNotificacion');
+        var span = document.getElementById('spanMensaje');
+        
+        // 1. Configurar el mensaje y el color
+        span.innerHTML = '" + mensaje + @"';
+        div.style.backgroundColor = '" + colorFondo + @"';
+        
+        // 2. Mostrar la notificación
+        div.style.display = 'block';
+        
+        // 3. Ocultar después de 3 segundos (3000 milisegundos)
+        setTimeout(function(){
+            div.style.display = 'none';
+        }, 3000);";
+            ScriptManager.RegisterStartupScript(this, GetType(), "MostrarMensajeValidacion", script, true);
         }
 
         protected void txtname_TextChanged(object sender, EventArgs e)
