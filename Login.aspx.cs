@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Web.UI;
 using System.Data; 
 using System.Data.SqlClient;
 using System.Web.Configuration;
+using System.Web.Security;
+using System.Web.UI;
 
 namespace Rutinas
 {
@@ -60,10 +61,10 @@ namespace Rutinas
 
                                 Session["MensajeNotificacion"] = "✅ ¡Bienvenido " + nombreUsuario + "! Sesión iniciada correctamente.";
                                 Session["ColorNotificacion"] = "#4CAF50";
-
+                                FormsAuthentication.RedirectFromLoginPage(nombreUsuario, createPersistentCookie: false);
                                 // Redirigir al usuario a la página principal
                                 // Reemplaza "~/Default.aspx" por la ruta correcta de tu página de inicio.
-                                Response.Redirect("~/Default.aspx");
+                               
                                 return; // Terminamos la ejecución
                             }
                             else

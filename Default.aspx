@@ -12,9 +12,9 @@
         <h1>Ingenio La Cabaña</h1>
         <nav>
             <ul>
-                <li><a href="#resgistros">Registro de rutinas</a></li>
-                <li><a href="logindeveloper">Login como desarrollador</a></li>
-                <li><a href="#Acercade">Acerca de.</a></li>
+                <li><a href="Registros.aspx">Registro de rutinas</a></li> 
+                <li><a href="LoginDeveloper.aspx">Login como desarrollador</a></li> 
+                <li><a href="AcercaDe.aspx">Acerca de.</a></li>
             </ul>
         </nav>
     </header>
