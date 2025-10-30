@@ -10,37 +10,24 @@
 <body>
     <form id="form1" runat="server">
         <div>
-            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString %>" DeleteCommand="DELETE FROM [Rutina_Instrumento] WHERE [Correlativo_Rutina] = @Correlativo_Rutina AND [Correlativo_Instrumento] = @Correlativo_Instrumento" InsertCommand="INSERT INTO [Rutina_Instrumento] ([Correlativo_Rutina], [Correlativo_Instrumento], [Estado]) VALUES (@Correlativo_Rutina, @Correlativo_Instrumento, @Estado)" ProviderName="<%$ ConnectionStrings:REPORTESConnectionString.ProviderName %>" SelectCommand="SELECT [Correlativo_Rutina], [Correlativo_Instrumento], [Estado] FROM [Rutina_Instrumento] ORDER BY [Correlativo_Instrumento]" UpdateCommand="UPDATE [Rutina_Instrumento] SET [Estado] = @Estado WHERE [Correlativo_Rutina] = @Correlativo_Rutina AND [Correlativo_Instrumento] = @Correlativo_Instrumento">
-                <DeleteParameters>
-                    <asp:Parameter Name="Correlativo_Rutina" Type="Int32" />
-                    <asp:Parameter Name="Correlativo_Instrumento" Type="Int32" />
-                </DeleteParameters>
-                <InsertParameters>
-                    <asp:Parameter Name="Correlativo_Rutina" Type="Int32" />
-                    <asp:Parameter Name="Correlativo_Instrumento" Type="Int32" />
-                    <asp:Parameter Name="Estado" Type="String" />
-                </InsertParameters>
-                <UpdateParameters>
-                    <asp:Parameter Name="Estado" Type="String" />
-                    <asp:Parameter Name="Correlativo_Rutina" Type="Int32" />
-                    <asp:Parameter Name="Correlativo_Instrumento" Type="Int32" />
-                </UpdateParameters>
-            </asp:SqlDataSource>
-            <asp:GridView ID="GridView1" runat="server" AllowPaging="True" AllowSorting="True" AutoGenerateColumns="False" BackColor="White" BorderColor="#336666" BorderStyle="Double" BorderWidth="3px" CellPadding="4" DataKeyNames="Correlativo_Rutina,Correlativo_Instrumento" DataSourceID="SqlDataSource1" GridLines="Horizontal">
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString2 %>" ProviderName="<%$ ConnectionStrings:REPORTESConnectionString2.ProviderName %>" SelectCommand="SELECT [Fecha_generacion], [Correlativo], [Codigo_empleado], [Codigo_turno], [Area_asignada] FROM [Rutina]"></asp:SqlDataSource>
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" BackColor="#CCCCCC" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" DataKeyNames="Correlativo" DataSourceID="SqlDataSource1" ForeColor="Black">
                 <Columns>
-                    <asp:BoundField DataField="Correlativo_Rutina" HeaderText="Correlativo_Rutina" ReadOnly="True" SortExpression="Correlativo_Rutina" />
-                    <asp:BoundField DataField="Correlativo_Instrumento" HeaderText="Correlativo_Instrumento" ReadOnly="True" SortExpression="Correlativo_Instrumento" />
-                    <asp:BoundField DataField="Estado" HeaderText="Estado" SortExpression="Estado" />
+                    <asp:BoundField DataField="Fecha_generacion" HeaderText="Fecha_generacion" SortExpression="Fecha_generacion" />
+                    <asp:BoundField DataField="Correlativo" HeaderText="Correlativo" InsertVisible="False" ReadOnly="True" SortExpression="Correlativo" />
+                    <asp:BoundField DataField="Codigo_empleado" HeaderText="Codigo_empleado" SortExpression="Codigo_empleado" />
+                    <asp:BoundField DataField="Codigo_turno" HeaderText="Codigo_turno" SortExpression="Codigo_turno" />
+                    <asp:BoundField DataField="Area_asignada" HeaderText="Area_asignada" SortExpression="Area_asignada" />
                 </Columns>
-                <FooterStyle BackColor="White" ForeColor="#333333" />
-                <HeaderStyle BackColor="#336666" Font-Bold="True" ForeColor="White" />
-                <PagerStyle BackColor="#336666" ForeColor="White" HorizontalAlign="Center" />
-                <RowStyle BackColor="White" ForeColor="#333333" />
-                <SelectedRowStyle BackColor="#339966" Font-Bold="True" ForeColor="White" />
-                <SortedAscendingCellStyle BackColor="#F7F7F7" />
-                <SortedAscendingHeaderStyle BackColor="#487575" />
-                <SortedDescendingCellStyle BackColor="#E5E5E5" />
-                <SortedDescendingHeaderStyle BackColor="#275353" />
+                <FooterStyle BackColor="#CCCCCC" />
+                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
+                <PagerStyle BackColor="#CCCCCC" ForeColor="Black" HorizontalAlign="Left" />
+                <RowStyle BackColor="White" />
+                <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
+                <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                <SortedAscendingHeaderStyle BackColor="#808080" />
+                <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                <SortedDescendingHeaderStyle BackColor="#383838" />
             </asp:GridView>
         </div>
     </form>
