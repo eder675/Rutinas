@@ -1,20 +1,30 @@
-﻿/* Fondo con imagen para la sección */
-body {
+﻿/* Asegura que el body y html ocupen toda la altura */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    background: #f2f2f2;
     display: flex;
-    justify-content: center;
-    padding: 50px;
-    background-image: url('media/paisajeILC.jpg'); /* Cambia esto por la ruta de tu imagen */
-    background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
-    background-position: center center; /* Centra la imagen */
-    background-attachment: fixed;
+    flex-direction: column;
 }
 
-/* Caja única con fondo blanco y bordes redondeados */
+/* Sección principal con fondo */
+#acerca-de {
+    background-image: url('../media/paisajeILC.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    flex: 1; /* Esto permite que la sección crezca y empuje el footer hacia abajo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+/* Caja de desarrolladores */
 .caja-desarrolladores {
-    background-color: rgba(255, 255, 255, 0.9); /* Blanco semitransparente para ver el fondo */
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     padding: 30px 40px;
     max-width: 500px;
@@ -23,22 +33,11 @@ body {
     text-align: center;
 }
 
-/* Título */
-.titulo-acerca {
-    color: #333;
-    margin-bottom: 20px;
+/* Footer al final */
+.footer-acerca {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
 }
-
-/* Lista vertical */
-.lista-desarrolladores {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-    .lista-desarrolladores li {
-        margin: 10px 0;
-        font-weight: bold;
-        color: #444;
-        font-size: 1.1em;
-    }

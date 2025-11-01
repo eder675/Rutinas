@@ -19,5 +19,8 @@
     </ul>
     </div>
   </section>
+    <footer class="footer-acerca">
+        <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
+    </footer> 
 </body>
 </html>
