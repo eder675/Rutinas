@@ -1,0 +1,44 @@
+﻿/* Fondo con imagen para la sección */
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    padding: 50px;
+    background-image: url('media/paisajeILC.jpg'); /* Cambia esto por la ruta de tu imagen */
+    background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-position: center center; /* Centra la imagen */
+    background-attachment: fixed;
+}
+
+/* Caja única con fondo blanco y bordes redondeados */
+.caja-desarrolladores {
+    background-color: rgba(255, 255, 255, 0.9); /* Blanco semitransparente para ver el fondo */
+    border-radius: 15px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* Título */
+.titulo-acerca {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Lista vertical */
+.lista-desarrolladores {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .lista-desarrolladores li {
+        margin: 10px 0;
+        font-weight: bold;
+        color: #444;
+        font-size: 1.1em;
+    }

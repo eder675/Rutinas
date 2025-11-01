@@ -5,12 +5,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title></title>
+    <title>About.</title>
+    <link rel="stylesheet" href="styles3.css"
 </head>
 <body>
-    <form id="form1" runat="server">
-        <div>
-            hola</div>
-    </form>
+    <section id="acerca-de">
+    <div class="caja-desarrolladores">
+    <h1 class="titulo-acerca">Acerca de</h1>
+    <p>Proyecto de generacion automatica de rutinas.</p>
+    <ul class="lista-desarrolladores">
+      <li>Franklin Duvan Granados - - - - Desarrollador Web</li>
+      <li>Eder Duvan Granados - Desarrollador Web</li>
+    </ul>
+    </div>
+  </section>
 </body>
 </html>
