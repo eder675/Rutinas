@@ -1,2 +1,95 @@
-﻿body {
+﻿/* ---------------------------------------------------- */
+/* ESTILOS PARA LA VISUALIZACIÓN EN PANTALLA            */
+/* ---------------------------------------------------- */
+
+.formato-carta {
+    /* Dimensiones que simulan una hoja de papel Carta */
+    width: 8.5in;
+    min-height: 11in;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.titulo-rutina {
+    text-align: center;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.datos-cabecera {
+    display: grid;
+    /* Divide la cabecera en dos columnas para los datos */
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+/* Estilos de la Tabla */
+.tabla-instrumentos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    font-size: 0.8em; /* Fuente pequeña para asegurar que quepan 15 ítems */
+}
+
+    .tabla-instrumentos th, .tabla-instrumentos td {
+        border: 1px solid #333;
+        padding: 5px;
+        text-align: left;
+        height: 25px; /* Altura mínima para cada fila */
+    }
+
+/* Casilla de Verificación */
+.casilla-verif {
+    height: 15px;
+    width: 15px;
+    border: 1px solid #000;
+    margin: 0 auto;
+}
+
+/* Estilos de Firma */
+.firmas-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+}
+
+.firma-box {
+    text-align: center;
+    width: 45%;
+    font-size: 0.8em;
+}
+
+/* ---------------------------------------------------- */
+/* REGLAS CRÍTICAS PARA LA IMPRESIÓN (@media print)     */
+/* ---------------------------------------------------- */
+@media print {
+    /* 1. Ocultar la navegación y otros elementos que no son parte del formulario */
+    header, nav, footer, .acciones-web {
+        display: none !important;
+    }
+
+    /* 2. Asegurar que el contenido ocupe todo el papel */
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .formato-carta {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* 3. Controlar saltos de página (evita que la tabla se corte a la mitad) */
+    .checklist-tabla, .firmas-container {
+        page-break-inside: avoid;
+    }
 }
