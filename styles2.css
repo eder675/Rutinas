@@ -41,13 +41,27 @@ nav ul {
     padding: 20px;
 }
 
+
+
 .panel {
     background: white;
     padding: 15px;
     text-align: center;
     border-radius: 5px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    /* Propiedades para que el enlace se comporte como una caja */
+    display: block;
+    text-decoration: none; /* Quita el subrayado */
+    color: #333; /* Color del texto para que no sea azul */
+    transition: transform 0.3s ease; /* Transición suave para el efecto */
 }
+
+    .panel:hover {
+        /* Efecto visual al pasar el ratón para indicar que es clicable */
+        box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px); /* Pequeño levantamiento */
+        /*cursor: pointer;*/
+    }
 
     .panel img {
         width: 100px;
@@ -56,7 +70,7 @@ nav ul {
         border-radius: 5px;
     }
 
-}
+
 
 footer {
     text-align: center;
