@@ -69,6 +69,8 @@
   <ItemGroup>
     <Content Include="AcercaDe.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="estilosgenerador.css" />
+    <Content Include="Generadorrutinas.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="LoginDeveloper.aspx" />
     <Content Include="media\IngenioLaCabana.jpg" />
@@ -91,6 +93,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Generadorrutinas.aspx.cs">
+      <DependentUpon>Generadorrutinas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Generadorrutinas.aspx.designer.cs">
+      <DependentUpon>Generadorrutinas.aspx</DependentUpon>
     </Compile>
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>

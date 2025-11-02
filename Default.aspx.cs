@@ -23,7 +23,7 @@ namespace Rutinas
             // y generar los 30 instrumentos al azar antes de redirigir.
 
             // Redirección a la página de generación de rutina
-            Response.Redirect("PaginaGeneracionRutina.aspx");
+            Response.Redirect("Generadorrutinas.aspx");
         }
 
         protected void btnImprimirRutina_Click(object sender, EventArgs e)
