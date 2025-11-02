@@ -70,7 +70,34 @@ nav ul {
         border-radius: 5px;
     }
 
+.nav-button-link {
+    /* Mantenemos las propiedades para que se vea como texto de navegación */
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    text-transform: uppercase; /* Para mantener las mayúsculas de tu texto */
+    /* 1. Bordes Redondeados */
+    border-radius: 8px; /* Valor para un borde redondeado suave */
+    /* 2. Un poco de relleno para que el borde se vea bien */
+    padding: 8px 12px;
+    /* 3. Color de fondo sutil (transparente por ahora) */
+    background-color: transparent;
+    /* 4. Transición para un efecto de hover suave */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+    .nav-button-link:hover {
+        /* 1. Color de fondo que se ilumina al pasar el ratón */
+        background-color: rgba(255, 255, 255, 0.2); /* Blanco semitransparente */
+        /* 2. Opcional: Cambiar el color del texto para resaltarlo */
+        color: #f4f4f4; /* Blanco muy claro */
+        /* 3. (Ya está definido por el cursor: pointer del nav-button-link) */
+        text-decoration: none; /* Asegurar que no se subraye */
+    }
 
 footer {
     text-align: center;

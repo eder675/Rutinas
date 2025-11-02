@@ -13,9 +13,27 @@
         <h1>Ingenio La Cabaña</h1>
         <nav>
             <ul>
-                <li><a href="Registros.aspx">Registro de rutinas</a></li> 
-                <li><a href="LoginDeveloper.aspx">Login como desarrollador</a></li> 
-                <li><a href="AcercaDe.aspx">Acerca de.</a></li>
+                <li>
+                    <asp:Button ID="registros" 
+                                runat="server" 
+                                Text="REGISTROS DE RUTINAS"
+                                OnClick="registros_Click"
+                                CssClass="nav-button-link"/>
+                    </li> 
+                <li>
+            <asp:Button 
+                ID="logout" 
+                runat="server" 
+                Text="CERRAR SESION" 
+                OnClick="logout_Click"
+                CssClass="nav-button-link" /> </li>
+                <li>
+                    <asp:Button ID="about" 
+                                runat="server" 
+                                OnClick="about_Click" 
+                                Text="Acerca de."
+                                CssClass="nav-button-link"/>
+                </li>
             </ul>
         </nav>
     </header>

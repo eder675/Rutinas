@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -34,5 +35,23 @@ namespace Rutinas
             Response.Redirect("PaginaReporteImpresion.aspx");
         }
 
+        protected void registros_Click(object sender, EventArgs e)
+        {
+            
+            Response.Redirect("Registros.aspx");
+        }
+
+        protected void logout_Click(object sender, EventArgs e)
+        {
+            FormsAuthentication.SignOut();
+
+            // 3. Redirigir al usuario a la página de inicio de sesión
+            Response.Redirect("Login.aspx", true);
+        }
+
+        protected void about_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("AcercaDe.aspx");
+        }
     }
 }
