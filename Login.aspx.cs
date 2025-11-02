@@ -59,12 +59,38 @@ namespace Rutinas
                                 Session["NombreEmpleado"] = nombreUsuario;
                                 Session["Cargo"] = cargoUsuario;
 
-                                Session["MensajeNotificacion"] = "✅ ¡Bienvenido " + nombreUsuario + "! Sesión iniciada correctamente.";
-                                Session["ColorNotificacion"] = "#4CAF50";
-                                FormsAuthentication.RedirectFromLoginPage(nombreUsuario, createPersistentCookie: false);
+
+
                                 // Redirigir al usuario a la página principal
                                 // Reemplaza "~/Default.aspx" por la ruta correcta de tu página de inicio.
-                               
+                                // --------------------------------------------------------------------------
+                                // LÓGICA DE REDIRECCIÓN CONDICIONAL
+                                // --------------------------------------------------------------------------
+
+                                string paginaDestino;
+
+                                // Evaluar si el cargo es Administrador (lo llevamos al panel de Desarrolladores)
+                                if (cargoUsuario.Equals("Administrador", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // El Administrador irá a la página de desarrollador
+                                    paginaDestino = "~/LoginDeveloper.aspx";
+                                }
+                                else
+                                {
+                                    // Cualquier otro (Instrumentista, etc.) va a la página principal
+                                    paginaDestino = "~/Default.aspx";
+                                }
+
+                                // --------------------------------------------------------------------------
+                                // EMISIÓN DEL TICKET Y REDIRECCIÓN FINAL
+                                // --------------------------------------------------------------------------
+
+                                // 1. Crea el ticket de autenticación (la cookie)
+                                FormsAuthentication.SetAuthCookie(nombreUsuario, false);
+
+                                // 2. Redirige a la página elegida
+                                Response.Redirect(paginaDestino);
+
                                 return; // Terminamos la ejecución
                             }
                             else
