@@ -27,48 +27,61 @@
         :
         <asp:Label ID="lblturno" runat="server" Text="Turno Actual"></asp:Label>
         <br />
-        <asp:Repeater ID="rptrutina" runat="server">
+        <div class="checklist-tabla">
+    <h3>Detalle de Tareas de Instrumentación</h3>
+    
+    <table class="tabla-instrumentos" cellspacing="0" cellpadding="0">
+        <asp:Repeater ID="rptRutina" runat="server">
+            
             <HeaderTemplate>
-        <table class="tabla-instrumentos" cellspacing="0" cellpadding="0">
-            <thead>
+                <thead>
+                    <tr>
+                        <th class="col-area">ÁREA</th> 
+                        <th class="col-equipo">EQUIPO</th>
+                        <th class="col-detalle">DETALLE A VERIFICAR</th>
+                        <th class="col-lectura">LECTURA ACTUAL</th>
+                        <th class="col-hora">HORA LECTURA</th>
+                        <th class="col-observaciones">OBSERVACIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+            </HeaderTemplate>
+
+            <ItemTemplate>
                 <tr>
-                    <th class="col-area">AREA</th>
-                    <th>EQUIPO</th>
-                    <th>DETALLE A VERIFICAR</th>
-                    <th class="col-lectura">LECTURA ACTUAL</th>
-                    <th class="col-hora">HORA LECTURA</th>
-                    <th class="col-observaciones">OBSERVACIONES</th>
+                    <td class="col-area">
+                        <asp:Label ID="lblArea" runat="server" Text='<%# Eval("NombreArea") %>' />
+                    </td>
+                    
+                    <td class="col-equipo"> 
+                        <asp:Label ID="lblEquipo" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+                    </td>
+                    
+                    <td class="col-detalle"> 
+                        <asp:Label ID="lblActividad" runat="server" Text='<%# Eval("Actividad") %>' />
+                    </td>
+                    
+                    <td class="col-lectura">
+                        <div class="linea-manual-pequena"></div>
+                    </td>
+                    
+                    <td class="col-hora">
+                        <div class="linea-manual-pequena"></div>
+                    </td>
+                    
+                    <td class="col-observaciones">
+                        <div class="linea-manual-larga"></div>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-    </HeaderTemplate>
+            </ItemTemplate>
 
-    <ItemTemplate>
-        <tr>
-            <td>
-                <asp:Label ID="lblInstrumento" runat="server" 
-                           Text='<%# Eval("NombreInstrumento") %>' />
-            </td>
-            
-            <td class="col-lectura">
-                <div class="casilla-verif-small"></div>
-            </td>
-            
-            <td class="col-hora">
-                <div class="linea-manual"></div>
-            </td>
-            
-            <td class="col-observaciones">
-                <div class="linea-manual-larga"></div>
-            </td>
-        </tr>
-    </ItemTemplate>
-
-    <FooterTemplate>
-            </tbody>
-        </table>
+            <FooterTemplate>
+                </tbody>
+            </table>
     </FooterTemplate>
+            
         </asp:Repeater>
+</div>
         <br />
         
     </form>
