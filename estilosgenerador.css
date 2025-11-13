@@ -20,49 +20,62 @@
     font-size: 1.2em;
 }
 
-.datos-cabecera {
-    display: grid;
-    /* Divide la cabecera en dos columnas para los datos */
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 20px;
-    font-size: 0.9em;
-}
 
-/* Estilos de la Tabla */
-.tabla-instrumentos {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 40px;
-    font-size: 0.8em; /* Fuente pequeña para asegurar que quepan 15 ítems */
-}
 
-    .tabla-instrumentos th, .tabla-instrumentos td {
-        border: 1px solid #333;
-        padding: 5px;
-        text-align: left;
-        height: 25px; /* Altura mínima para cada fila */
-    }
+/* --- Definición de Anchos de Columna (Asegura que sumen 100%) --- */
 
-/* Casilla de Verificación */
-.casilla-verif {
-    height: 15px;
-    width: 15px;
-    border: 1px solid #000;
-    margin: 0 auto;
-}
-
-/* Estilos de Firma */
-.firmas-container {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 50px;
-}
-
-.firma-box {
+/* Columna de LECTURA ACTUAL (MUY PEQUEÑA) */
+.col-lectura {
+    width: 8%;
     text-align: center;
-    width: 45%;
-    font-size: 0.8em;
+}
+
+/* Columna de HORA LECTURA (MUY PEQUEÑA) */
+.col-hora {
+    width: 8%;
+    text-align: center;
+}
+
+/* Columna de OBSERVACIONES (Grande, para escritura) */
+.col-observaciones {
+    width: 25%;
+}
+
+/* Columna de ÁREA (Mediana) */
+.col-area {
+    width: 10%;
+}
+
+/* Columna de EQUIPO (Más ancha, para nombres largos) */
+.col-equipo {
+    width: 20%;
+}
+
+/* Columna de DETALLE A VERIFICAR (La más ancha, para la descripción) */
+.col-detalle {
+    width: 29%;
+}
+
+/* --- Ajustes para el Llenado Manual --- */
+
+/* Hace el espacio para LECTURA ACTUAL y HORA más pequeño */
+.linea-manual-pequena {
+    width: 90%;
+    margin: 0 auto;
+    height: 1.2em; /* Altura para una línea */
+}
+
+/* Mantiene el espacio para OBSERVACIONES grande */
+.linea-manual-larga {
+    
+    height: 3em; /* Más altura para varias líneas de escritura */
+}
+
+/* Ajustes generales */
+.tabla-instrumentos th, .tabla-instrumentos td {
+    border: 1px solid #333;
+    padding: 3px;
+    vertical-align: top; /* Para que el texto se alinee arriba en celdas grandes */
 }
 
 /* ---------------------------------------------------- */
