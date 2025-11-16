@@ -27,7 +27,7 @@
         :
         <asp:Label ID="lblturno" runat="server" Text="Turno Actual"></asp:Label>
         <br />
-        <div class="checklist-tabla">
+        
     <h3>Detalle de Tareas de Instrumentación</h3>
     
     <table class="tabla-instrumentos" cellspacing="0" cellpadding="0">
@@ -68,7 +68,7 @@
                     <td class="col-hora">
                         <div class="linea-manual-pequena"></div>
                     </td>
-                    
+                     
                     <td class="col-observaciones">
                         <div class="linea-manual-larga"></div>
                     </td>
@@ -77,11 +77,12 @@
 
             <FooterTemplate>
                 </tbody>
-            </table>
+      
     </FooterTemplate>
-            
+           
         </asp:Repeater>
-</div>
+</table> 
+
         <br />
         
     </form>
