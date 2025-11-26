@@ -12,6 +12,7 @@ namespace Rutinas
         protected void Page_Load(object sender, EventArgs e)
         {
             UnobtrusiveValidationMode = UnobtrusiveValidationMode.None;
+            rfvName.Enabled = false;
         }
 
         protected void btnentrar_Click(object sender, EventArgs e)
@@ -22,7 +23,7 @@ namespace Rutinas
 
             // Solo necesitamos la cadena de conexión si las validaciones son correctas
             // string connectionString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
-
+            
             if (Page.IsValid)
             {
                 // 1. Obtener datos de los TextBox (Asegúrate que los IDs sean correctos: txtname y txtcodigo)
@@ -34,7 +35,19 @@ namespace Rutinas
 
                 // 3. Consulta SQL para verificar la credencial
                 // Buscamos un registro que COINCIDA en Nombre Y Codigo_empleado
-                string consulta = "SELECT Nombre, Cargo FROM Empleado WHERE Nombre = @Nombre AND Codigo_empleado = @Codigo";
+                string consulta;
+                bool esInstrumentista = rbtInstrumentista.Checked;
+
+                if (esInstrumentista)
+                {
+                    // A) Lógica para INSTRUMENTISTA: Solo validar por Codigo_empleado
+                    consulta = "SELECT Nombre, Cargo FROM Empleado WHERE Codigo_empleado = @Codigo";
+                }
+                else // Se asume que es Administrador (o la única otra opción)
+                {
+                    // B) Lógica para ADMINISTRADOR: Validar por Nombre Y Codigo_empleado
+                    consulta = "SELECT Nombre, Cargo FROM Empleado WHERE Nombre = @Nombre AND Codigo_empleado = @Codigo";
+                }
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
@@ -145,6 +158,21 @@ namespace Rutinas
         protected void txtname_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        protected void rbtInstrumentista_CheckedChanged(object sender, EventArgs e)
+        {
+                txtname.Enabled = false;
+                rfvName.Enabled = false;
+                txtname.Text = "";
+
+        }
+
+        protected void rbtAdministrador_CheckedChanged(object sender, EventArgs e)
+        {
+            txtname.Enabled = true;
+            rfvName.Enabled = true;
+            txtname.Text = "";
         }
     }
 }

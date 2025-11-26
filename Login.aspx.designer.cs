@@ -42,13 +42,13 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvName;
 
         /// <summary>
-        /// Control rbtnadmin.
+        /// Control rbtInstrumentista.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButton rbtnadmin;
+        protected global::System.Web.UI.WebControls.RadioButton rbtInstrumentista;
 
         /// <summary>
         /// Control txtcodigo.
@@ -69,13 +69,13 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvCodigo;
 
         /// <summary>
-        /// Control rbtninst.
+        /// Control rbtAdministrador.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButton rbtninst;
+        protected global::System.Web.UI.WebControls.RadioButton rbtAdministrador;
 
         /// <summary>
         /// Control btnentrar.

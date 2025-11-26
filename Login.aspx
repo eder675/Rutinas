@@ -40,16 +40,16 @@
         <div class="auto-style1">
             <h1>Bienvenido a Rutinas MTI</h1>
             <p>
-                <asp:TextBox ID="txtname" runat="server" input type="text" placeholder="Nombre y Apellido" ></asp:TextBox>
+                <asp:TextBox ID="txtname" runat="server" input type="text" placeholder="Nombre y Apellido" Enabled="False" ></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvName" runat="server" ControlToValidate="txtname" ErrorMessage="Ingrese su nombre" ForeColor="Red"></asp:RequiredFieldValidator>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:RadioButton ID="rbtnadmin" runat="server" Font-Bold="True" Font-Size="Medium" ForeColor="Red" Text="Administrador" />
+                <asp:RadioButton ID="rbtInstrumentista" runat="server" AutoPostBack="True" Checked="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtInstrumentista_CheckedChanged" Text="Instrumentista" />
             </p>
             <p>
                 <asp:TextBox ID="txtcodigo" runat="server" input type ="number" placeholder="Codigo de empleado"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvCodigo" runat="server" ControlToValidate="txtcodigo" ErrorMessage="Complete este campo " ForeColor="Red"></asp:RequiredFieldValidator>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:RadioButton ID="rbtninst" runat="server" AutoPostBack="True" Font-Bold="True" Font-Size="Medium" ForeColor="Red" Text="Instrumentista" />
+                <asp:RadioButton ID="rbtAdministrador" runat="server" AutoPostBack="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtAdministrador_CheckedChanged" Text="Administrador " />
             </p>
             <p>
                 <asp:Button ID="btnentrar" runat="server" button type="submit" Text="INICIAR SESION" OnClick="btnentrar_Click" />
