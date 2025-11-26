@@ -1,6 +1,19 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Rutinas.Login" %>
 
 <!DOCTYPE html>
+<style type="text/css">
+    .auto-style1 {
+        background-position: 0% 0%;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background-color: rgba(255, 255, 255, 0.90);
+        width: 627px;
+        background-image: none;
+        background-repeat: repeat;
+        background-attachment: scroll;
+    }
+</style>
 <div id="divNotificacion" 
     style="display:none; 
            position: fixed; 
@@ -24,15 +37,19 @@
     
         <form id="form1" runat="server">
     
-        <div class="CONTENEDOR">
+        <div class="auto-style1">
             <h1>Bienvenido a Rutinas MTI</h1>
             <p>
                 <asp:TextBox ID="txtname" runat="server" input type="text" placeholder="Nombre y Apellido" ></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvName" runat="server" ControlToValidate="txtname" ErrorMessage="Ingrese su nombre" ForeColor="Red"></asp:RequiredFieldValidator>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <asp:RadioButton ID="rbtnadmin" runat="server" Font-Bold="True" Font-Size="Medium" ForeColor="Red" Text="Administrador" />
             </p>
             <p>
                 <asp:TextBox ID="txtcodigo" runat="server" input type ="number" placeholder="Codigo de empleado"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvCodigo" runat="server" ControlToValidate="txtcodigo" ErrorMessage="Complete este campo " ForeColor="Red"></asp:RequiredFieldValidator>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <asp:RadioButton ID="rbtninst" runat="server" AutoPostBack="True" Font-Bold="True" Font-Size="Medium" ForeColor="Red" Text="Instrumentista" />
             </p>
             <p>
                 <asp:Button ID="btnentrar" runat="server" button type="submit" Text="INICIAR SESION" OnClick="btnentrar_Click" />
