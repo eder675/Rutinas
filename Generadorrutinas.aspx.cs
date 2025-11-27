@@ -19,28 +19,36 @@ namespace Rutinas
         {
             if (!IsPostBack)
             {
-                // --- 1. DATOS DE ENTRADA SIMULADOS (Ajustar según tu logueo) ---
-                string codigoEmpleado = "I101";
+                // 1. OBTENER DATOS DE LA SESIÓN
+                // Validamos la sesión. Si no hay código, redirigimos al login.
+                /*if (Session["CodigoEmpleado"] == null || Session["NombreEmpleado"] == null)
+                {
+                    // Opcional: Redirigir al usuario si no ha iniciado sesión
+                    // Response.Redirect("Login.aspx");
+                    return;
+                }*/
 
-                // --- 2. PREPARACIÓN DE DATOS ---
-                string nombreEmpleado = ObtenerNombreEmpleado(codigoEmpleado);
+                string codigoEmpleado = Session["CodigoEmpleado"].ToString();
+                string nombreEmpleado = Session["NombreEmpleado"].ToString(); // ¡Directo de la sesión!
+
+                // 2. PREPARACIÓN DE DATOS LOCALES
                 string turnoActual = DeterminarTurnoActual();
 
-                // --- 3. EJECUCIÓN DEL ALGORITMO COMPLEJO ---
+                // 3. EJECUCIÓN DEL ALGORITMO COMPLEJO
                 string nombreGrupoAsignado;
                 List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado);
 
-                // --- 4. LLENADO DE ENCABEZADO Y REPEATER ---
+                // 4. LLENADO DE ENCABEZADO Y REPEATER
 
-                // Llenado de Labels (Asume que tienes lblInstrumentista, lblFecha, lblTurno, etc.)
+                // Descomenta y ajusta estos IDs según tu ASPX
                 
                 lblname.Text = nombreEmpleado;
                 lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
                 lblturno.Text = turnoActual;
-                //lblGrupoAsignado.Text = nombreGrupoAsignado; 
+                //lblGrupoAsignado.Text = nombreGrupoAsignado;
                 
 
-                // Llenar el Repeater (la tabla de la rutina)
+                // Llenar el Repeater
                 rptRutina.DataSource = rutinaGenerada;
                 rptRutina.DataBind();
             }
@@ -79,6 +87,28 @@ namespace Rutinas
                 }
             }
             return nombre;
+        }
+
+        // --- NUEVO MÉTODO: Obtiene los IDarea del grupo asignado en orden geográfico ---
+        private List<int> ObtenerAreasPorGrupo(int idGrupo)
+        {
+            List<int> areaIds = new List<int>();
+            // Seleccionamos los IDarea que pertenecen al grupo, ordenados por su IDarea (que es el orden geográfico)
+            string sql = "SELECT IDarea FROM Area WHERE IDgrupo = @IDGrupo ORDER BY IDarea ASC;";
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@IDGrupo", idGrupo);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    areaIds.Add(reader.GetInt32(0));
+                }
+            }
+            return areaIds;
         }
 
         // -------------------------------------------------------------------------------------
@@ -161,32 +191,42 @@ namespace Rutinas
         }
         #endregion
         #region fase2
-        // ----------------------------------------------------
-        // FASE 2: SELECCIÓN DE INSTRUMENTOS (5-5-5 CON EXCLUSIÓN DE 24H)
-        // ----------------------------------------------------
+        // -------------------------------------------------------------------------
+        // FASE 2: SELECCIÓN DE INSTRUMENTOS (3x Área: 1 Alta, 1 Media, 1 Baja)
+        // -------------------------------------------------------------------------
         private List<ItemRutina> SeleccionarInstrumentos(int idGrupo)
         {
             List<ItemRutina> rutina = new List<ItemRutina>();
             List<string> tagsExcluidos = new List<string>();
 
-            // Llama a la lógica de selección tres veces para forzar el 5-5-5
+            // 1. Obtener todas las áreas del grupo asignado en orden geográfico
+            List<int> areasDelGrupo = ObtenerAreasPorGrupo(idGrupo);
 
-            var alta = ObtenerInstrumentosPorPrioridad(idGrupo, "Alta", 5, tagsExcluidos);
-            rutina.AddRange(alta);
-            tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList());
+            // 2. Iterar sobre CADA ÁREA
+            foreach (int idArea in areasDelGrupo)
+            {
+                // Seleccionar 1 equipo de ALTA Prioridad para esta área
+                var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", 1, tagsExcluidos);
+                rutina.AddRange(alta);
+                tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList()); // Excluir en esta ejecución
 
-            var media = ObtenerInstrumentosPorPrioridad(idGrupo, "Media", 5, tagsExcluidos);
-            rutina.AddRange(media);
-            tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
+                // Seleccionar 1 equipo de MEDIA Prioridad para esta área
+                var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", 1, tagsExcluidos);
+                rutina.AddRange(media);
+                tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
 
-            var baja = ObtenerInstrumentosPorPrioridad(idGrupo, "Baja", 5, tagsExcluidos);
-            rutina.AddRange(baja);
+                // Seleccionar 1 equipo de BAJA Prioridad para esta área
+                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", 1, tagsExcluidos);
+                rutina.AddRange(baja);
 
-            // NOTA: Si una prioridad no tiene 5 instrumentos disponibles, devolverá menos.
+                // La lista 'rutina' se construye secuencialmente, asegurando el orden geográfico.
+            }
+
             return rutina;
         }
 
-        private List<ItemRutina> ObtenerInstrumentosPorPrioridad(int idGrupo, string prioridadNombre, int cantidad, List<string> tagsExcluidos)
+        // --- MÉTODO MODIFICADO: Selecciona un equipo por Área y Prioridad ---
+        private List<ItemRutina> ObtenerInstrumentosPorAreaPrioridad(int idArea, string prioridadNombre, int cantidad, List<string> tagsExcluidos)
         {
             List<ItemRutina> lista = new List<ItemRutina>();
             DataTable dt = new DataTable();
@@ -195,7 +235,7 @@ namespace Rutinas
                 "AND I.TAG NOT IN ('" + string.Join("','", tagsExcluidos) + "')" :
                 string.Empty;
 
-            // Consulta SQL con la lógica de 24h
+            // Consulta SQL: El filtro se aplica directamente al IDarea
             string sql = $@"
             SELECT TOP {cantidad} 
                 I.TAG, 
@@ -205,23 +245,22 @@ namespace Rutinas
             FROM Instrumentos I
             INNER JOIN Area A ON I.IDarea = A.IDarea
             WHERE 
-                A.IDgrupo = @IDGrupo
+                I.IDarea = @IDArea -- << FILTRO POR EL ÁREA ESPECÍFICA
                 AND I.IDprioridad = (SELECT IDprioridad FROM Prioridad WHERE Nombre = @PrioridadNombre)
                 {tagsYaSeleccionados}
                 AND I.TAG NOT IN (
                     SELECT RI.TAG
                     FROM Rutinas R
                     INNER JOIN Rutina_instrumento RI ON R.Correlativo = RI.Correlativo
-                    -- REGLA CRÍTICA: Excluir si ya se usó en las últimas 24 horas
                     WHERE R.Fecha >= DATEADD(hour, -24, GETDATE()) 
                 )
-            ORDER BY NEWID()"; // Selección aleatoria
+            ORDER BY NEWID()"; // La aleatoriedad se aplica al equipo dentro de esta Area/Prioridad
 
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@IDGrupo", idGrupo);
+                cmd.Parameters.AddWithValue("@IDArea", idArea); // NUEVO PARÁMETRO
                 cmd.Parameters.AddWithValue("@PrioridadNombre", prioridadNombre);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);

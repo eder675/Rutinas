@@ -41,7 +41,7 @@ namespace Rutinas
                 if (esInstrumentista)
                 {
                     // A) Lógica para INSTRUMENTISTA: Solo validar por Codigo_empleado
-                    consulta = "SELECT Nombre, Cargo FROM Empleado WHERE Codigo_empleado = @Codigo";
+                    consulta = "SELECT Nombre, Cargo, Codigo_empleado FROM Empleado WHERE Codigo_empleado = @Codigo";
                 }
                 else // Se asume que es Administrador (o la única otra opción)
                 {
@@ -67,10 +67,13 @@ namespace Rutinas
                                 // 4. ¡Inicio de Sesión Exitoso!
                                 string nombreUsuario = reader["Nombre"].ToString();
                                 string cargoUsuario = reader["Cargo"].ToString();
+                                //string codigoUsuario = reader["Codigo"].ToString();
 
                                 // Crear Variables de Sesión para mantener el estado del usuario
                                 Session["NombreEmpleado"] = nombreUsuario;
                                 Session["Cargo"] = cargoUsuario;
+                                //Session["Codigo,"] = codigoUsuario;
+                                //Session["CodigoEmpleado"] = codigoUsuario;
 
 
 
