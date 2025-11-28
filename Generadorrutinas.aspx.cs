@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Web;
 using System.Web.Configuration;
@@ -14,7 +15,7 @@ namespace Rutinas
 {
     public partial class Generadorrutinas : System.Web.UI.Page
     {
-        private readonly string ConnString =WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -28,32 +29,47 @@ namespace Rutinas
                     return;
                 }*/
 
-                string codigoEmpleado = Session["CodigoEmpleado"].ToString();
-                string nombreEmpleado = Session["NombreEmpleado"].ToString(); // ¡Directo de la sesión!
+                if (Session["CodigoEmpleado"] == null || Session["NombreEmpleado"] == null)
+                {
+                    // Opcional: Redirigir si la sesión no existe
+                    Response.Redirect("Login.aspx");
+                    return;
+                }
 
-                // 2. PREPARACIÓN DE DATOS LOCALES
-                string turnoActual = DeterminarTurnoActual();
+                // 2. Obtener la acción de la URL (QueryString)
+                string action = Request.QueryString["Action"];
+                if (action == "Reimprimir")
+                {
+                    CargarUltimaRutina();
+                }
+                else
+                {
+                    string codigoEmpleado = Session["CodigoEmpleado"].ToString();
+                    string nombreEmpleado = Session["NombreEmpleado"].ToString(); // ¡Directo de la sesión!
 
-                // 3. EJECUCIÓN DEL ALGORITMO COMPLEJO
-                string nombreGrupoAsignado;
-                List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado);
+                    // 2. PREPARACIÓN DE DATOS LOCALES
+                    string turnoActual = DeterminarTurnoActual();
 
-                // 4. LLENADO DE ENCABEZADO Y REPEATER
+                    // 3. EJECUCIÓN DEL ALGORITMO COMPLEJO
+                    string nombreGrupoAsignado;
+                    List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado);
 
-                // Descomenta y ajusta estos IDs según tu ASPX
-                
-                lblname.Text = nombreEmpleado;
-                lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-                lblturno.Text = turnoActual;
-                //lblGrupoAsignado.Text = nombreGrupoAsignado;
-                
+                    // 4. LLENADO DE ENCABEZADO Y REPEATER
 
-                // Llenar el Repeater
-                rptRutina.DataSource = rutinaGenerada;
-                rptRutina.DataBind();
+                    // Descomenta y ajusta estos IDs según tu ASPX
 
-                // Registra un script para el cliente que llama a la función de impresión
-                string script = @"
+                    lblname.Text = nombreEmpleado;
+                    lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                    lblturno.Text = turnoActual;
+                    //lblGrupoAsignado.Text = nombreGrupoAsignado;
+
+
+                    // Llenar el Repeater
+                    rptRutina.DataSource = rutinaGenerada;
+                    rptRutina.DataBind();
+
+                    // Registra un script para el cliente que llama a la función de impresión
+                    string script = @"
             <script type='text/javascript'>
                 window.onload = function() { 
                     // 1. Guardar el título original
@@ -69,7 +85,8 @@ namespace Rutinas
                     document.title = originalTitle;
                 };
             </script>";
-                this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirRutina", script);
+                    this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirRutina", script);
+                }
             }
         }
 
@@ -350,6 +367,100 @@ namespace Rutinas
                 }
             }
         }
+
+        #endregion
+        #region ultimarutina
+        private void CargarUltimaRutina()
+        {
+            // --- 1. OBTENER PARÁMETROS DE SESIÓN Y TURNO ---
+            if (Session["CodigoEmpleado"] == null || Session["NombreEmpleado"] == null)
+            {
+                return;
+            }
+
+            string codigoEmpleado = Session["CodigoEmpleado"].ToString();
+            string nombreEmpleado = Session["NombreEmpleado"].ToString();
+            string turnoActual = DeterminarTurnoActual();
+
+            // Almacenará el Correlativo y la Fecha/Hora de la última rutina encontrada
+            int correlativoUltimaRutina = 0;
+            string fechaRutinaGuardada = "";
+
+            // --- A. BUSCAR EL CORRELATIVO MÁS RECIENTE ---
+            string sqlBuscarCorrelativo = @"
+        SELECT TOP 1 
+            Correlativo, 
+            CONVERT(VARCHAR, Fecha, 120) AS FechaRutina -- Formato ISO 8601 para fácil manejo
+        FROM Rutinas
+        WHERE 
+            Codigo_empleado = @CodigoEmpleado 
+            AND Turno = @TurnoActual
+        ORDER BY Correlativo DESC";
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sqlBuscarCorrelativo, conn);
+                cmd.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
+                cmd.Parameters.AddWithValue("@TurnoActual", turnoActual);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    correlativoUltimaRutina = reader.GetInt32(0); // Columna Correlativo
+                    fechaRutinaGuardada = reader.GetString(1); // Columna FechaRutina
+                }
+                reader.Close();
+            }
+
+            if (correlativoUltimaRutina == 0)
+            {
+                // No se encontró una rutina previa.
+                Response.Write("<script>alert('No se encontró una rutina previa generada por usted para este turno actual.');</script>");
+                return;
+            }
+
+            // --- B. CARGAR TODOS LOS INSTRUMENTOS USANDO EL CORRELATIVO ENCONTRADO ---
+            string sqlCargarDetalle = @"
+        SELECT 
+            A.Nombre AS NombreArea, 
+            I.TAG, 
+            I.Nombre AS NombreInstrumento, 
+            I.Actividad
+        FROM Rutina_instrumento RI
+        INNER JOIN Instrumentos I ON RI.TAG = I.TAG
+        INNER JOIN Area A ON I.IDarea = A.IDarea
+        WHERE 
+            RI.Correlativo = @Correlativo
+        ORDER BY A.IDarea ASC"; // Ordenamos por área para mantener el orden geográfico
+
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sqlCargarDetalle, conn);
+                cmd.Parameters.AddWithValue("@Correlativo", correlativoUltimaRutina); // Usamos el Correlativo único
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+
+            // --- C. LLENADO DE ENCABEZADO Y REPEATER ---
+
+            // 1. Hora Correcta: Usamos la hora guardada en la BD
+            lblname.Text = nombreEmpleado;
+            lblfecha.Text = fechaRutinaGuardada; // ¡CORRECCIÓN APLICADA!
+            lblturno.Text = turnoActual;
+
+            // 2. Repeater Completo: Llenamos con el DataTable completo de detalles
+            rptRutina.DataSource = dt;
+            rptRutina.DataBind();
+            rptRutina.Visible = true;
+
+            // --- 3. IMPRESIÓN AUTOMÁTICA ---
+            string script = @"window.onload = function() { var originalTitle = document.title; document.title = ''; window.print(); document.title = originalTitle; };";
+            ClientScript.RegisterStartupScript(this.GetType(), "ImprimirRutina", script, true);
+        }
+        #endregion
     }
-    #endregion
 }

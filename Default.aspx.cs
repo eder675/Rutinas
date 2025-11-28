@@ -28,11 +28,10 @@ namespace Rutinas
 
         protected void btnImprimirRutina_Click(object sender, EventArgs e)
         {
-            // Lógica para obtener el correlativo de la última rutina generada en el turno
-            // y prepararla para la impresión.
 
-            // Redirección a la página de impresión/reporte
-            Response.Redirect("PaginaReporteImpresion.aspx");
+            //Response.Redirect("Generadorrutinas.aspx"); asi redirecciona a la misma pagina que el generador
+            Response.Redirect("Generadorrutinas.aspx?Action=Reimprimir");//aqui tambien pero el link se modifica para contener
+                                                                         //un parametro que identifique de donde viene la solicitud
         }
 
         protected void registros_Click(object sender, EventArgs e)
