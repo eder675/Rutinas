@@ -51,6 +51,25 @@ namespace Rutinas
                 // Llenar el Repeater
                 rptRutina.DataSource = rutinaGenerada;
                 rptRutina.DataBind();
+
+                // Registra un script para el cliente que llama a la función de impresión
+                string script = @"
+            <script type='text/javascript'>
+                window.onload = function() { 
+                    // 1. Guardar el título original
+                    var originalTitle = document.title;
+                    
+                    // 2. Establecer el título como vacío (el navegador lo usa para el encabezado)
+                    document.title = '';
+                    
+                    // 3. Abrir la ventana de impresión
+                    window.print(); 
+                    
+                    // 4. Restaurar el título original después de que se inicia la impresión
+                    document.title = originalTitle;
+                };
+            </script>";
+                this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirRutina", script);
             }
         }
 
@@ -63,11 +82,11 @@ namespace Rutinas
 
             // Lógica de turnos: Mañana (06:00-14:00), Tarde (14:00-22:00), Noche (22:00-06:00)
             if (ahora >= new TimeSpan(6, 0, 0) && ahora < new TimeSpan(14, 0, 0))
-                return "Mañana (06:00 - 14:00)";
+                return "06:00 A 14:00";
             else if (ahora >= new TimeSpan(14, 0, 0) && ahora < new TimeSpan(22, 0, 0))
-                return "Tarde (14:00 - 22:00)";
+                return "14:00 A 22:00";
             else
-                return "Noche (22:00 - 06:00)";
+                return "22:00 - 06:00";
         }
 
         private string ObtenerNombreEmpleado(string codigo)

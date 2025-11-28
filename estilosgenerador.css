@@ -1,5 +1,5 @@
 ﻿/* ---------------------------------------------------- */
-/* ESTILOS PARA LA VISUALIZACIÓN EN PANTALLA            */
+/* ESTILOS PARA LA VISUALIZACIÓN EN PANTALLA            */
 /* ---------------------------------------------------- */
 
 .formato-carta {
@@ -20,77 +20,89 @@
     font-size: 1.2em;
 }
 
+/* --- Estilo y Borde de la Tabla --- */
 
+.tabla-instrumentos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .tabla-instrumentos th, .tabla-instrumentos td {
+        border: 1px solid #333;
+        padding: 3px;
+        vertical-align: top;
+    }
+
+    .tabla-instrumentos th {
+        background-color: #f2f2f2;
+        text-align: center;
+    }
 
 /* --- Definición de Anchos de Columna (Asegura que sumen 100%) --- */
 
-/* Columna de LECTURA ACTUAL (MUY PEQUEÑA) */
+/* Nota: Se mantendrá table-layout: fixed; y !important en la sección @media print */
+
+.col-area {
+    width: 10%;
+}
+
+.col-equipo {
+    width: 20%;
+}
+
+.col-detalle {
+    width: 29%;
+}
+
 .col-lectura {
     width: 8%;
     text-align: center;
 }
 
-/* Columna de HORA LECTURA (MUY PEQUEÑA) */
 .col-hora {
     width: 8%;
     text-align: center;
 }
 
-/* Columna de OBSERVACIONES (Grande, para escritura) */
 .col-observaciones {
     width: 25%;
 }
 
-/* Columna de ÁREA (Mediana) */
-.col-area {
-    width: 10%;
-}
+/* --- Ajustes para el Llenado Manual (Líneas en pantalla) --- */
 
-/* Columna de EQUIPO (Más ancha, para nombres largos) */
-.col-equipo {
-    width: 20%;
-}
-
-/* Columna de DETALLE A VERIFICAR (La más ancha, para la descripción) */
-.col-detalle {
-    width: 29%;
-}
-
-/* --- Ajustes para el Llenado Manual --- */
-
-/* Hace el espacio para LECTURA ACTUAL y HORA más pequeño */
 .linea-manual-pequena {
+    /* Simulamos el espacio para escribir */
     width: 90%;
     margin: 0 auto;
-    height: 1.2em; /* Altura para una línea */
+    height: 1.2em;
 }
 
-/* Mantiene el espacio para OBSERVACIONES grande */
 .linea-manual-larga {
-    
-    height: 3em; /* Más altura para varias líneas de escritura */
-}
-
-/* Ajustes generales */
-.tabla-instrumentos th, .tabla-instrumentos td {
-    border: 1px solid #333;
-    padding: 3px;
-    vertical-align: top; /* Para que el texto se alinee arriba en celdas grandes */
+    /* Más altura para observaciones */
+    height: 3em;
 }
 
 /* ---------------------------------------------------- */
-/* REGLAS CRÍTICAS PARA LA IMPRESIÓN (@media print)     */
+/* REGLAS CRÍTICAS PARA LA IMPRESIÓN (@media print)     */
 /* ---------------------------------------------------- */
 @media print {
-    /* 1. Ocultar la navegación y otros elementos que no son parte del formulario */
-    header, nav, footer, .acciones-web {
+    /* 1. CONFIGURACIÓN DEL PAPEL (CRÍTICO) */
+    @page {
+        size: letter portrait;
+        margin: 0.5in; /* Márgenes reducidos */
+    }
+
+    /* 2. OCULTAR ELEMENTOS NO IMPRIMIBLES */
+    header, nav, footer, .acciones-web, .boton-imprimir {
         display: none !important;
     }
 
-    /* 2. Asegurar que el contenido ocupe todo el papel */
+    /* 3. REINICIO DE ESTILOS DEL CUERPO Y CONTENEDOR */
     body {
         margin: 0;
         padding: 0;
+        font-size: 10pt; /* Fuente legible en papel */
+        color: #000;
     }
 
     .formato-carta {
@@ -101,7 +113,66 @@
         padding: 0;
     }
 
-    /* 3. Controlar saltos de página (evita que la tabla se corte a la mitad) */
+    /* 4. AJUSTE CRÍTICO DE TABLA */
+    .tabla-instrumentos {
+        width: 100% !important;
+        table-layout: fixed !important; /* Fuerza los anchos */
+    }
+
+    /* Reaplicación de anchos con !important */
+    .col-area {
+        width: 10% !important;
+    }
+
+    .col-equipo {
+        width: 20% !important;
+    }
+
+    .col-detalle {
+        width: 29% !important;
+    }
+
+    .col-lectura {
+        width: 8% !important;
+    }
+
+    .col-hora {
+        width: 8% !important;
+    }
+
+    .col-observaciones {
+        width: 25% !important;
+    }
+
+    /* Forzar bordes negros para impresión */
+    .tabla-instrumentos th, .tabla-instrumentos td {
+        border: 1px solid #000 !important;
+        padding: 3px;
+        vertical-align: top;
+    }
+
+        /* Asegurar que los datos generados se muestren */
+        .tabla-instrumentos td label {
+            display: block !important;
+            word-wrap: break-word;
+        }
+
+    /* 5. IMPRESIÓN DE LÍNEAS MANUALES */
+    /* Hacemos que la línea divisoria se vea como una línea de escritura */
+    .linea-manual-pequena, .linea-manual-larga {
+        height: auto;
+        border: none !important;
+        border-bottom: 1px solid #000;
+        margin-top: 5px;
+    }
+
+    /* 6. CONTROL DE SALTO DE PÁGINA */
+    /* Evita cortes a mitad de fila */
+    .tabla-instrumentos tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+
     .checklist-tabla, .firmas-container {
         page-break-inside: avoid;
     }

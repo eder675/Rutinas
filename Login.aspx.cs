@@ -71,7 +71,7 @@ namespace Rutinas
 
                                 // Crear Variables de Sesión para mantener el estado del usuario
                                 Session["NombreEmpleado"] = nombreUsuario;
-                                Session["Cargo"] = cargoUsuario;
+                                Session["Cargo"] = cargoUsuario; 
                                 //Session["Codigo,"] = codigoUsuario;
                                 Session["CodigoEmpleado"] = codigoUsuario;
 
