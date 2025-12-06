@@ -149,12 +149,17 @@
         border: 1px solid #000 !important;
         padding: 3px;
         vertical-align: top;
+        word-break: break-word; /* Permite que palabras muy largas se rompan */
+        overflow-wrap: break-word; /* Controla el salto de línea en palabras largas */
     }
 
         /* Asegurar que los datos generados se muestren */
         .tabla-instrumentos td label {
             display: block !important;
+            /* PROPIEDADES CORREGIDAS Y APLICADAS AQUÍ */
             word-wrap: break-word;
+            word-break: break-word; /* Fuerza el corte de palabras largas */
+            overflow-wrap: break-word;
         }
 
     /* 5. IMPRESIÓN DE LÍNEAS MANUALES */
