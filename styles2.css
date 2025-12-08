@@ -123,3 +123,32 @@ footer {
     }
 }
 
+/* CLASE .panel.deshabilitado (El estado inactivo) */
+.panel.deshabilitado {
+    background-color: #cccccc !important; /* Fondo gris fijo */
+    color: #555555 !important; /* Texto gris */
+    opacity: 0.7; /* Atenuación general */
+    cursor: not-allowed !important; /* Icono de no permitido */
+    box-shadow: none !important; /* Eliminar box-shadow base */
+    transform: none !important; /* Anular el transform base */
+    transition: none !important; /* CRÍTICO: Anular la transición del panel */
+    pointer-events: none; /* CRÍTICO: Ignora eventos del mouse */
+}
+
+    /* 2. ANULAR EL EFECTO :HOVER DE LEVANTAMIENTO */
+    /* Sobreescribimos específicamente el :hover para el estado deshabilitado */
+    .panel.deshabilitado:hover {
+        box-shadow: none !important; /* Anula el box-shadow:hover */
+        transform: none !important; /* Anula el transform:hover */
+        /* Mantenemos el mismo color y opacidad del estado inactivo */
+        background-color: #cccccc !important;
+        opacity: 0.7 !important;
+    }
+
+    /* 3. ESCALA DE GRISES PARA LA IMAGEN (Selector específico) */
+    .panel.deshabilitado img {
+        /* Aplica el filtro de escala de grises al 100% */
+        filter: grayscale(100%);
+        /* Opcional: Si la imagen tenía una transición, anularla */
+        transition: none;
+    }

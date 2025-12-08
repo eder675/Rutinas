@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -13,10 +16,41 @@ namespace Rutinas
         protected void Page_Load(object sender, EventArgs e)
         {
            if (!IsPostBack) {
+                // 1. VERIFICACIÓN CRÍTICA DE SESIÓN
+                if (Session["CodigoEmpleado"] == null)
+                {
+                    // Si la sesión no existe, redirigir al Login.
+                    Response.Redirect("Login.aspx");
+                    return; // Termina la ejecución de la página
+                }
 
-           }
+                // 2. Si la sesión es válida, procedemos con el control de botones.
+
+                bool rutinaExisteRecientemente = RutinaRecienteExiste();
+
+                if (rutinaExisteRecientemente)
+                {
+                    // Rutina generada: Bloquear Generar
+                    btnGenerarRutina.Enabled = false;
+                    btnGenerarRutina.CssClass = "panel deshabilitado";
+
+                    // Habilitar Reimprimir
+                    btnImprimirRutina.Enabled = true;
+                    btnImprimirRutina.CssClass = "panel";
+                }
+                else
+                {
+                    // Rutina no generada: Habilitar Generar
+                    btnGenerarRutina.Enabled = true;
+                    btnGenerarRutina.CssClass = "panel";
+
+                    // Bloquear Reimprimir
+                    btnImprimirRutina.Enabled = false;
+                    btnImprimirRutina.CssClass = "panel deshabilitado";
+                }
+            }
         }
-
+        string connectionString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void btnGenerarRutina_Click(object sender, EventArgs e)
         {
             // Aquí puedes incluir la lógica para determinar el área (Fabricación/Extracción)
@@ -51,6 +85,41 @@ namespace Rutinas
         protected void about_Click(object sender, EventArgs e)
         {
             Response.Redirect("AcercaDe.aspx");
+        }
+
+        private bool RutinaRecienteExiste()
+        {
+            if (Session["CodigoEmpleado"] == null)
+            {
+                return false;
+            }
+
+            string codigoEmpleado = Session["CodigoEmpleado"].ToString();
+
+            // 1. Definir el límite de tiempo (8 horas atrás)
+            DateTime limiteTiempo = DateTime.Now.AddHours(-8);
+
+            // 2. Consulta SQL: Verificar existencia en las últimas 8 horas
+            // Nota: Reemplaza [TuTablaRutinas] por Rutinas.
+            string sql = @"
+        SELECT COUNT(Correlativo) 
+        FROM Rutinas 
+        WHERE Codigo_empleado = @CodigoEmpleado AND Fecha >= @LimiteTiempo";
+
+            int count = 0;
+
+            using (SqlConnection conn = new SqlConnection(connectionString)) // Asegúrate de tener ConnString definido
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
+                cmd.Parameters.AddWithValue("@LimiteTiempo", limiteTiempo);
+
+                count = (int)cmd.ExecuteScalar();
+            }
+
+            // Si la cuenta es mayor que cero, la rutina ya existe.
+            return count > 0;
         }
     }
 }
