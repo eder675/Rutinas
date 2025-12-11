@@ -146,15 +146,137 @@ namespace Rutinas
             }
             return areaIds;
         }
+        // Importante: La función debe recibir el CodigoEmpleado aunque solo se use para el contexto.
+        private int ObtenerSiguienteIDgrupo(string codigoEmpleado, string turnoActual)
+        {
+            // =========================================================================
+            // PASO 1: CHEQUEO DE PAREJA (Rotación A vs B)
+            // Busca si ya se generó una rutina en la última hora (es decir, si el compañero ya generó).
+            // =========================================================================
 
+            int grupoAsignadoReciente = 0;
+            DateTime limiteTiempo = DateTime.Now.AddHours(-1);
+
+            string sqlCheckRecent = @"
+        SELECT TOP 1 IDgrupo 
+        FROM Rutinas 
+        WHERE Turno = @TurnoActual AND Fecha >= @LimiteTiempo
+        ORDER BY Correlativo DESC";
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sqlCheckRecent, conn);
+                cmd.Parameters.AddWithValue("@TurnoActual", turnoActual);
+                cmd.Parameters.AddWithValue("@LimiteTiempo", limiteTiempo);
+
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    grupoAsignadoReciente = Convert.ToInt32(result);
+                }
+            }
+
+            // CASO B: Es el segundo instrumentista. Rotación de Pareja (A -> B).
+            // Esta lógica no debe tocar el estado atómico.
+            if (grupoAsignadoReciente != 0)
+            {
+                return (grupoAsignadoReciente == 1) ? 2 : 1;
+            }
+
+            // A partir de aquí, solo ejecuta el Instrumentista que genera PRIMERO en el turno (CASO A).
+
+            // =========================================================================
+            // PASO 2: ROTACIÓN DIARIA y CORRECCIÓN PERSONAL (Manejo del Estado Atómico)
+            // =========================================================================
+
+            int grupoAsignadoHoy;     // El grupo que se asignará al instrumentista actual
+            int grupoQueToca;         // El grupo que el estado atómico dice que toca por turno (Memoria Global)
+            int ultimoGrupoPersonal = 0; // El último grupo que tuvo este empleado (Memoria Personal)
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+
+                // 1. OBTENER EL ÚLTIMO GRUPO PERSONAL DE AYER (Memoria de la Persona)
+                // Filtro: Busca el último grupo que ESTE empleado tuvo ANTES de hoy.
+                string sqlUltimoPersonal = @"
+            SELECT TOP 1 IDgrupo 
+            FROM Rutinas 
+            WHERE 
+                Codigo_empleado = @CodigoEmpleado 
+                AND Turno = @TurnoActual -- Añadimos el turno para ser más específico
+                AND CONVERT(DATE, Fecha) < CONVERT(DATE, GETDATE()) 
+            ORDER BY Fecha DESC, Correlativo DESC";
+
+                SqlCommand cmdPersonal = new SqlCommand(sqlUltimoPersonal, conn);
+                cmdPersonal.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
+                cmdPersonal.Parameters.AddWithValue("@TurnoActual", turnoActual);
+                object resultPersonal = cmdPersonal.ExecuteScalar();
+
+                if (resultPersonal != null && resultPersonal != DBNull.Value)
+                {
+                    ultimoGrupoPersonal = Convert.ToInt32(resultPersonal);
+                }
+
+                // 2. LEER EL ESTADO ATÓMICO (Memoria del Turno)
+                string sqlReadState = "SELECT Grupo_Siguiente FROM Configuracion_Rotacion WHERE Turno = @TurnoActual";
+                SqlCommand cmdReadState = new SqlCommand(sqlReadState, conn);
+                cmdReadState.Parameters.AddWithValue("@TurnoActual", turnoActual);
+
+                object resultState = cmdReadState.ExecuteScalar();
+                if (resultState != null && resultState != DBNull.Value)
+                {
+                    grupoQueToca = Convert.ToInt32(resultState);
+                }
+                else
+                {
+                    // Inicialización si es la primera vez que se usa el turno
+                    grupoQueToca = 1;
+                }
+
+                grupoAsignadoHoy = grupoQueToca; // Asignación inicial basada en el estado
+
+                // 3. APLICAR LA CORRECCIÓN PERSONAL (Evitar repetición G1->G1 o G2->G2)
+                if (ultimoGrupoPersonal != 0 && ultimoGrupoPersonal == grupoAsignadoHoy)
+                {
+                    // ¡El grupo que toca hoy es el mismo que tuve ayer! Se fuerza la rotación.
+                    grupoAsignadoHoy = (grupoAsignadoHoy == 1) ? 2 : 1;
+                }
+
+                // 4. ACTUALIZAR EL ESTADO para el siguiente ciclo de ROTACIÓN DIARIA
+                // El nuevo estado debe ser el opuesto al grupo FINAL que se asignó hoy.
+                int nuevoGrupoSiguiente = (grupoAsignadoHoy == 1) ? 2 : 1;
+
+                string sqlUpdateState = $@"
+            UPDATE Configuracion_Rotacion 
+            SET Grupo_Siguiente = @NuevoGrupo 
+            WHERE Turno = @TurnoActual;
+            
+            -- Si no existe el registro, lo insertamos (UPSERT)
+            IF @@ROWCOUNT = 0
+            BEGIN
+                INSERT INTO Configuracion_Rotacion (Turno, Grupo_Siguiente) 
+                VALUES (@TurnoActual, @NuevoGrupo);
+            END";
+
+                SqlCommand cmdUpdate = new SqlCommand(sqlUpdateState, conn);
+                cmdUpdate.Parameters.AddWithValue("@NuevoGrupo", nuevoGrupoSiguiente);
+                cmdUpdate.Parameters.AddWithValue("@TurnoActual", turnoActual);
+                cmdUpdate.ExecuteNonQuery();
+            }
+
+            return grupoAsignadoHoy;
+        }
         // -------------------------------------------------------------------------------------
         // MÉTODO COORDINADOR PRINCIPAL
         // -------------------------------------------------------------------------------------
-        private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
+        /*private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
         {
             // 1. ROTACIÓN DE GRUPOS
             GrupoRotacionAsignado grupo = ObtenerGrupoRotacion();
             nombreGrupoAsignado = grupo.NombreGrupo;
+            int idGrupoAsignado = ObtenerSiguienteIDgrupo(turnoActual);
 
             // 2. SELECCIÓN DE INSTRUMENTOS (5 Alta, 5 Media, 5 Baja)
             List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(grupo.IdGrupo);
@@ -163,13 +285,35 @@ namespace Rutinas
             GuardarNuevaRutina(codigoEmpleado, turnoActual, grupo.IdGrupo, instrumentosSeleccionados);
 
             return instrumentosSeleccionados;
+        }*/
+
+        private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
+        {
+            // 1. ROTACIÓN DE GRUPOS CORREGIDA
+
+            // Obtiene el ID del grupo que debe rotar (1 o 2), basado en la última rutina del turno.
+            int idGrupoAsignado = ObtenerSiguienteIDgrupo(codigoEmpleado, turnoActual);
+
+            // Asigna un nombre (solo para el encabezado del reporte si es necesario)
+            nombreGrupoAsignado = (idGrupoAsignado == 1) ? "Grupo 1" : "Grupo 2";
+
+            // 2. SELECCIÓN DE INSTRUMENTOS (5 Alta, 5 Media, 5 Baja)
+            // Usamos el grupo que OBTUVIMOS DE LA ROTACIÓN (idGrupoAsignado)
+            List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado);
+
+            // 3. GUARDADO DE LA RUTINA
+            // Usamos el grupo que OBTUVIMOS DE LA ROTACIÓN (idGrupoAsignado)
+            GuardarNuevaRutina(codigoEmpleado, turnoActual, idGrupoAsignado, instrumentosSeleccionados);
+
+            return instrumentosSeleccionados;
         }
+
         #endregion
         #region fase1
         // ----------------------------------------------------
         // FASE 1: ROTACIÓN DE GRUPOS (Lógica de Ciclo)
         // ----------------------------------------------------
-        private GrupoRotacionAsignado ObtenerGrupoRotacion()
+       /* private GrupoRotacionAsignado ObtenerGrupoRotacion()
         {
             int ultimoGrupoID = 0;
             DataTable dtGrupo = new DataTable();
@@ -224,7 +368,7 @@ namespace Rutinas
             }
 
             throw new Exception("Error: La tabla Rotaciongrupos está vacía.");
-        }
+        }*/
         #endregion
         #region fase2
         // -------------------------------------------------------------------------
