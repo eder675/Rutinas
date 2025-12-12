@@ -49,6 +49,8 @@ namespace Rutinas
                     btnImprimirRutina.CssClass = "panel deshabilitado";
                 }
             }
+            string nombreEmpleado = Session["NombreEmpleado"].ToString();
+            lblnombremenu.Text = "Bienvenido, " + nombreEmpleado;
         }
         string connectionString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void btnGenerarRutina_Click(object sender, EventArgs e)

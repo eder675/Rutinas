@@ -39,7 +39,9 @@
     </header>
 
  <section id="panel">
-    <h2>Seleccione Una Opcion</h2>
+    <h2>
+        <asp:Label ID="lblnombremenu" runat="server" Text="Username"></asp:Label>
+     </h2>
     <div class="contenedor-panel">
 
         <asp:LinkButton ID="btnGenerarRutina" runat="server" OnClick="btnGenerarRutina_Click" CssClass="panel">
