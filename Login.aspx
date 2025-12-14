@@ -12,6 +12,7 @@
         background-image: none;
         background-repeat: repeat;
         background-attachment: scroll;
+        margin-top: 0px;
     }
 </style>
 <div id="divNotificacion" 
@@ -53,6 +54,8 @@
             </p>
             <p>
                 <asp:Button ID="btnentrar" runat="server" button type="submit" Text="INICIAR SESION" OnClick="btnentrar_Click" />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <asp:Button ID="btnAbout" runat="server" BorderColor="#CCFF66" BorderStyle="Outset" OnClick="Button1_Click" Text="Acerca de." CausesValidation="False" />
             </p
         </div>
 

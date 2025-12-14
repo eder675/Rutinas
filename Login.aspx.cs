@@ -177,5 +177,10 @@ namespace Rutinas
             rfvName.Enabled = true;
             txtname.Text = "";
         }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("AcercaDe.aspx");
+        }
     }
 }
