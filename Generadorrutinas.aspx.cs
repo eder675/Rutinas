@@ -68,31 +68,65 @@ namespace Rutinas
                     rptRutina.DataSource = rutinaGenerada;
                     rptRutina.DataBind();
 
-                    // Registra un script para el cliente que llama a la función de impresión
-                    string script = @"
-            <script type='text/javascript'>
-                window.onload = function() { 
-                    // 1. Guardar el título original
-                    var originalTitle = document.title;
-                    
-                    // 2. Establecer el título como vacío (el navegador lo usa para el encabezado)
-                    document.title = '';
-                    
-                    // 3. Abrir la ventana de impresión
-                    window.print(); 
-                    
-                    // 4. Restaurar el título original después de que se inicia la impresión
-                    document.title = originalTitle;
-                };
-            </script>";
-                    this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirRutina", script);
+                    // --- Dentro del Page_Load de la página de Impresión/PDF ---
+
+                    // 1. Definimos la URL de nuestra página de servicio para cerrar la sesión
+                    // Usamos ResolveClientUrl para garantizar la ruta correcta
+                    string logoutUrl = ResolveClientUrl("~/closesession.aspx");
+
+                    // 2. Definimos el script que se ejecutará en el cliente (navegador)
+                    string script = $@"
+<script type='text/javascript'>
+    
+    // Función que se llama cuando el usuario cierra el diálogo de impresión
+    function cerrarSesionAlTerminarImpresion() {{
+        // Redirigimos la ventana actual a la página de servicio.
+        // Esto asegura que la autenticación (FormsAuth) y las variables de Session sean destruidas.
+        window.location.href = '{logoutUrl}'; 
+    }}
+
+    // Preparamos el listener para el evento 'onafterprint' (post-impresión)
+    if (window.matchMedia) {{
+        // Listener moderno: Mejor detección del cierre del diálogo
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {{
+            // mql.matches es true durante la impresión, false cuando se cierra el diálogo
+            if (!mql.matches) {{
+                cerrarSesionAlTerminarImpresion();
+            }}
+        }});
+    }} else {{
+        // Fallback para navegadores antiguos
+        window.onafterprint = cerrarSesionAlTerminarImpresion;
+    }}
+    
+    window.onload = function() {{
+        // Lógica existente para la impresión
+        var originalTitle = document.title;
+        document.title = '';
+        
+        // Abre el diálogo de impresión
+        window.print();
+        
+        // Restaura el título (lo hace después de que el navegador inicia la impresión)
+        document.title = originalTitle;
+    }};
+</script>";
+
+                    // 3. Registramos el script en el cliente
+                    this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirCerrarSesion", script);
+
+                    // -----------------------------------------------------------
+                    // IMPORTANTE: Si estás usando Response.End() o Server.Transfer(), 
+                    // asegúrate de que el código de impresión esté en un bloque que 
+                    // permita que el ResponseBuffer se complete antes de la redirección.
+                    // -----------------------------------------------------------
                 }
             }
         }
 
-        // El resto de los métodos deben ir aquí...
-
         #region metodos auxiliares
+        #region turno actual
         private string DeterminarTurnoActual()
         {
             TimeSpan ahora = DateTime.Now.TimeOfDay;
@@ -124,8 +158,8 @@ namespace Rutinas
             }
             return nombre;
         }
-
-        // --- NUEVO MÉTODO: Obtiene los IDarea del grupo asignado en orden geográfico ---
+        #endregion
+        #region areas por grupo
         private List<int> ObtenerAreasPorGrupo(int idGrupo)
         {
             List<int> areaIds = new List<int>();
@@ -146,7 +180,9 @@ namespace Rutinas
             }
             return areaIds;
         }
+        #endregion
         // Importante: La función debe recibir el CodigoEmpleado aunque solo se use para el contexto.
+        #region obtencion de ID grupo
         private int ObtenerSiguienteIDgrupo(string codigoEmpleado, string turnoActual)
         {
             // =========================================================================
@@ -268,24 +304,10 @@ namespace Rutinas
 
             return grupoAsignadoHoy;
         }
+        #endregion
         // -------------------------------------------------------------------------------------
         // MÉTODO COORDINADOR PRINCIPAL
         // -------------------------------------------------------------------------------------
-        /*private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
-        {
-            // 1. ROTACIÓN DE GRUPOS
-            GrupoRotacionAsignado grupo = ObtenerGrupoRotacion();
-            nombreGrupoAsignado = grupo.NombreGrupo;
-            int idGrupoAsignado = ObtenerSiguienteIDgrupo(turnoActual);
-
-            // 2. SELECCIÓN DE INSTRUMENTOS (5 Alta, 5 Media, 5 Baja)
-            List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(grupo.IdGrupo);
-
-            // 3. GUARDADO DE LA RUTINA
-            GuardarNuevaRutina(codigoEmpleado, turnoActual, grupo.IdGrupo, instrumentosSeleccionados);
-
-            return instrumentosSeleccionados;
-        }*/
 
         private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
         {
@@ -602,8 +624,52 @@ namespace Rutinas
             rptRutina.Visible = true;
 
             // --- 3. IMPRESIÓN AUTOMÁTICA ---
-            string script = @"window.onload = function() { var originalTitle = document.title; document.title = ''; window.print(); document.title = originalTitle; };";
-            ClientScript.RegisterStartupScript(this.GetType(), "ImprimirRutina", script, true);
+            //string script = @"window.onload = function() { var originalTitle = document.title; document.title = ''; window.print(); document.title = originalTitle; };";
+            string logoutUrl = ResolveClientUrl("~/closesession.aspx");
+
+            // 2. Definimos el script que se ejecutará en el cliente (navegador)
+            string scriptReimpresion = $@"
+<script type='text/javascript'>
+    
+    // Función que se llama cuando el usuario cierra el diálogo de impresión
+    function cerrarSesionAlTerminarImpresion() {{
+        // Redirigimos la ventana actual a la página de servicio para destruir la sesión.
+        window.location.href = '{logoutUrl}'; 
+    }}
+
+    // Preparamos el listener para el evento 'onafterprint' (post-impresión)
+    if (window.matchMedia) {{
+        // Listener moderno: Mejor detección del cierre del diálogo
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {{
+            // mql.matches es true durante la impresión, false cuando se cierra el diálogo
+            if (!mql.matches) {{
+                cerrarSesionAlTerminarImpresion();
+            }}
+        }});
+    }} else {{
+        // Fallback para navegadores antiguos
+        window.onafterprint = cerrarSesionAlTerminarImpresion;
+    }}
+    
+    // Ejecutamos la impresión justo después de registrar los manejadores
+    window.onload = function() {{
+        // Lógica para el título
+        var originalTitle = document.title;
+        document.title = '';
+        
+        // Abre el diálogo de impresión
+        window.print();
+        
+        // Restaura el título
+        document.title = originalTitle;
+    }};
+</script>";
+
+            // 3. Registramos el script en el cliente
+            // Usamos RegisterClientScriptBlock para que cargue en el HEAD y maneje el evento onload.
+            ClientScript.RegisterClientScriptBlock(this.GetType(), "ReimprimirRutina", scriptReimpresion, false);
+            // Nota: Se usa 'false' para indicar que la etiqueta <script> ya está incluida en la cadena.
         }
         #endregion
     }

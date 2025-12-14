@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AcercaDe.aspx" />
+    <Content Include="Closesession.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="estilosgenerador.css" />
     <Content Include="Generadorrutinas.aspx" />
@@ -86,6 +87,13 @@
     </Compile>
     <Compile Include="AcercaDe.aspx.designer.cs">
       <DependentUpon>AcercaDe.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Closesession.aspx.cs">
+      <DependentUpon>Closesession.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Closesession.aspx.designer.cs">
+      <DependentUpon>Closesession.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>

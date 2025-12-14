@@ -78,8 +78,9 @@ namespace Rutinas
 
         protected void logout_Click(object sender, EventArgs e)
         {
-            FormsAuthentication.SignOut();
-
+            FormsAuthentication.SignOut(); //eliminar la cookie de autenticacion
+            Session.Clear();
+            Session.Abandon(); //asi destruimos la sesion
             // 3. Redirigir al usuario a la página de inicio de sesión
             Response.Redirect("Login.aspx", true);
         }
