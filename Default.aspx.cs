@@ -85,10 +85,7 @@ namespace Rutinas
             Response.Redirect("Login.aspx", true);
         }
 
-        protected void about_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("AcercaDe.aspx");
-        }
+        
 
         private bool RutinaRecienteExiste()
         {

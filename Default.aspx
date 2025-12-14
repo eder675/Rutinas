@@ -28,11 +28,6 @@
                 OnClick="logout_Click"
                 CssClass="nav-button-link" /> </li>
                 <li>
-                    <asp:Button ID="about" 
-                                runat="server" 
-                                OnClick="about_Click" 
-                                Text="Acerca de."
-                                CssClass="nav-button-link"/>
                 </li>
             </ul>
         </nav>
