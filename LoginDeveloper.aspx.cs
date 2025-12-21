@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -11,7 +12,8 @@ namespace Rutinas
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            string Adminname = Session["NombreEmpleado"].ToString();
+            lblnameadmin.Text = "Administrador en sesion: "+ Adminname;
         }
 
         protected void lnk_Click(object sender, EventArgs e)
@@ -36,7 +38,7 @@ namespace Rutinas
         protected void gvempleados_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             // Solo actuamos si el comando es el que definimos en el botón del Footer
-            if (e.CommandName == "insertnew")
+            if (e.CommandName == "insertnewempleado")
             {
                 // 1. Localizar los controles dentro del FooterRow del GridView
                 // Usamos los IDs que les pusiste a tus controles en el modo "Editar Plantillas"
@@ -76,6 +78,54 @@ namespace Rutinas
                     Response.Write("<script>alert('Error al insertar: " + ex.Message.Replace("'", "") + "');</script>");
                 }
             }
+        }
+
+        protected void gvarea_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            // Solo actuamos si el comando es el que definimos en el botón del Footer
+            if (e.CommandName == "insertnewarea")
+            {
+                // 1. Localizar los controles dentro del FooterRow del GridView
+                // Usamos los IDs que les pusiste a tus controles en el modo "Editar Plantillas"
+                TextBox txtName = (TextBox)gvarea.FooterRow.FindControl("txtnewarea");
+                DropDownList ddlGroup = (DropDownList)gvarea.FooterRow.FindControl("ddlnewgrupo");
+
+                // 2. Validar que los campos no estén vacíos (opcional pero recomendado)
+                if (string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(ddlGroup.Text))
+                {
+                    Response.Write("<script>alert('Por favor, complete los campos requeridos.");
+                    return;
+                }
+
+                // 3. Asignar los valores a los parámetros del SqlDataSource
+                // Estos nombres ["NombreParametro"] deben ser IGUALES a los que pusiste 
+                // en el InsertQuery del SqlDataSource2 (@Codigo_empleado, @Nombre, @Cargo)
+                SqlDataSource1.InsertParameters["Nombre"].DefaultValue = txtName.Text;
+                SqlDataSource1.InsertParameters["IDgrupo"].DefaultValue = ddlGroup.SelectedValue;
+
+                try
+                {
+                    // 4. Ejecutar la inserción en la base de datos
+                    SqlDataSource1.Insert();
+
+                    // 5. Limpiar los campos para una nueva entrada
+                    txtName.Text = "";
+                   
+                    // El dropdown regresa a su primer valor automáticamente al recargar
+
+                    // El GridView se refresca solo gracias al SqlDataSource
+                }
+                catch (Exception ex)
+                {
+                    // Manejo de errores (por ejemplo, si el código de empleado ya existe)
+                    Response.Write("<script>alert('Error al insertar: " + ex.Message.Replace("'", "") + "');</script>");
+                }
+            }
+        }
+
+        protected void gvinstrumentos_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+
         }
     }
 }

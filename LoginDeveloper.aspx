@@ -14,6 +14,9 @@
             </div>
     <header>
     <h1>Pagina de administracion.</h1>
+        <h2>
+            <asp:Label ID="lblnameadmin" runat="server" Text="Label"></asp:Label>
+        </h2>
 </header>
 <nav>
     <ul class="menu">
@@ -105,16 +108,13 @@
                                 <asp:Label ID="Label3" runat="server" Text='<%# Bind("Cargo") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField></asp:TemplateField>
-                        <asp:TemplateField></asp:TemplateField>
-                        <asp:TemplateField></asp:TemplateField>
                         <asp:TemplateField ShowHeader="False">
                             <EditItemTemplate>
                                 <asp:Button ID="Button1" runat="server" CausesValidation="True" CommandName="Update" Text="Actualizar" />
                                 &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:Button ID="btninsertnew" runat="server" CommandName="insertnew" Text="INSERTAR" />
+                                <asp:Button ID="btninsertnew" runat="server" CommandName="insertnewempleado" Text="INSERTAR" />
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Edit" Text="Editar" />
@@ -140,14 +140,14 @@
                 </asp:SqlDataSource>
             </asp:View>
             <asp:View ID="vareas" runat="server">
-                <asp:GridView ID="gvarea" runat="server" AutoGenerateColumns="False" DataKeyNames="IDarea" DataSourceID="SqlDataSource1" ShowFooter="True"> 
+                <asp:GridView ID="gvarea" runat="server" AutoGenerateColumns="False" DataKeyNames="IDarea" DataSourceID="SqlDataSource1" ShowFooter="True" OnRowCommand="gvarea_RowCommand"> 
                     <Columns>
                         <asp:TemplateField HeaderText="IDarea" InsertVisible="False" SortExpression="IDarea">
                             <EditItemTemplate>
                                 <asp:Label ID="Label1" runat="server" Text='<%# Eval("IDarea") %>'></asp:Label>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:TextBox ID="txtnewarea" runat="server"></asp:TextBox>
+                                <asp:Label ID="Label6" runat="server" Text="Campo Automatico"></asp:Label>
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label1" runat="server" Text='<%# Bind("IDarea") %>'></asp:Label>
@@ -158,7 +158,7 @@
                                 <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Nombre") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:TextBox ID="txtnewnamearea" runat="server"></asp:TextBox>
+                                <asp:TextBox ID="txtnewarea" runat="server"></asp:TextBox>
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label2" runat="server" Text='<%# Bind("Nombre") %>'></asp:Label>
@@ -169,23 +169,36 @@
                                 <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("IDgrupo") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="SqlDataSourceGrupo" DataTextField="Nombregrupo" DataValueField="IDgrupo">
+                                <asp:DropDownList ID="ddlnewgrupo" runat="server" DataSourceID="SqlDataSourceGrupo" DataTextField="Nombregrupo" DataValueField="IDgrupo">
                                 </asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSourceGrupo" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDgrupo], [Nombregrupo] FROM [Rotaciongrupos]"></asp:SqlDataSource>
                             </FooterTemplate>
                             <ItemTemplate>
-                                <asp:Label ID="Label3" runat="server" Text='<%# Bind("IDgrupo") %>'></asp:Label>
+                                <asp:Label ID="Label3" runat="server" Text='<%# Bind("Nombregrupo") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField ShowHeader="False"></asp:TemplateField>
-                        <asp:TemplateField>
+                        <asp:TemplateField ShowHeader="False">
+                            <EditItemTemplate>
+                                <asp:Button ID="Button1" runat="server" CausesValidation="True" CommandName="Update" Text="Actualizar" />
+                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
+                            </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:Button ID="Button3" runat="server" Text="Button" />
+                                <asp:Button ID="btnnewinsert" runat="server" Text="INSERTAR" CommandName="insertnewarea" />
                             </FooterTemplate>
+                            <ItemTemplate>
+                                <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Edit" Text="Editar" />
+                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Delete" Text="Eliminar" />
+                            </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>
-                <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Area] WHERE [IDarea] = @IDarea" InsertCommand="INSERT INTO [Area] ([Nombre], [IDgrupo]) VALUES (@Nombre, @IDgrupo)" SelectCommand="SELECT * FROM [Area]" UpdateCommand="UPDATE [Area] SET [Nombre] = @Nombre, [IDgrupo] = @IDgrupo WHERE [IDarea] = @IDarea">
+                <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Area] WHERE [IDarea] = @IDarea" InsertCommand="INSERT INTO [Area] ([Nombre], [IDgrupo]) VALUES (@Nombre, @IDgrupo)" SelectCommand="SELECT 
+    A.IDarea, 
+    A.Nombre, 
+    G.Nombregrupo, 
+    A.IDgrupo
+FROM Area A
+INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Area] SET [Nombre] = @Nombre, [IDgrupo] = @IDgrupo WHERE [IDarea] = @IDarea">
                     <DeleteParameters>
                         <asp:Parameter Name="IDarea" Type="Int32" />
                     </DeleteParameters>
@@ -201,7 +214,7 @@
                 </asp:SqlDataSource>
             </asp:View>
             <asp:View ID="vinstrumentos" runat="server">
-                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True">
+                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand">
                     <Columns>
                         <asp:TemplateField HeaderText="TAG" SortExpression="TAG">
                             <EditItemTemplate>
@@ -218,6 +231,9 @@
                             <EditItemTemplate>
                                 <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Nombre") %>'></asp:TextBox>
                             </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:TextBox ID="txtnameinst" runat="server"></asp:TextBox>
+                            </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label2" runat="server" Text='<%# Bind("Nombre") %>'></asp:Label>
                             </ItemTemplate>
@@ -226,6 +242,9 @@
                             <EditItemTemplate>
                                 <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("Actividad") %>'></asp:TextBox>
                             </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:TextBox ID="txtactividad" runat="server"></asp:TextBox>
+                            </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label3" runat="server" Text='<%# Bind("Actividad") %>'></asp:Label>
                             </ItemTemplate>
@@ -234,27 +253,44 @@
                             <EditItemTemplate>
                                 <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("IDarea") %>'></asp:TextBox>
                             </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSourceIDAreas" DataTextField="Nombre" DataValueField="IDarea">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceIDAreas" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDarea], [Nombre] FROM [Area]"></asp:SqlDataSource>
+                            </FooterTemplate>
                             <ItemTemplate>
-                                <asp:Label ID="Label4" runat="server" Text='<%# Bind("IDarea") %>'></asp:Label>
+                                <asp:Label ID="Label4" runat="server" Text='<%# Bind("Expr1") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="IDprioridad" SortExpression="IDprioridad">
                             <EditItemTemplate>
                                 <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("IDprioridad") %>'></asp:TextBox>
                             </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="SqlDataSourcePrioridad" DataTextField="Nombre" DataValueField="IDprioridad">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourcePrioridad" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDprioridad], [Nombre] FROM [Prioridad]"></asp:SqlDataSource>
+                            </FooterTemplate>
                             <ItemTemplate>
-                                <asp:Label ID="Label5" runat="server" Text='<%# Bind("IDprioridad") %>'></asp:Label>
+                                <asp:Label ID="Label5" runat="server" Text='<%# Bind("Expr2") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField></asp:TemplateField>
                         <asp:TemplateField ShowHeader="False">
+                            <EditItemTemplate>
+                                <asp:Button ID="Button1" runat="server" CausesValidation="True" CommandName="Update" Text="Actualizar" />
+                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
+                            </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:Button ID="btninsertinstrumento" runat="server" Text="INSERTAR" />
+                                <asp:Button ID="btninsertinstrumento" runat="server" Text="INSERTAR" CommandName="insertnewinstrumentos" />
                             </FooterTemplate>
+                            <ItemTemplate>
+                                <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Edit" Text="Editar" />
+                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Delete" Text="Eliminar" />
+                            </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>
-                <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Instrumentos] WHERE [TAG] = @TAG" InsertCommand="INSERT INTO [Instrumentos] ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad]) VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad)" SelectCommand="SELECT * FROM [Instrumentos]" UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad WHERE [TAG] = @TAG">
+                <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Instrumentos] WHERE [TAG] = @TAG" InsertCommand="INSERT INTO [Instrumentos] ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad]) VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad)" SelectCommand="SELECT Instrumentos.TAG, Instrumentos.Nombre, Instrumentos.Actividad, Instrumentos.IDarea, Instrumentos.IDprioridad, Area.Nombre AS Expr1, Prioridad.Nombre AS Expr2 FROM Instrumentos INNER JOIN Prioridad ON Instrumentos.IDprioridad = Prioridad.IDprioridad INNER JOIN Area ON Instrumentos.IDarea = Area.IDarea" UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad WHERE [TAG] = @TAG">
                     <DeleteParameters>
                         <asp:Parameter Name="TAG" Type="String" />
                     </DeleteParameters>
