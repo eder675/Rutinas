@@ -13,6 +13,7 @@ namespace Rutinas
         {
             UnobtrusiveValidationMode = UnobtrusiveValidationMode.None;
             rfvName.Enabled = false;
+            txtcodigo.Focus();  
         }
 
         protected void btnentrar_Click(object sender, EventArgs e)

@@ -32,6 +32,7 @@ namespace Rutinas
             if (viewIndex == 1) gvempleados.DataBind();
             if (viewIndex == 2) gvarea.DataBind();
             if (viewIndex == 3) gvinstrumentos.DataBind();
+
             // ... y así sucesivamente para las otras vistas
         }
 
@@ -49,7 +50,7 @@ namespace Rutinas
                 // 2. Validar que los campos no estén vacíos (opcional pero recomendado)
                 if (string.IsNullOrEmpty(txtCod.Text) || string.IsNullOrEmpty(txtNom.Text))
                 {
-                    Response.Write("<script>alert('Por favor, complete el código y el nombre.');</script>");
+                    
                     return;
                 }
 
@@ -93,7 +94,7 @@ namespace Rutinas
                 // 2. Validar que los campos no estén vacíos (opcional pero recomendado)
                 if (string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(ddlGroup.Text))
                 {
-                    Response.Write("<script>alert('Por favor, complete los campos requeridos.");
+                    Response.Write("<script>alert('Por favor, los campos requeridos.');</script>");
                     return;
                 }
 
@@ -135,7 +136,7 @@ namespace Rutinas
 
                 if (string.IsNullOrEmpty(txtTAG.Text) || string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtActividad.Text) || string.IsNullOrEmpty(ddlGrupo.Text) || string.IsNullOrEmpty(ddlPrioridad.Text))
                 {
-                    Response.Write("<script>alert('Por favor, complete los campos requeridos.");
+                    Response.Write("<script>alert('Por favor, los campos requeridos.');</script>");
                     return;
                 }
                 SqlDataSource3.InsertParameters["TAG"].DefaultValue = txtTAG.Text;
@@ -162,6 +163,11 @@ namespace Rutinas
                 }
 
             }
+        }
+
+        protected void lnkLogout_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("Closesession.aspx");
         }
     }
 }

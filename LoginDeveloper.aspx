@@ -52,6 +52,13 @@
             OnClick="lnk_Click" 
             CommandArgument="3" />
     </li>
+        <li>
+            <asp:LinkButton 
+            ID="lnkLogout" 
+            runat="server" 
+            Text="Cerrar sesion." 
+            OnClick="lnkLogout_Click" />
+        </li>
     </ul>
 </nav>
     <p>
