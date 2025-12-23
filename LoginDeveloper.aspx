@@ -254,7 +254,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("IDarea") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSourceIDAreas" DataTextField="Nombre" DataValueField="IDarea">
+                                <asp:DropDownList ID="ddlarea" runat="server" DataSourceID="SqlDataSourceIDAreas" DataTextField="Nombre" DataValueField="IDarea">
                                 </asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSourceIDAreas" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDarea], [Nombre] FROM [Area]"></asp:SqlDataSource>
                             </FooterTemplate>
@@ -267,7 +267,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("IDprioridad") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="SqlDataSourcePrioridad" DataTextField="Nombre" DataValueField="IDprioridad">
+                                <asp:DropDownList ID="ddlprioridad" runat="server" DataSourceID="SqlDataSourcePrioridad" DataTextField="Nombre" DataValueField="IDprioridad">
                                 </asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSourcePrioridad" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDprioridad], [Nombre] FROM [Prioridad]"></asp:SqlDataSource>
                             </FooterTemplate>

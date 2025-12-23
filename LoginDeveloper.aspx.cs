@@ -125,7 +125,43 @@ namespace Rutinas
 
         protected void gvinstrumentos_RowCommand(object sender, GridViewCommandEventArgs e)
         {
+            if (e.CommandName == "insertnewinstrumentos")
+            {
+                TextBox txtTAG = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnewtag");
+                TextBox txtName = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnameinst");
+                TextBox txtActividad = (TextBox)gvinstrumentos.FooterRow.FindControl("txtactividad");
+                DropDownList ddlGrupo = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlarea");
+                DropDownList ddlPrioridad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlprioridad");
 
+                if (string.IsNullOrEmpty(txtTAG.Text) || string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtActividad.Text) || string.IsNullOrEmpty(ddlGrupo.Text) || string.IsNullOrEmpty(ddlPrioridad.Text))
+                {
+                    Response.Write("<script>alert('Por favor, complete los campos requeridos.");
+                    return;
+                }
+                SqlDataSource3.InsertParameters["TAG"].DefaultValue = txtTAG.Text;
+                SqlDataSource3.InsertParameters["Nombre"].DefaultValue = txtName.Text;
+                SqlDataSource3.InsertParameters["Actividad"].DefaultValue = txtActividad.Text;
+                SqlDataSource3.InsertParameters["IDarea"].DefaultValue = ddlGrupo.SelectedValue;
+                SqlDataSource3.InsertParameters["IDprioridad"].DefaultValue = ddlPrioridad.SelectedValue;
+                try
+                {
+                    // 4. Ejecutar la inserción en la base de datos
+                    SqlDataSource3.Insert();
+
+                    // 5. Limpiar los campos para una nueva entrada
+                    txtName.Text = "";
+
+                    // El dropdown regresa a su primer valor automáticamente al recargar
+
+                    // El GridView se refresca solo gracias al SqlDataSource
+                }
+                catch (Exception ex)
+                {
+                    // Manejo de errores (por ejemplo, si el código de empleado ya existe)
+                    Response.Write("<script>alert('Error al insertar: " + ex.Message.Replace("'", "") + "');</script>");
+                }
+
+            }
         }
     }
 }
