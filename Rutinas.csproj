@@ -75,6 +75,8 @@
     <Content Include="Registros.aspx" />
     <Content Include="styles.css" />
     <Content Include="styles2.css" />
+    <Content Include="styles3.css" />
+    <Content Include="styleslogin.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
