@@ -71,7 +71,10 @@
     <Content Include="Generadorrutinas.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="LoginDeveloper.aspx" />
+    <Content Include="media\documentoicono.jpg" />
+    <Content Include="media\iconoimpresora.jpg" />
     <Content Include="media\IngenioLaCabana.jpg" />
+    <Content Include="media\paisajeILC.jpg" />
     <Content Include="Registros.aspx" />
     <Content Include="styles.css" />
     <Content Include="styles2.css" />

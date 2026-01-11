@@ -75,6 +75,8 @@
                 </asp:GridView>
                 <asp:SqlDataSource ID="runtines" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT * FROM [Rutinas]">
                 </asp:SqlDataSource>
+                <asp:DropDownList ID="DropDownList1" runat="server">
+                </asp:DropDownList>
                 <br />
             </asp:View>
             <asp:View ID="vempleados" runat="server">
