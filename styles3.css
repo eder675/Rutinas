@@ -10,7 +10,7 @@ html, body {
 
 /* Sección principal con fondo */
 #acerca-de {
-    background-image: url('../media/paisajeILC.jpg');
+    background-image: url('media/paisajeILC.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
