@@ -223,7 +223,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                 </asp:SqlDataSource>
             </asp:View>
             <asp:View ID="vinstrumentos" runat="server">
-                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand">
+                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand" OnSelectedIndexChanged="gvinstrumentos_SelectedIndexChanged">
                     <Columns>
                         <asp:TemplateField HeaderText="TAG" SortExpression="TAG">
                             <EditItemTemplate>
@@ -249,7 +249,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="Actividad" SortExpression="Actividad">
                             <EditItemTemplate>
-                                <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("Actividad") %>'></asp:TextBox>
+                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSource4" DataTextField="Actividad" DataValueField="Actividad">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSource4" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString5 %>" ProviderName="<%$ ConnectionStrings:REPORTESConnectionString5.ProviderName %>" SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]"></asp:SqlDataSource>
                             </EditItemTemplate>
                             <FooterTemplate>
                                 <asp:TextBox ID="txtactividad" runat="server"></asp:TextBox>

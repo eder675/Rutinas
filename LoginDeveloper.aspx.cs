@@ -130,18 +130,18 @@ namespace Rutinas
             {
                 TextBox txtTAG = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnewtag");
                 TextBox txtName = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnameinst");
-                TextBox txtActividad = (TextBox)gvinstrumentos.FooterRow.FindControl("txtactividad");
+                TextBox txtactividad = (TextBox)gvinstrumentos.FooterRow.FindControl("txtactividad");
                 DropDownList ddlGrupo = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlarea");
                 DropDownList ddlPrioridad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlprioridad");
 
-                if (string.IsNullOrEmpty(txtTAG.Text) || string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtActividad.Text) || string.IsNullOrEmpty(ddlGrupo.Text) || string.IsNullOrEmpty(ddlPrioridad.Text))
+                if (string.IsNullOrEmpty(txtTAG.Text) || string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtactividad.Text) || string.IsNullOrEmpty(ddlGrupo.Text) || string.IsNullOrEmpty(ddlPrioridad.Text))
                 {
                     Response.Write("<script>alert('Por favor, los campos requeridos.');</script>");
                     return;
                 }
                 SqlDataSource3.InsertParameters["TAG"].DefaultValue = txtTAG.Text;
                 SqlDataSource3.InsertParameters["Nombre"].DefaultValue = txtName.Text;
-                SqlDataSource3.InsertParameters["Actividad"].DefaultValue = txtActividad.Text;
+                SqlDataSource3.InsertParameters["Actividad"].DefaultValue = txtactividad.Text;
                 SqlDataSource3.InsertParameters["IDarea"].DefaultValue = ddlGrupo.SelectedValue;
                 SqlDataSource3.InsertParameters["IDprioridad"].DefaultValue = ddlPrioridad.SelectedValue;
                 try
@@ -168,6 +168,16 @@ namespace Rutinas
         protected void lnkLogout_Click(object sender, EventArgs e)
         {
             Response.Redirect("Closesession.aspx");
+        }
+
+        protected void txtactividad_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void gvinstrumentos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
