@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LoginDeveloper.aspx.cs" Inherits="Rutinas.LoginDeveloper" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LoginDeveloper.aspx.cs" EnableEventValidation="false" Inherits="Rutinas.LoginDeveloper" %>
 
 <!DOCTYPE html>
 
@@ -7,6 +7,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
     <link rel="stylesheet" href="styleslogin.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -223,6 +226,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                 </asp:SqlDataSource>
             </asp:View>
             <asp:View ID="vinstrumentos" runat="server">
+                <asp:Label ID="Label7" runat="server" Text="LISTA DE INSTRUMENTOS"></asp:Label>
+                <br />
                 <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand" OnSelectedIndexChanged="gvinstrumentos_SelectedIndexChanged">
                     <Columns>
                         <asp:TemplateField HeaderText="TAG" SortExpression="TAG">
@@ -230,7 +235,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:Label ID="Label1" runat="server" Text='<%# Eval("TAG") %>'></asp:Label>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:TextBox ID="txtnewtag" runat="server"></asp:TextBox>
+                                <asp:ListBox ID="lbxtag" runat="server" CssClass="select2-busqueda" DataSourceID="SqlDataSourceDonador" DataTextField="TAG" DataValueField="TAG"></asp:ListBox>
+                                <asp:SqlDataSource ID="SqlDataSourceDonador" runat="server" ConnectionString="<%$ ConnectionStrings:VinetasConnectionString %>" ProviderName="<%$ ConnectionStrings:VinetasConnectionString.ProviderName %>" SelectCommand="SELECT [TAG] FROM [equipos]"></asp:SqlDataSource>
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label1" runat="server" Text='<%# Bind("TAG") %>'></asp:Label>
@@ -241,7 +247,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Nombre") %>'></asp:TextBox>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:TextBox ID="txtnameinst" runat="server"></asp:TextBox>
+                                <asp:ListBox ID="lbxnombre" runat="server" CssClass="select2-busqueda-desc" DataSourceID="SqlDataSourcedescripciondonador" DataTextField="Descripcion" DataValueField="Descripcion"></asp:ListBox>
+                                <asp:SqlDataSource ID="SqlDataSourcedescripciondonador" runat="server" ConnectionString="<%$ ConnectionStrings:VinetasConnectionString %>" SelectCommand="SELECT [Descripcion] FROM [equipos]"></asp:SqlDataSource>
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label2" runat="server" Text='<%# Bind("Nombre") %>'></asp:Label>
@@ -292,7 +299,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:Button ID="btninsertinstrumento" runat="server" Text="INSERTAR" CommandName="insertnewinstrumentos" />
+                                <asp:Button ID="btninsertinstrumento" runat="server" Text="INSERTAR" CommandName="insertnewinstrumentos" OnClick="btninsertinstrumento_Click" />
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Edit" Text="Editar" />
@@ -331,5 +338,40 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
     <footer class="footer-acerca">
     <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
 </footer>
+    <script type="text/javascript">
+        function setupSincronizacion() {
+            var $selectTag = $('.select2-busqueda');
+            var $selectDesc = $('.select2-busqueda-desc');
+
+            // Inicializar Select2
+            $selectTag.select2({ tags: true, placeholder: "TAG...", width: '100%' });
+            $selectDesc.select2({ tags: true, placeholder: "Descripcion...", width: '100%' });
+
+            // Sincronizar por índice
+            $selectTag.on('select2:select', function (e) {
+                var index = e.params.data.element.index;
+                $selectDesc.prop('selectedIndex', index).trigger('change.select2');
+            });
+
+            $selectDesc.on('select2:select', function (e) {
+                var index = e.params.data.element.index;
+                $selectTag.prop('selectedIndex', index).trigger('change.select2');
+            });
+        }
+
+        // Ejecución inicial
+        $(document).ready(function () {
+            setupSincronizacion();
+        });
+
+        // RE-INICIALIZACIÓN (Crucial para Web Forms)
+        // Esto hace que funcione después de insertar o cambiar de página en el GridView
+        if (typeof(Sys) !== 'undefined') {
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+            prm.add_endRequest(function() {
+                setupSincronizacion();
+            });
+        }
+    </script>
 </body>
 </html>

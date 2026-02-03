@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Xml.Linq;
+
 
 namespace Rutinas
 {
@@ -128,40 +130,56 @@ namespace Rutinas
         {
             if (e.CommandName == "insertnewinstrumentos")
             {
-                TextBox txtTAG = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnewtag");
-                TextBox txtName = (TextBox)gvinstrumentos.FooterRow.FindControl("txtnameinst");
+                // 1. CAPTURAR CONTROLES (Cambiamos TextBox por ListBox en TAG y Nombre)
+                ListBox lbxtag = (ListBox)gvinstrumentos.FooterRow.FindControl("lbxtag");
+                ListBox lbxnombre = (ListBox)gvinstrumentos.FooterRow.FindControl("lbxnombre");
+
                 TextBox txtactividad = (TextBox)gvinstrumentos.FooterRow.FindControl("txtactividad");
                 DropDownList ddlGrupo = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlarea");
                 DropDownList ddlPrioridad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlprioridad");
 
-                if (string.IsNullOrEmpty(txtTAG.Text) || string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtactividad.Text) || string.IsNullOrEmpty(ddlGrupo.Text) || string.IsNullOrEmpty(ddlPrioridad.Text))
+                // 2. OBTENER VALORES (Lógica para Select2 con tags:true)
+                // Si el usuario escribió algo nuevo, SelectedValue nos dará ese texto.
+                //string valorTAG = lbxtag.SelectedValue;
+                //string valorNombre = lbxnombre.SelectedValue;
+                string valorTAG = Request.Form[lbxtag.UniqueID];
+                string valorNombre = Request.Form[lbxnombre.UniqueID];
+
+                // PRUEBA TEMPORAL: Reemplaza tu alerta por esta para ver qué llega
+                if (string.IsNullOrEmpty(valorTAG) || string.IsNullOrEmpty(valorNombre))
                 {
-                    Response.Write("<script>alert('Por favor, los campos requeridos.');</script>");
+                    string debugMsg = "TAG encontrado: " + (valorTAG ?? "NULL") + " | Nombre encontrado: " + (valorNombre ?? "NULL");
+                    Response.Write("<script>alert('" + debugMsg + "');</script>");
                     return;
                 }
-                SqlDataSource3.InsertParameters["TAG"].DefaultValue = txtTAG.Text;
-                SqlDataSource3.InsertParameters["Nombre"].DefaultValue = txtName.Text;
+                // Validación de campos vacíos
+                //if (string.IsNullOrEmpty(valorTAG) || string.IsNullOrEmpty(valorNombre) ||
+                //    string.IsNullOrEmpty(txtactividad.Text) || ddlGrupo.SelectedIndex == 0 || ddlPrioridad.SelectedIndex == 0)
+                //{
+               //     Response.Write("<script>alert('Por favor, complete todos los campos requeridos.');</script>");
+                //    return;
+                //}
+
+                // 3. ASIGNAR PARÁMETROS AL SQLDATASOURCE
+                SqlDataSource3.InsertParameters["TAG"].DefaultValue = valorTAG;
+                SqlDataSource3.InsertParameters["Nombre"].DefaultValue = valorNombre;
                 SqlDataSource3.InsertParameters["Actividad"].DefaultValue = txtactividad.Text;
                 SqlDataSource3.InsertParameters["IDarea"].DefaultValue = ddlGrupo.SelectedValue;
                 SqlDataSource3.InsertParameters["IDprioridad"].DefaultValue = ddlPrioridad.SelectedValue;
+
                 try
                 {
-                    // 4. Ejecutar la inserción en la base de datos
+                    // 4. Ejecutar la inserción
                     SqlDataSource3.Insert();
 
-                    // 5. Limpiar los campos para una nueva entrada
-                    txtName.Text = "";
-
-                    // El dropdown regresa a su primer valor automáticamente al recargar
-
-                    // El GridView se refresca solo gracias al SqlDataSource
+                    // 5. Limpieza (Opcional, ya que el GridView suele recargarse)
+                    txtactividad.Text = "";
+                    // Nota: Los ListBox/Select2 se limpian solos al recargar el GridView
                 }
                 catch (Exception ex)
                 {
-                    // Manejo de errores (por ejemplo, si el código de empleado ya existe)
                     Response.Write("<script>alert('Error al insertar: " + ex.Message.Replace("'", "") + "');</script>");
                 }
-
             }
         }
 
@@ -176,6 +194,11 @@ namespace Rutinas
         }
 
         protected void gvinstrumentos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btninsertinstrumento_Click(object sender, EventArgs e)
         {
 
         }
