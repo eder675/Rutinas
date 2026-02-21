@@ -228,7 +228,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
             <asp:View ID="vinstrumentos" runat="server">
                 <asp:Label ID="Label7" runat="server" Text="LISTA DE INSTRUMENTOS"></asp:Label>
                 <br />
-                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand" OnSelectedIndexChanged="gvinstrumentos_SelectedIndexChanged">
+                <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand" OnSelectedIndexChanged="gvinstrumentos_SelectedIndexChanged" OnRowDataBound="gvinstrumentos_RowDataBound">
                     <Columns>
                         <asp:TemplateField HeaderText="TAG" SortExpression="TAG">
                             <EditItemTemplate>

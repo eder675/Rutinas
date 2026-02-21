@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Web;
@@ -201,6 +202,46 @@ namespace Rutinas
         protected void btninsertinstrumento_Click(object sender, EventArgs e)
         {
 
+        }
+
+        protected void gvinstrumentos_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            // Solo actuamos en el Footer (donde están los buscadores)
+            if (e.Row.RowType == DataControlRowType.Footer)
+            {
+                // 1. Localizar los ListBox
+                ListBox lbxTag = (ListBox)e.Row.FindControl("lbxtag");
+                ListBox lbxNombre = (ListBox)e.Row.FindControl("lbxnombre");
+
+                if (lbxTag != null && lbxNombre != null)
+                {
+                    // 2. Obtener los datos que ya están en tu base de REPORTES
+                    // Usamos el SqlDataSource3 que es el que apunta a tu tabla local
+                    DataView dvLocal = (DataView)SqlDataSource3.Select(DataSourceSelectArguments.Empty);
+
+                    if (dvLocal != null)
+                    {
+                        // Creamos una lista de comparación (Hashset es más rápido para buscar)
+                        HashSet<string> tagsExistentes = new HashSet<string>();
+                        foreach (DataRow row in dvLocal.Table.Rows)
+                        {
+                            tagsExistentes.Add(row["TAG"].ToString().Trim().ToUpper());
+                        }
+
+                        // 3. Filtrar: Recorrer de atrás hacia adelante para no romper el índice
+                        for (int i = lbxTag.Items.Count - 1; i >= 0; i--)
+                        {
+                            string tagDonador = lbxTag.Items[i].Value.Trim().ToUpper();
+
+                            if (tagsExistentes.Contains(tagDonador))
+                            {
+                                lbxTag.Items.RemoveAt(i);
+                                lbxNombre.Items.RemoveAt(i); // Mantener sincronía con el script JS
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
