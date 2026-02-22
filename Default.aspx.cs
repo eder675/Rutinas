@@ -82,32 +82,28 @@ namespace Rutinas
         protected void btnGenerarRutina_Click(object sender, EventArgs e)
         {
             DateTime ahora = DateTime.Now;
-            DateTime fechaInicioZafra = ahora.AddDays(-90); // Tu referencia: hoy es el día 90
-            TimeSpan diferencia = ahora - fechaInicioZafra;
-            int diaZafra = diferencia.Days + 1; // Hoy sería el día 91 para el sistema
+            DateTime fechaInicioZafra = new DateTime(2024, 11, 25); // Fecha real del Día 1
+
+            int diaZafra = (ahora - fechaInicioZafra).Days + 1; // Hoy 22 de Feb = Día 90
+            int semanaZafra = diaZafra / 7; // Semana 12 (Par)
+            bool esSemanaPar = (semanaZafra % 2 == 0);
 
             if (ahora.DayOfWeek == DayOfWeek.Sunday && ahora.TimeOfDay >= new TimeSpan(17, 40, 0))
             {
                 var perfil = ConsultarDatosEmpleado(Session["CodigoEmpleado"].ToString());
 
-                // Calculamos la paridad de la semana de zafra (cada 7 días)
-                // Esto asegura que la alternancia sea constante cada domingo
-                int semanaZafra = (diaZafra / 7);
-                bool esSemanaParZafra = (semanaZafra % 2 == 0);
-
+                // Hoy es Domingo, Semana 12 (Par). 
+                // Como el Puesto A hizo 12h hoy, la lógica par coincide:
                 if (perfil.PuestoFijo == 1) // Pareja A
                 {
-                    // Si hoy (día 90, semana 12 aprox) A hizo 12h, 
-                    // ajustamos la paridad para que coincida.
-                    Session["JornadaDomingo"] = esSemanaParZafra ? "12h" : "4h";
+                    Session["JornadaDomingo"] = esSemanaPar ? "12h" : "4h";
                 }
                 else if (perfil.PuestoFijo == 2) // Pareja B
                 {
-                    Session["JornadaDomingo"] = !esSemanaParZafra ? "12h" : "4h";
+                    Session["JornadaDomingo"] = !esSemanaPar ? "12h" : "4h";
                 }
             }
-
-            Response.Redirect("Generadorrutinas.aspx?Action=Nuevo");
+            // ... resto del código (Redirect)
         }
 
         protected void btnImprimirRutina_Click(object sender, EventArgs e)

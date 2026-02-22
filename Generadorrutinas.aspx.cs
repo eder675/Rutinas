@@ -15,7 +15,7 @@ namespace Rutinas
 {
     public partial class Generadorrutinas : System.Web.UI.Page
     {
-        private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2024, 11, 24);
+        private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 24);
         
         private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
@@ -192,10 +192,13 @@ namespace Rutinas
         public string ObtenerAreaDeterminista(string codigoEmpleado)
         {
             DateTime ahora = DateTime.Now;
-            int puestoEfectivo = 0; // 1 para Posición A, 2 para Posición B
+            int puestoEfectivo = 0;
 
-            // 1. OBTENER DATOS DEL EMPLEADO
-            // Suponemos que estos datos vienen de tu tabla dbo.Empleado modificada
+            // Usamos la variable global de la clase o la definimos aquí fijamente
+            DateTime inicioReal = new DateTime(2025, 11, 24);
+            int diaZafra = (ahora - inicioReal).Days + 1;
+            bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
+
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
             bool esCuartoTurno = empleado.EsCuartoTurno;
             int puestoFijo = empleado.PuestoFijo;
@@ -205,28 +208,20 @@ namespace Rutinas
                 DayOfWeek dia = ahora.DayOfWeek;
                 int hora = ahora.Hour;
 
-                // Determinar número de semana para el ciclo de 2 semanas (cambio de 12/4h)
-                int numSemana = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(ahora, System.Globalization.DateTimeFormatInfo.CurrentInfo.CalendarWeekRule, DayOfWeek.Sunday);
-                bool cicloA = (numSemana % 2 == 0); // Alterna cada semana o cada dos según prefieras ajustar
+                // Relevos Martes a Viernes
+                if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) puestoEfectivo = 1;
+                else if (dia == DayOfWeek.Wednesday || dia == DayOfWeek.Friday) puestoEfectivo = 2;
 
-                // --- MAPEO DE RELEVOS DEL 4TO TURNO ---
-                if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) puestoEfectivo = 1; // Releva a A (Mañana/Tarde)
-                else if (dia == DayOfWeek.Wednesday || dia == DayOfWeek.Friday) puestoEfectivo = 2; // Releva a B (Mañana/Tarde)
-
-                // Lógica de Noche (Domingo y Lunes)
-                else if (dia == DayOfWeek.Sunday && hora >= 22 || (dia == DayOfWeek.Monday && hora < 6))
+                // DOMINGO NOCHE: Hoy es semana 12 (Par). 
+                // A hizo 12h, Relevo cubre a B (Puesto 2).
+                else if (dia == DayOfWeek.Sunday && hora >= 21 || (dia == DayOfWeek.Monday && hora < 6))
                 {
-                    int diaZafra = (ahora - FECHA_INICIO_ZAFRA).Days + 1;
-                    bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
-
-                    // El relevo cubre al que hizo 4h. 
-                    // Si en semana par A hace 12h, el relevo cubre a B (Puesto 2).
                     puestoEfectivo = esSemanaPar ? 2 : 1;
                 }
-                else if (dia == DayOfWeek.Monday && hora >= 22 || (dia == DayOfWeek.Tuesday && hora < 6))
+                // LUNES NOCHE: Relevo cubre al que hizo las 12h ayer (Puesto 1).
+                else if (dia == DayOfWeek.Monday && hora >= 21 || (dia == DayOfWeek.Tuesday && hora < 6))
                 {
-                    // Lunes noche: Releva al que hizo 12h el domingo (descansa el lunes)
-                    puestoEfectivo = cicloA ? 2 : 1;
+                    puestoEfectivo = esSemanaPar ? 1 : 2;
                 }
             }
             else
@@ -234,12 +229,8 @@ namespace Rutinas
                 puestoEfectivo = puestoFijo;
             }
 
-            // 2. CÁLCULO DE ÁREA POR PARIDAD CALENDARIO
-            // Usamos el día del año. Esto asegura que el área rote cada 24h sin falta.
             int diaJuliano = ahora.DayOfYear;
-
-            // Fórmula: (Día + Puesto) % 2
-            // Si es 0 -> Extracción | Si es 1 -> Alcalizado
+            // Resultado 0 -> Extracción | Resultado 1 -> Alcalizado
             return ((diaJuliano + puestoEfectivo) % 2 == 0) ? "Extracción" : "Alcalizado";
         }
         #endregion
