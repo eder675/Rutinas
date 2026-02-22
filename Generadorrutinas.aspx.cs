@@ -183,126 +183,54 @@ namespace Rutinas
         #endregion
         // Importante: La función debe recibir el CodigoEmpleado aunque solo se use para el contexto.
         #region obtencion de ID grupo
-        private int ObtenerSiguienteIDgrupo(string codigoEmpleado, string turnoActual)
+        public string ObtenerAreaDeterminista(string codigoEmpleado)
         {
-            // =========================================================================
-            // PASO 1: CHEQUEO DE PAREJA (Rotación A vs B)
-            // Busca si ya se generó una rutina en la última hora (es decir, si el compañero ya generó).
-            // =========================================================================
+            DateTime ahora = DateTime.Now;
+            int puestoEfectivo = 0; // 1 para Posición A, 2 para Posición B
 
-            int grupoAsignadoReciente = 0;
-            DateTime limiteTiempo = DateTime.Now.AddHours(-1);
+            // 1. OBTENER DATOS DEL EMPLEADO
+            // Suponemos que estos datos vienen de tu tabla dbo.Empleado modificada
+            var empleado = ConsultarDatosEmpleado(codigoEmpleado);
+            bool esCuartoTurno = empleado.EsCuartoTurno;
+            int puestoFijo = empleado.PuestoFijo;
 
-            string sqlCheckRecent = @"
-        SELECT TOP 1 IDgrupo 
-        FROM Rutinas 
-        WHERE Turno = @TurnoActual AND Fecha >= @LimiteTiempo
-        ORDER BY Correlativo DESC";
-
-            using (SqlConnection conn = new SqlConnection(ConnString))
+            if (esCuartoTurno)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sqlCheckRecent, conn);
-                cmd.Parameters.AddWithValue("@TurnoActual", turnoActual);
-                cmd.Parameters.AddWithValue("@LimiteTiempo", limiteTiempo);
+                DayOfWeek dia = ahora.DayOfWeek;
+                int hora = ahora.Hour;
 
-                object result = cmd.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
+                // Determinar número de semana para el ciclo de 2 semanas (cambio de 12/4h)
+                int numSemana = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(ahora, System.Globalization.DateTimeFormatInfo.CurrentInfo.CalendarWeekRule, DayOfWeek.Sunday);
+                bool cicloA = (numSemana % 2 == 0); // Alterna cada semana o cada dos según prefieras ajustar
+
+                // --- MAPEO DE RELEVOS DEL 4TO TURNO ---
+                if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) puestoEfectivo = 1; // Releva a A (Mañana/Tarde)
+                else if (dia == DayOfWeek.Wednesday || dia == DayOfWeek.Friday) puestoEfectivo = 2; // Releva a B (Mañana/Tarde)
+
+                // Lógica de Noche (Domingo y Lunes)
+                else if (dia == DayOfWeek.Sunday && hora >= 22 || (dia == DayOfWeek.Monday && hora < 6))
                 {
-                    grupoAsignadoReciente = Convert.ToInt32(result);
+                    // Domingo noche: Releva al que hizo solo 4h (6pm-10pm)
+                    puestoEfectivo = cicloA ? 1 : 2;
+                }
+                else if (dia == DayOfWeek.Monday && hora >= 22 || (dia == DayOfWeek.Tuesday && hora < 6))
+                {
+                    // Lunes noche: Releva al que hizo 12h el domingo (descansa el lunes)
+                    puestoEfectivo = cicloA ? 2 : 1;
                 }
             }
-
-            // CASO B: Es el segundo instrumentista. Rotación de Pareja (A -> B).
-            // Esta lógica no debe tocar el estado atómico.
-            if (grupoAsignadoReciente != 0)
+            else
             {
-                return (grupoAsignadoReciente == 1) ? 2 : 1;
+                puestoEfectivo = puestoFijo;
             }
 
-            // A partir de aquí, solo ejecuta el Instrumentista que genera PRIMERO en el turno (CASO A).
+            // 2. CÁLCULO DE ÁREA POR PARIDAD CALENDARIO
+            // Usamos el día del año. Esto asegura que el área rote cada 24h sin falta.
+            int diaJuliano = ahora.DayOfYear;
 
-            // =========================================================================
-            // PASO 2: ROTACIÓN DIARIA y CORRECCIÓN PERSONAL (Manejo del Estado Atómico)
-            // =========================================================================
-
-            int grupoAsignadoHoy;     // El grupo que se asignará al instrumentista actual
-            int grupoQueToca;         // El grupo que el estado atómico dice que toca por turno (Memoria Global)
-            int ultimoGrupoPersonal = 0; // El último grupo que tuvo este empleado (Memoria Personal)
-
-            using (SqlConnection conn = new SqlConnection(ConnString))
-            {
-                conn.Open();
-
-                // 1. OBTENER EL ÚLTIMO GRUPO PERSONAL DE AYER (Memoria de la Persona)
-                // Filtro: Busca el último grupo que ESTE empleado tuvo ANTES de hoy.
-                string sqlUltimoPersonal = @"
-            SELECT TOP 1 IDgrupo 
-            FROM Rutinas 
-            WHERE 
-                Codigo_empleado = @CodigoEmpleado 
-                AND Turno = @TurnoActual -- Añadimos el turno para ser más específico
-                AND CONVERT(DATE, Fecha) < CONVERT(DATE, GETDATE()) 
-            ORDER BY Fecha DESC, Correlativo DESC";
-
-                SqlCommand cmdPersonal = new SqlCommand(sqlUltimoPersonal, conn);
-                cmdPersonal.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
-                cmdPersonal.Parameters.AddWithValue("@TurnoActual", turnoActual);
-                object resultPersonal = cmdPersonal.ExecuteScalar();
-
-                if (resultPersonal != null && resultPersonal != DBNull.Value)
-                {
-                    ultimoGrupoPersonal = Convert.ToInt32(resultPersonal);
-                }
-
-                // 2. LEER EL ESTADO ATÓMICO (Memoria del Turno)
-                string sqlReadState = "SELECT Grupo_Siguiente FROM Configuracion_Rotacion WHERE Turno = @TurnoActual";
-                SqlCommand cmdReadState = new SqlCommand(sqlReadState, conn);
-                cmdReadState.Parameters.AddWithValue("@TurnoActual", turnoActual);
-
-                object resultState = cmdReadState.ExecuteScalar();
-                if (resultState != null && resultState != DBNull.Value)
-                {
-                    grupoQueToca = Convert.ToInt32(resultState);
-                }
-                else
-                {
-                    // Inicialización si es la primera vez que se usa el turno
-                    grupoQueToca = 1;
-                }
-
-                grupoAsignadoHoy = grupoQueToca; // Asignación inicial basada en el estado
-
-                // 3. APLICAR LA CORRECCIÓN PERSONAL (Evitar repetición G1->G1 o G2->G2)
-                if (ultimoGrupoPersonal != 0 && ultimoGrupoPersonal == grupoAsignadoHoy)
-                {
-                    // ¡El grupo que toca hoy es el mismo que tuve ayer! Se fuerza la rotación.
-                    grupoAsignadoHoy = (grupoAsignadoHoy == 1) ? 2 : 1;
-                }
-
-                // 4. ACTUALIZAR EL ESTADO para el siguiente ciclo de ROTACIÓN DIARIA
-                // El nuevo estado debe ser el opuesto al grupo FINAL que se asignó hoy.
-                int nuevoGrupoSiguiente = (grupoAsignadoHoy == 1) ? 2 : 1;
-
-                string sqlUpdateState = $@"
-            UPDATE Configuracion_Rotacion 
-            SET Grupo_Siguiente = @NuevoGrupo 
-            WHERE Turno = @TurnoActual;
-            
-            -- Si no existe el registro, lo insertamos (UPSERT)
-            IF @@ROWCOUNT = 0
-            BEGIN
-                INSERT INTO Configuracion_Rotacion (Turno, Grupo_Siguiente) 
-                VALUES (@TurnoActual, @NuevoGrupo);
-            END";
-
-                SqlCommand cmdUpdate = new SqlCommand(sqlUpdateState, conn);
-                cmdUpdate.Parameters.AddWithValue("@NuevoGrupo", nuevoGrupoSiguiente);
-                cmdUpdate.Parameters.AddWithValue("@TurnoActual", turnoActual);
-                cmdUpdate.ExecuteNonQuery();
-            }
-
-            return grupoAsignadoHoy;
+            // Fórmula: (Día + Puesto) % 2
+            // Si es 0 -> Extracción | Si es 1 -> Alcalizado
+            return ((diaJuliano + puestoEfectivo) % 2 == 0) ? "Extracción" : "Alcalizado";
         }
         #endregion
         // -------------------------------------------------------------------------------------
@@ -311,86 +239,111 @@ namespace Rutinas
 
         private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
         {
-            // 1. ROTACIÓN DE GRUPOS CORREGIDA
+            // 1. DETERMINAR EL ÁREA USANDO EL NUEVO MOTOR
+            // Esto reemplaza la búsqueda de "quién lo hizo hace una hora"
+            string areaCalculada = ObtenerAreaDeterminista(codigoEmpleado);
 
-            // Obtiene el ID del grupo que debe rotar (1 o 2), basado en la última rutina del turno.
-            int idGrupoAsignado = ObtenerSiguienteIDgrupo(codigoEmpleado, turnoActual);
+            // 2. OBTENER EL ID DEL GRUPO (1 para Extracción, 2 para Alcalizado)
+            // Suponiendo que en tu tabla 'Rotaciongrupos' G1 = Extracción y G2 = Alcalizado
+            int idGrupoAsignado = (areaCalculada == "Extracción") ? 1 : 2;
 
-            // Asigna un nombre (solo para el encabezado del reporte si es necesario)
-            nombreGrupoAsignado = (idGrupoAsignado == 1) ? "Grupo 1" : "Grupo 2";
+            nombreGrupoAsignado = areaCalculada; // Ahora el nombre es el área misma
 
-            // 2. SELECCIÓN DE INSTRUMENTOS (5 Alta, 5 Media, 5 Baja)
-            // Usamos el grupo que OBTUVIMOS DE LA ROTACIÓN (idGrupoAsignado)
+            // 3. SELECCIÓN DE INSTRUMENTOS
+            // El algoritmo de selección de 5 Alta, 5 Media, 5 Baja sigue igual, 
+            // pero ahora recibe el grupo correcto por calendario.
             List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado);
 
-            // 3. GUARDADO DE LA RUTINA
-            // Usamos el grupo que OBTUVIMOS DE LA ROTACIÓN (idGrupoAsignado)
+            // 4. GUARDADO DE LA RUTINA
             GuardarNuevaRutina(codigoEmpleado, turnoActual, idGrupoAsignado, instrumentosSeleccionados);
 
             return instrumentosSeleccionados;
         }
+        #region metodo de consulta
+        private (int PuestoFijo, bool EsCuartoTurno) ConsultarDatosEmpleado(string codigoEmpleado)
+        {
+            int puesto = 0;
+            bool esRelevo = false;
+            string sql = "SELECT PuestoFijo, EsCuartoTurno FROM Empleado WHERE Codigo_empleado = @Codigo";
 
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        puesto = dr["PuestoFijo"] != DBNull.Value ? Convert.ToInt32(dr["PuestoFijo"]) : 0;
+                        esRelevo = dr["EsCuartoTurno"] != DBNull.Value && Convert.ToBoolean(dr["EsCuartoTurno"]);
+                    }
+                }
+            }
+            return (puesto, esRelevo);
+        }
+        #endregion
         #endregion
         #region fase1
         // ----------------------------------------------------
         // FASE 1: ROTACIÓN DE GRUPOS (Lógica de Ciclo)
         // ----------------------------------------------------
-       /* private GrupoRotacionAsignado ObtenerGrupoRotacion()
-        {
-            int ultimoGrupoID = 0;
-            DataTable dtGrupo = new DataTable();
+        /* private GrupoRotacionAsignado ObtenerGrupoRotacion()
+         {
+             int ultimoGrupoID = 0;
+             DataTable dtGrupo = new DataTable();
 
-            using (SqlConnection conn = new SqlConnection(ConnString))
-            {
-                conn.Open();
+             using (SqlConnection conn = new SqlConnection(ConnString))
+             {
+                 conn.Open();
 
-                // Buscar el ID del último grupo asignado
-                string sqlUltimoGrupo = "SELECT TOP 1 IDgrupo FROM Rutinas ORDER BY Correlativo DESC;";
-                SqlCommand cmd = new SqlCommand(sqlUltimoGrupo, conn);
-                object resultado = cmd.ExecuteScalar();
+                 // Buscar el ID del último grupo asignado
+                 string sqlUltimoGrupo = "SELECT TOP 1 IDgrupo FROM Rutinas ORDER BY Correlativo DESC;";
+                 SqlCommand cmd = new SqlCommand(sqlUltimoGrupo, conn);
+                 object resultado = cmd.ExecuteScalar();
 
-                if (resultado != null && resultado != DBNull.Value)
-                {
-                    ultimoGrupoID = Convert.ToInt32(resultado);
-                }
+                 if (resultado != null && resultado != DBNull.Value)
+                 {
+                     ultimoGrupoID = Convert.ToInt32(resultado);
+                 }
 
-                // 1. Intentar encontrar el siguiente grupo (ID > Ultimo ID)
-                string sqlProximoGrupo = $@"
-                SELECT TOP 1 IDgrupo, Nombregrupo 
-                FROM Rotaciongrupos
-                WHERE IDgrupo > {ultimoGrupoID}
-                ORDER BY IDgrupo ASC;";
+                 // 1. Intentar encontrar el siguiente grupo (ID > Ultimo ID)
+                 string sqlProximoGrupo = $@"
+                 SELECT TOP 1 IDgrupo, Nombregrupo 
+                 FROM Rotaciongrupos
+                 WHERE IDgrupo > {ultimoGrupoID}
+                 ORDER BY IDgrupo ASC;";
 
-                // 2. Respaldo: Si no hay, buscar el primer grupo (ID más bajo)
-                string sqlPrimerGrupo = @"
-                SELECT TOP 1 IDgrupo, Nombregrupo 
-                FROM Rotaciongrupos
-                ORDER BY IDgrupo ASC;";
+                 // 2. Respaldo: Si no hay, buscar el primer grupo (ID más bajo)
+                 string sqlPrimerGrupo = @"
+                 SELECT TOP 1 IDgrupo, Nombregrupo 
+                 FROM Rotaciongrupos
+                 ORDER BY IDgrupo ASC;";
 
-                cmd.CommandText = sqlProximoGrupo;
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dtGrupo);
+                 cmd.CommandText = sqlProximoGrupo;
+                 SqlDataAdapter da = new SqlDataAdapter(cmd);
+                 da.Fill(dtGrupo);
 
-                if (dtGrupo.Rows.Count == 0)
-                {
-                    // Si la consulta no devuelve resultados, reiniciar la rotación.
-                    cmd.CommandText = sqlPrimerGrupo;
-                    da.SelectCommand.Parameters.Clear();
-                    da.Fill(dtGrupo);
-                }
-            }
+                 if (dtGrupo.Rows.Count == 0)
+                 {
+                     // Si la consulta no devuelve resultados, reiniciar la rotación.
+                     cmd.CommandText = sqlPrimerGrupo;
+                     da.SelectCommand.Parameters.Clear();
+                     da.Fill(dtGrupo);
+                 }
+             }
 
-            if (dtGrupo.Rows.Count > 0)
-            {
-                return new GrupoRotacionAsignado
-                {
-                    IdGrupo = Convert.ToInt32(dtGrupo.Rows[0]["IDgrupo"]),
-                    NombreGrupo = dtGrupo.Rows[0]["Nombregrupo"].ToString()
-                };
-            }
+             if (dtGrupo.Rows.Count > 0)
+             {
+                 return new GrupoRotacionAsignado
+                 {
+                     IdGrupo = Convert.ToInt32(dtGrupo.Rows[0]["IDgrupo"]),
+                     NombreGrupo = dtGrupo.Rows[0]["Nombregrupo"].ToString()
+                 };
+             }
 
-            throw new Exception("Error: La tabla Rotaciongrupos está vacía.");
-        }*/
+             throw new Exception("Error: La tabla Rotaciongrupos está vacía.");
+         }*/
         #endregion
         #region fase2
         // -------------------------------------------------------------------------
