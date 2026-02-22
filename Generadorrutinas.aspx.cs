@@ -15,6 +15,8 @@ namespace Rutinas
 {
     public partial class Generadorrutinas : System.Web.UI.Page
     {
+        private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2024, 11, 24);
+        
         private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -129,15 +131,19 @@ namespace Rutinas
         #region turno actual
         private string DeterminarTurnoActual()
         {
-            TimeSpan ahora = DateTime.Now.TimeOfDay;
+            DateTime ahora = DateTime.Now;
 
-            // Lógica de turnos: Mañana (06:00-14:00), Tarde (14:00-22:00), Noche (22:00-06:00)
-            if (ahora >= new TimeSpan(6, 0, 0) && ahora < new TimeSpan(14, 0, 0))
-                return "06:00 A 14:00";
-            else if (ahora >= new TimeSpan(14, 0, 0) && ahora < new TimeSpan(22, 0, 0))
-                return "14:00 A 22:00";
-            else
-                return "22:00 - 06:00";
+            // Si venimos del menú con una jornada de domingo ya definida
+            if (ahora.DayOfWeek == DayOfWeek.Sunday && Session["JornadaDomingo"] != null)
+            {
+                return (Session["JornadaDomingo"].ToString() == "4h") ? "18:00 A 22:00" : "18:00 A 06:00";
+            }
+
+            // Lógica normal de turnos (Mañana, Tarde, Noche)
+            TimeSpan hora = ahora.TimeOfDay;
+            if (hora >= new TimeSpan(6, 0, 0) && hora < new TimeSpan(14, 0, 0)) return "06:00 A 14:00";
+            if (hora >= new TimeSpan(14, 0, 0) && hora < new TimeSpan(22, 0, 0)) return "14:00 A 22:00";
+            return "22:00 - 06:00";
         }
 
         private string ObtenerNombreEmpleado(string codigo)
@@ -210,8 +216,12 @@ namespace Rutinas
                 // Lógica de Noche (Domingo y Lunes)
                 else if (dia == DayOfWeek.Sunday && hora >= 22 || (dia == DayOfWeek.Monday && hora < 6))
                 {
-                    // Domingo noche: Releva al que hizo solo 4h (6pm-10pm)
-                    puestoEfectivo = cicloA ? 1 : 2;
+                    int diaZafra = (ahora - FECHA_INICIO_ZAFRA).Days + 1;
+                    bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
+
+                    // El relevo cubre al que hizo 4h. 
+                    // Si en semana par A hace 12h, el relevo cubre a B (Puesto 2).
+                    puestoEfectivo = esSemanaPar ? 2 : 1;
                 }
                 else if (dia == DayOfWeek.Monday && hora >= 22 || (dia == DayOfWeek.Tuesday && hora < 6))
                 {
