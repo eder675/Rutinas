@@ -82,7 +82,7 @@ namespace Rutinas
         protected void btnGenerarRutina_Click(object sender, EventArgs e)
         {
             DateTime ahora = DateTime.Now;
-            DateTime fechaInicioZafra = new DateTime(2024, 11, 25); // Fecha real del Día 1
+            DateTime fechaInicioZafra = new DateTime(2025, 11, 25); // Fecha real del Día 1
 
             int diaZafra = (ahora - fechaInicioZafra).Days + 1; // Hoy 22 de Feb = Día 90
             int semanaZafra = diaZafra / 7; // Semana 12 (Par)
@@ -103,7 +103,7 @@ namespace Rutinas
                     Session["JornadaDomingo"] = !esSemanaPar ? "12h" : "4h";
                 }
             }
-            // ... resto del código (Redirect)
+            Response.Redirect("Generadorrutinas.aspx?Action=Imprimir");
         }
 
         protected void btnImprimirRutina_Click(object sender, EventArgs e)
