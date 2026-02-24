@@ -261,7 +261,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:SqlDataSource ID="SqlDataSource4" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString5 %>" ProviderName="<%$ ConnectionStrings:REPORTESConnectionString5.ProviderName %>" SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]"></asp:SqlDataSource>
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:TextBox ID="txtactividad" runat="server"></asp:TextBox>
+                                <asp:DropDownList ID="ddlactividad" runat="server" DataSourceID="SqlDataSourceactividad" DataTextField="Actividad" DataValueField="Actividad">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceactividad" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]"></asp:SqlDataSource>
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Label ID="Label3" runat="server" Text='<%# Bind("Actividad") %>'></asp:Label>

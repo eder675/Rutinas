@@ -135,7 +135,7 @@ namespace Rutinas
                 ListBox lbxtag = (ListBox)gvinstrumentos.FooterRow.FindControl("lbxtag");
                 ListBox lbxnombre = (ListBox)gvinstrumentos.FooterRow.FindControl("lbxnombre");
 
-                TextBox txtactividad = (TextBox)gvinstrumentos.FooterRow.FindControl("txtactividad");
+                DropDownList ddlactividad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlactividad");
                 DropDownList ddlGrupo = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlarea");
                 DropDownList ddlPrioridad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlprioridad");
 
@@ -164,7 +164,7 @@ namespace Rutinas
                 // 3. ASIGNAR PARÁMETROS AL SQLDATASOURCE
                 SqlDataSource3.InsertParameters["TAG"].DefaultValue = valorTAG;
                 SqlDataSource3.InsertParameters["Nombre"].DefaultValue = valorNombre;
-                SqlDataSource3.InsertParameters["Actividad"].DefaultValue = txtactividad.Text;
+                SqlDataSource3.InsertParameters["Actividad"].DefaultValue = ddlactividad.SelectedValue;
                 SqlDataSource3.InsertParameters["IDarea"].DefaultValue = ddlGrupo.SelectedValue;
                 SqlDataSource3.InsertParameters["IDprioridad"].DefaultValue = ddlPrioridad.SelectedValue;
 
@@ -174,7 +174,7 @@ namespace Rutinas
                     SqlDataSource3.Insert();
 
                     // 5. Limpieza (Opcional, ya que el GridView suele recargarse)
-                    txtactividad.Text = "";
+                    //ddlactividad.Text = "";
                     // Nota: Los ListBox/Select2 se limpian solos al recargar el GridView
                 }
                 catch (Exception ex)
