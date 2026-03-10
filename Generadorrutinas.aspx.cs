@@ -132,17 +132,35 @@ namespace Rutinas
         private string DeterminarTurnoActual()
         {
             DateTime ahora = DateTime.Now;
+            TimeSpan hora = ahora.TimeOfDay;
 
-            // Si venimos del menú con una jornada de domingo ya definida
-            if (ahora.DayOfWeek == DayOfWeek.Sunday && Session["JornadaDomingo"] != null)
+            // --- LÓGICA DE DOMINGO (12h / 4h) ---
+            if (ahora.DayOfWeek == DayOfWeek.Sunday)
             {
-                return (Session["JornadaDomingo"].ToString() == "4h") ? "18:00 A 22:00" : "18:00 A 06:00";
+                // Jornada de Día (6am a 6pm): Entrada desde 5:41 AM hasta antes de las 5:41 PM
+                if (hora >= new TimeSpan(5, 41, 0) && hora <= new TimeSpan(17, 40, 59))
+                {
+                    return "06:00 A 18:00";
+                }
+
+                // Jornada de Noche: Después de las 5:41 PM (17:41) entra la lógica de sesión
+                if (hora >= new TimeSpan(17, 41, 0))
+                {
+                    if (Session["JornadaDomingo"] != null)
+                    {
+                        return (Session["JornadaDomingo"].ToString() == "4h") ? "18:00 A 22:00" : "18:00 A 06:00";
+                    }
+                }
             }
 
-            // Lógica normal de turnos (Mañana, Tarde, Noche)
-            TimeSpan hora = ahora.TimeOfDay;
-            if (hora >= new TimeSpan(6, 0, 0) && hora < new TimeSpan(14, 0, 0)) return "06:00 A 14:00";
-            if (hora >= new TimeSpan(14, 0, 0) && hora < new TimeSpan(22, 0, 0)) return "14:00 A 22:00";
+            // --- LÓGICA NORMAL Y RELEVO ---
+            // Turno Mañana: 05:41 AM a 01:40 PM
+            if (hora >= new TimeSpan(5, 41, 0) && hora <= new TimeSpan(13, 40, 59)) return "06:00 A 14:00";
+
+            // Turno Tarde: 01:41 PM a 09:40 PM
+            if (hora >= new TimeSpan(13, 41, 0) && hora <= new TimeSpan(21, 40, 59)) return "14:00 A 22:00";
+
+            // Turno Noche (Relevo y Nocturnos): 09:41 PM a 05:40 AM
             return "22:00 - 06:00";
         }
 
@@ -194,9 +212,9 @@ namespace Rutinas
             DateTime ahora = DateTime.Now;
             int puestoEfectivo = 0;
 
-            // Usamos la variable global de la clase o la definimos aquí fijamente
-            DateTime inicioReal = new DateTime(2025, 11, 24);
-            int diaZafra = (ahora - inicioReal).Days + 1;
+            // Sincronizado para que el 22 Feb 2026 sea Día 90 (Semana 12 Par)
+            DateTime fechaInicioZafra = new DateTime(2025, 11, 24);
+            int diaZafra = (ahora - fechaInicioZafra).Days + 1;
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
 
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
@@ -206,21 +224,23 @@ namespace Rutinas
             if (esCuartoTurno)
             {
                 DayOfWeek dia = ahora.DayOfWeek;
-                int hora = ahora.Hour;
+                int h = ahora.Hour;
+                int m = ahora.Minute;
 
-                // Relevos Martes a Viernes
+                // Martes a Viernes
                 if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) puestoEfectivo = 1;
                 else if (dia == DayOfWeek.Wednesday || dia == DayOfWeek.Friday) puestoEfectivo = 2;
 
-                // DOMINGO NOCHE: Hoy es semana 12 (Par). 
-                // A hizo 12h, Relevo cubre a B (Puesto 2).
-                else if (dia == DayOfWeek.Sunday && hora >= 21 || (dia == DayOfWeek.Monday && hora < 6))
+                // DOMINGO NOCHE (Inicia 21:41)
+                else if ((dia == DayOfWeek.Sunday && (h > 21 || (h == 21 && m >= 41))) || (dia == DayOfWeek.Monday && h < 6))
                 {
+                    // Semana Par: A(1) hizo 12h, Relevo cubre a B(2).
                     puestoEfectivo = esSemanaPar ? 2 : 1;
                 }
-                // LUNES NOCHE: Relevo cubre al que hizo las 12h ayer (Puesto 1).
-                else if (dia == DayOfWeek.Monday && hora >= 21 || (dia == DayOfWeek.Tuesday && hora < 6))
+                // LUNES NOCHE (Inicia 21:41)
+                else if ((dia == DayOfWeek.Monday && (h > 21 || (h == 21 && m >= 41))) || (dia == DayOfWeek.Tuesday && h < 6))
                 {
+                    // Relevo cubre al que hizo 12h el domingo (descansa lunes)
                     puestoEfectivo = esSemanaPar ? 1 : 2;
                 }
             }
@@ -230,7 +250,6 @@ namespace Rutinas
             }
 
             int diaJuliano = ahora.DayOfYear;
-            // Resultado 0 -> Extracción | Resultado 1 -> Alcalizado
             return ((diaJuliano + puestoEfectivo) % 2 == 0) ? "Extracción" : "Alcalizado";
         }
         #endregion
