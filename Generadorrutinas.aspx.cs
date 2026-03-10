@@ -272,8 +272,8 @@ namespace Rutinas
             // 3. SELECCIÓN DE INSTRUMENTOS
             // El algoritmo de selección de 5 Alta, 5 Media, 5 Baja sigue igual, 
             // pero ahora recibe el grupo correcto por calendario.
-            List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado);
-
+            //List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado);
+            List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado, turnoActual);
             // 4. GUARDADO DE LA RUTINA
             GuardarNuevaRutina(codigoEmpleado, turnoActual, idGrupoAsignado, instrumentosSeleccionados);
 
@@ -369,7 +369,49 @@ namespace Rutinas
         // -------------------------------------------------------------------------
         // FASE 2: SELECCIÓN DE INSTRUMENTOS (3x Área: 1 Alta, 1 Media, 1 Baja)
         // -------------------------------------------------------------------------
-        private List<ItemRutina> SeleccionarInstrumentos(int idGrupo)
+        private List<ItemRutina> SeleccionarInstrumentos(int idGrupo, string turnoActual)
+        {
+            List<ItemRutina> rutina = new List<ItemRutina>();
+            List<string> tagsExcluidos = new List<string>();
+
+            // 1. Obtener todas las áreas del grupo (12 para Extracción, 9 para Alcalizado)
+            List<int> todasLasAreas = ObtenerAreasPorGrupo(idGrupo);
+            int totalAreas = todasLasAreas.Count;
+
+            // 2. Determinar el índice del bloque según el turno
+            // Bloque 0: Mañana, Bloque 1: Tarde, Bloque 2: Noche
+            int indiceBloque = 0;
+            if (turnoActual.Contains("14:00") || turnoActual.Contains("18:00 A 22:00")) indiceBloque = 1;
+            else if (turnoActual.Contains("22:00") || turnoActual.Contains("18:00 A 06:00")) indiceBloque = 2;
+
+            // 3. Calcular rango (Ej: 12 áreas / 3 turnos = 4 áreas por turno)
+            int areasPorTurno = totalAreas / 3;
+            int inicio = indiceBloque * areasPorTurno;
+
+            // Ajuste para el último turno por si la división no es exacta
+            int fin = (indiceBloque == 2) ? totalAreas : inicio + areasPorTurno;
+
+            // 4. Tomar solo el subconjunto de áreas que corresponden a este turno
+            List<int> areasFiltradas = todasLasAreas.GetRange(inicio, fin - inicio);
+
+            // 5. Generar instrumentos solo para esas áreas
+            foreach (int idArea in areasFiltradas)
+            {
+                var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", 1, tagsExcluidos);
+                rutina.AddRange(alta);
+                tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList());
+
+                var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", 1, tagsExcluidos);
+                rutina.AddRange(media);
+                tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
+
+                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", 1, tagsExcluidos);
+                rutina.AddRange(baja);
+            }
+
+            return rutina;
+        }
+        /*private List<ItemRutina> SeleccionarInstrumentos(int idGrupo)
         {
             List<ItemRutina> rutina = new List<ItemRutina>();
             List<string> tagsExcluidos = new List<string>();
@@ -398,7 +440,7 @@ namespace Rutinas
             }
 
             return rutina;
-        }
+        }*/
 
         // --- MÉTODO MODIFICADO: Selecciona un equipo por Área y Prioridad ---
         private List<ItemRutina> ObtenerInstrumentosPorAreaPrioridad(int idArea, string prioridadNombre, int cantidad, List<string> tagsExcluidos)
