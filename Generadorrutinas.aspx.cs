@@ -210,47 +210,52 @@ namespace Rutinas
         public string ObtenerAreaDeterminista(string codigoEmpleado)
         {
             DateTime ahora = DateTime.Now;
-            int puestoEfectivo = 0;
-
-            // Sincronizado para que el 22 Feb 2026 sea Día 90 (Semana 12 Par)
             DateTime fechaInicioZafra = new DateTime(2025, 11, 24);
             int diaZafra = (ahora - fechaInicioZafra).Days + 1;
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
+            int diaJuliano = ahora.DayOfYear;
 
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
             bool esCuartoTurno = empleado.EsCuartoTurno;
             int puestoFijo = empleado.PuestoFijo;
 
+            // 1. Calculamos el área que le toca al "Puesto 1" hoy (La base de la rotación)
+            // Esta fórmula mantiene la rotación diaria para toda la planta.
+            string areaPuesto1 = ((diaJuliano + 1) % 2 == 0) ? "Extracción" : "Alcalizado";
+            string areaPuesto2 = (areaPuesto1 == "Extracción") ? "Alcalizado" : "Extracción";
+
+            // 2. Si es Cuarto Turno, decidimos qué puesto está relevando según el día/hora
             if (esCuartoTurno)
             {
                 DayOfWeek dia = ahora.DayOfWeek;
                 int h = ahora.Hour;
                 int m = ahora.Minute;
 
-                // Martes a Viernes
-                if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) puestoEfectivo = 1;
-                else if (dia == DayOfWeek.Wednesday || dia == DayOfWeek.Friday) puestoEfectivo = 2;
+                // ¿A quién releva hoy?
+                bool relevaAlPuesto1 = false;
 
-                // DOMINGO NOCHE (Inicia 21:41)
-                else if ((dia == DayOfWeek.Sunday && (h > 21 || (h == 21 && m >= 41))) || (dia == DayOfWeek.Monday && h < 6))
+                // Martes/Jueves (Mañana/Tarde) -> Releva al Puesto 1
+                if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) relevaAlPuesto1 = true;
+
+                // Domingo Noche / Lunes Noche
+                else if ((dia == DayOfWeek.Sunday || dia == DayOfWeek.Monday) && (h > 21 || (h == 21 && m >= 41)))
                 {
-                    // Semana Par: A(1) hizo 12h, Relevo cubre a B(2).
-                    puestoEfectivo = esSemanaPar ? 2 : 1;
+                    // El domingo noche releva al Puesto 2 si es semana par
+                    relevaAlPuesto1 = esSemanaPar ? false : true;
                 }
-                // LUNES NOCHE (Inicia 21:41)
-                else if ((dia == DayOfWeek.Monday && (h > 21 || (h == 21 && m >= 41))) || (dia == DayOfWeek.Tuesday && h < 6))
+                else if ((dia == DayOfWeek.Monday || dia == DayOfWeek.Tuesday) && h < 6)
                 {
-                    // Relevo cubre al que hizo 12h el domingo (descansa lunes)
-                    puestoEfectivo = esSemanaPar ? 1 : 2;
+                    // Madrugada (continuación del relevo nocturno)
+                    relevaAlPuesto1 = esSemanaPar ? false : true;
                 }
+
+                return relevaAlPuesto1 ? areaPuesto1 : areaPuesto2;
             }
             else
             {
-                puestoEfectivo = puestoFijo;
+                // 3. Para los demás (Puestos fijos), se usa la lógica estándar del Día Juliano
+                return (puestoFijo == 1) ? areaPuesto1 : areaPuesto2;
             }
-
-            int diaJuliano = ahora.DayOfYear;
-            return ((diaJuliano + puestoEfectivo) % 2 == 0) ? "Extracción" : "Alcalizado";
         }
         #endregion
         // -------------------------------------------------------------------------------------
