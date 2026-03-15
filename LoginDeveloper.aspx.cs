@@ -138,13 +138,16 @@ namespace Rutinas
                 DropDownList ddlactividad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlactividad");
                 DropDownList ddlGrupo = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlarea");
                 DropDownList ddlPrioridad = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlprioridad");
-
+                DropDownList ddlObliga = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlobliga");
+                DropDownList ddlAnalisis = (DropDownList)gvinstrumentos.FooterRow.FindControl("ddlanalisis");
                 // 2. OBTENER VALORES (Lógica para Select2 con tags:true)
                 // Si el usuario escribió algo nuevo, SelectedValue nos dará ese texto.
                 //string valorTAG = lbxtag.SelectedValue;
                 //string valorNombre = lbxnombre.SelectedValue;
                 string valorTAG = Request.Form[lbxtag.UniqueID];
                 string valorNombre = Request.Form[lbxnombre.UniqueID];
+                //string obligatorio = "1";
+                //string tipoanalisis = "N/A";
 
                 // PRUEBA TEMPORAL: Reemplaza tu alerta por esta para ver qué llega
                 if (string.IsNullOrEmpty(valorTAG) || string.IsNullOrEmpty(valorNombre))
@@ -167,7 +170,8 @@ namespace Rutinas
                 SqlDataSource3.InsertParameters["Actividad"].DefaultValue = ddlactividad.SelectedValue;
                 SqlDataSource3.InsertParameters["IDarea"].DefaultValue = ddlGrupo.SelectedValue;
                 SqlDataSource3.InsertParameters["IDprioridad"].DefaultValue = ddlPrioridad.SelectedValue;
-
+                SqlDataSource3.InsertParameters["EsObligatorio"].DefaultValue = ddlObliga.SelectedValue;
+                SqlDataSource3.InsertParameters["TipoAnalisis"].DefaultValue = ddlAnalisis.SelectedValue;
                 try
                 {
                     // 4. Ejecutar la inserción

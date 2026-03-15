@@ -38,6 +38,22 @@
         text-align: center;
     }
 
+.tabla-comprobaciones {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .tabla-comprobaciones th, .tabla-comprobaciones td {
+        border: 1px solid #333;
+        padding: 3px;
+        vertical-align: top;
+    }
+
+    .tabla-comprobaciones th {
+        background-color: #f2f2f2;
+        text-align: center;
+    }
+
 /* --- Definición de Anchos de Columna (Asegura que sumen 100%) --- */
 
 /* Nota: Se mantendrá table-layout: fixed; y !important en la sección @media print */
@@ -55,6 +71,21 @@
 }
 
 .col-lectura {
+    width: 8%;
+    text-align: center;
+}
+
+.col-lecturaeq {
+    width: 8%;
+    text-align: center;
+}
+
+.col-lecturalab {
+    width: 8%;
+    text-align: center;
+}
+
+.col-evidencia {
     width: 8%;
     text-align: center;
 }

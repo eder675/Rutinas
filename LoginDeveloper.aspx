@@ -78,8 +78,6 @@
                 </asp:GridView>
                 <asp:SqlDataSource ID="runtines" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT * FROM [Rutinas]">
                 </asp:SqlDataSource>
-                <asp:DropDownList ID="DropDownList1" runat="server">
-                </asp:DropDownList>
                 <br />
             </asp:View>
             <asp:View ID="vempleados" runat="server">
@@ -295,22 +293,52 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <asp:Label ID="Label5" runat="server" Text='<%# Bind("Expr2") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField HeaderText="EsObligatorio" SortExpression="Obligatorio">
+                            <EditItemTemplate>
+                                <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="SqlDataSourceobliga" DataTextField="EsObligatorio" DataValueField="EsObligatorio" SelectedValue='<%# Bind("EsObligatorio") %>'>
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceobliga" runat="server" ConnectionString="<%$ ConnectionStrings:ConexionRutinasMTI %>" SelectCommand="SELECT DISTINCT [EsObligatorio] FROM [Instrumentos]"></asp:SqlDataSource>
+                            </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:DropDownList ID="ddlobliga" runat="server" DataSourceID="SqlDataSourceobliatorio" DataTextField="EsObligatorio" DataValueField="EsObligatorio">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceobliatorio" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString %>" SelectCommand="SELECT DISTINCT [EsObligatorio] FROM [Instrumentos]"></asp:SqlDataSource>
+                            </FooterTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="Label8" runat="server" Text='<%# Bind("EsObligatorio") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="TipoAnalisis" SortExpression="Tipoanalisis">
+                            <EditItemTemplate>
+                                <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="SqlDataSourceTipoanalisisddl" DataTextField="TipoAnalisis" DataValueField="TipoAnalisis" SelectedValue='<%# Bind("TipoAnalisis") %>'>
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceTipoanalisisddl" runat="server" ConnectionString="<%$ ConnectionStrings:ConexionRutinasMTI %>" SelectCommand="SELECT DISTINCT [TipoAnalisis] FROM [Instrumentos]"></asp:SqlDataSource>
+                            </EditItemTemplate>
+                            <FooterTemplate>
+                                <asp:DropDownList ID="ddlanalisis" runat="server" DataSourceID="SqlDataSourcetipoanalisis" DataTextField="TipoAnalisis" DataValueField="TipoAnalisis">
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourcetipoanalisis" runat="server" ConnectionString="<%$ ConnectionStrings:ConexionRutinasMTI %>" SelectCommand="SELECT DISTINCT [TipoAnalisis] FROM [Instrumentos]"></asp:SqlDataSource>
+                            </FooterTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="Label9" runat="server" Text='<%# Bind("TipoAnalisis") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:TemplateField ShowHeader="False">
                             <EditItemTemplate>
                                 <asp:Button ID="Button1" runat="server" CausesValidation="True" CommandName="Update" Text="Actualizar" />
-                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
+                                <asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancelar" />
                             </EditItemTemplate>
                             <FooterTemplate>
-                                <asp:Button ID="btninsertinstrumento" runat="server" Text="INSERTAR" CommandName="insertnewinstrumentos" OnClick="btninsertinstrumento_Click" />
+                                <asp:Button ID="btninsertinstrumento" runat="server" CommandName="insertnewinstrumentos" OnClick="btninsertinstrumento_Click" Text="INSERTAR" />
                             </FooterTemplate>
                             <ItemTemplate>
                                 <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Edit" Text="Editar" />
-                                &nbsp;<asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Delete" Text="Eliminar" />
+                                <asp:Button ID="Button2" runat="server" CausesValidation="False" CommandName="Delete" Text="Eliminar" />
                             </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>
-                <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Instrumentos] WHERE [TAG] = @TAG" InsertCommand="INSERT INTO [Instrumentos] ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad]) VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad)" SelectCommand="SELECT Instrumentos.TAG, Instrumentos.Nombre, Instrumentos.Actividad, Instrumentos.IDarea, Instrumentos.IDprioridad, Area.Nombre AS Expr1, Prioridad.Nombre AS Expr2 FROM Instrumentos INNER JOIN Prioridad ON Instrumentos.IDprioridad = Prioridad.IDprioridad INNER JOIN Area ON Instrumentos.IDarea = Area.IDarea" UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad WHERE [TAG] = @TAG">
+                <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" DeleteCommand="DELETE FROM [Instrumentos] WHERE [TAG] = @TAG" InsertCommand="INSERT INTO [Instrumentos] ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad], [EsObligatorio], [TipoAnalisis]) VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad, @EsObligatorio, @TipoAnalisis)" SelectCommand="SELECT Instrumentos.TAG, Instrumentos.Nombre, Instrumentos.Actividad, Instrumentos.IDarea, Instrumentos.IDprioridad, Area.Nombre AS Expr1, Prioridad.Nombre AS Expr2, Instrumentos.EsObligatorio, Instrumentos.TipoAnalisis FROM Instrumentos INNER JOIN Prioridad ON Instrumentos.IDprioridad = Prioridad.IDprioridad INNER JOIN Area ON Instrumentos.IDarea = Area.IDarea" UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad, [EsObligatorio] = @EsObligatorio, [TipoAnalisis] = @TipoAnalisis WHERE [TAG] = @TAG">
                     <DeleteParameters>
                         <asp:Parameter Name="TAG" Type="String" />
                     </DeleteParameters>
@@ -320,6 +348,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <asp:Parameter Name="Actividad" Type="String" />
                         <asp:Parameter Name="IDarea" Type="Int32" />
                         <asp:Parameter Name="IDprioridad" Type="Int32" />
+                        <asp:Parameter Name="EsObligatorio" Type="String" /> 
+                        <asp:Parameter Name="TipoAnalisis" Type="String" />
                     </InsertParameters>
                     <UpdateParameters>
                         <asp:Parameter Name="Nombre" Type="String" />
@@ -327,6 +357,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <asp:Parameter Name="IDarea" Type="Int32" />
                         <asp:Parameter Name="IDprioridad" Type="Int32" />
                         <asp:Parameter Name="TAG" Type="String" />
+                        <asp:Parameter Name="EsObligatorio" Type="String" /> 
+                        <asp:Parameter Name="TipoAnalisis" Type="String" />
                     </UpdateParameters>
                 </asp:SqlDataSource>
             </asp:View>
@@ -368,9 +400,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
 
         // RE-INICIALIZACIÓN (Crucial para Web Forms)
         // Esto hace que funcione después de insertar o cambiar de página en el GridView
-        if (typeof(Sys) !== 'undefined') {
+        if (typeof (Sys) !== 'undefined') {
             var prm = Sys.WebForms.PageRequestManager.getInstance();
-            prm.add_endRequest(function() {
+            prm.add_endRequest(function () {
                 setupSincronizacion();
             });
         }
