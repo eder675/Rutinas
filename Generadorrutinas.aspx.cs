@@ -70,6 +70,11 @@ namespace Rutinas
                     rptRutina.DataSource = rutinaGenerada;
                     rptRutina.DataBind();
 
+                    // Llenar el Repeater de comprobaciones obligatorias
+                    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado);
+                    rptObligatorios.DataSource = obligatorios;
+                    rptObligatorios.DataBind();
+
                     // --- Dentro del Page_Load de la página de Impresión/PDF ---
 
                     // 1. Definimos la URL de nuestra página de servicio para cerrar la sesión
@@ -555,6 +560,95 @@ namespace Rutinas
         }
 
         #endregion
+        #region comprobaciones obligatorias
+        private List<ItemRutina> SeleccionarEquiposObligatorios(string areaCalculada)
+        {
+            List<ItemRutina> lista = new List<ItemRutina>();
+
+            if (areaCalculada == "Extracción")
+            {
+                // 2 equipos que miden pH (de cualquier área)
+                string sqlPH = @"
+                    SELECT TOP 2
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE I.TipoAnalisis = 'pH'
+                    ORDER BY NEWID()";
+                lista.AddRange(EjecutarConsultaObligatorios(sqlPH));
+
+                // 1 báscula servo del área SECADORA Y EMPAQUE
+                string sqlServo = @"
+                    SELECT TOP 1
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE A.Nombre LIKE '%SECADORA%'
+                      AND I.Nombre LIKE '%SERVO%'
+                    ORDER BY NEWID()";
+                lista.AddRange(EjecutarConsultaObligatorios(sqlServo));
+
+                // 1 báscula neumática del área SECADORA Y EMPAQUE
+                string sqlNeumatica = @"
+                    SELECT TOP 1
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE A.Nombre LIKE '%SECADORA%'
+                      AND I.Nombre LIKE '%NEUMATICA%'
+                    ORDER BY NEWID()";
+                lista.AddRange(EjecutarConsultaObligatorios(sqlNeumatica));
+            }
+            else // Alcalizado
+            {
+                // 4 equipos Brix aleatorios (de los 11 disponibles)
+                string sqlBrix = @"
+                    SELECT TOP 4
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE I.TipoAnalisis = 'Brix'
+                    ORDER BY NEWID()";
+                lista.AddRange(EjecutarConsultaObligatorios(sqlBrix));
+            }
+
+            return lista;
+        }
+
+        private List<ItemRutina> EjecutarConsultaObligatorios(string sql)
+        {
+            List<ItemRutina> lista = new List<ItemRutina>();
+            DataTable dt = new DataTable();
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new ItemRutina
+                {
+                    NombreArea = row["NombreArea"].ToString(),
+                    TAG = row["TAG"].ToString(),
+                    NombreInstrumento = row["NombreInstrumento"].ToString(),
+                    Actividad = string.Empty
+                });
+            }
+            return lista;
+        }
+        #endregion
         #region ultimarutina
         private void CargarUltimaRutina()
         {
@@ -643,7 +737,13 @@ namespace Rutinas
             rptRutina.DataBind();
             rptRutina.Visible = true;
 
-            // --- 3. IMPRESIÓN AUTOMÁTICA ---
+            // 3. Llenar el Repeater de comprobaciones obligatorias
+            string areaObligatorios = ObtenerAreaDeterminista(codigoEmpleado);
+            List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(areaObligatorios);
+            rptObligatorios.DataSource = obligatorios;
+            rptObligatorios.DataBind();
+
+            // --- 4. IMPRESIÓN AUTOMÁTICA ---
             //string script = @"window.onload = function() { var originalTitle = document.title; document.title = ''; window.print(); document.title = originalTitle; };";
             string logoutUrl = ResolveClientUrl("~/closesession.aspx");
 

@@ -192,7 +192,45 @@
 </table> 
 
         <br />
-        
+
     </form>
+
+    <script type="text/javascript">
+        // Fusiona las celdas de ÁREA consecutivas con el mismo valor,
+        // aplica escritura vertical y oculta los duplicados.
+        function mergeAreaCells(tableSelector) {
+            var table = document.querySelector(tableSelector);
+            if (!table) return;
+            var tbody = table.querySelector('tbody');
+            if (!tbody) return;
+
+            var rows = tbody.querySelectorAll('tr');
+            var prevCell = null;
+            var prevText = '';
+            var span = 1;
+
+            for (var i = 0; i < rows.length; i++) {
+                var cell = rows[i].cells[0];
+                if (!cell) continue;
+                var text = cell.textContent.trim();
+
+                if (prevCell !== null && text === prevText) {
+                    span++;
+                    prevCell.rowSpan = span;
+                    cell.style.display = 'none';
+                } else {
+                    prevCell = cell;
+                    prevText = text;
+                    span = 1;
+                    cell.classList.add('area-vertical');
+                }
+            }
+        }
+
+        window.addEventListener('load', function () {
+            mergeAreaCells('.tabla-instrumentos');
+            mergeAreaCells('.tabla-comprobaciones');
+        });
+    </script>
 </body>
 </html>
