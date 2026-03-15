@@ -222,10 +222,8 @@
     .linea-manual-pequena,
     .linea-manual-larga {
         height: auto;
-        min-height: 12pt;
         border: none !important;
-        border-bottom: 1px solid #000 !important;
-        margin-top: 4px;
+        margin-top: 0;
     }
 
     /* 9. CONTROL DE SALTO DE PÁGINA */
