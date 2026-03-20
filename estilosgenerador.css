@@ -26,7 +26,7 @@
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    font-size: 0.78em;
+    font-size: 0.86em; /* +10% desde 0.78em */
 }
 
     .tabla-instrumentos th, .tabla-instrumentos td,
@@ -42,7 +42,7 @@
     .tabla-comprobaciones th {
         background-color: #f2f2f2;
         text-align: center;
-        font-size: 0.82em;
+        font-size: 0.90em; /* +10% desde 0.82em */
         hyphens: auto;
     }
 
@@ -53,6 +53,7 @@
     text-align: center;
     vertical-align: middle;
     padding: 3px 2px;
+    overflow: hidden; /* evita que nombres largos estiren la altura de las filas */
 }
 
 .area-vertical {
@@ -123,6 +124,17 @@
     width: 33%;
 }
 
+/* --- Altura de celdas: 3 líneas de texto --- */
+/* Se aplica sobre un div interno porque height en td no es fiable en impresión */
+.tabla-instrumentos td.col-equipo,
+.tabla-comprobaciones td.col-equipo {
+    vertical-align: top;
+}
+
+.celda-equipo {
+    min-height: 3em; /* 3 líneas (~41px a fuente de tabla 13.8px) */
+}
+
 /* --- Líneas de llenado manual --- */
 
 .linea-manual-pequena {
@@ -132,7 +144,7 @@
 }
 
 .linea-manual-larga {
-    height: 3em;
+    height: 3em; /* igual que celda-equipo para filas consistentes */
 }
 
 /* ---------------------------------------------------- */
@@ -155,7 +167,7 @@
     body {
         margin: 0;
         padding: 0;
-        font-size: 8pt;
+        font-size: 8.8pt; /* +10% desde 8pt */
         color: #000;
     }
 
@@ -172,7 +184,7 @@
     .tabla-comprobaciones {
         width: 100% !important;
         table-layout: fixed !important;
-        font-size: 7.5pt !important;
+        font-size: 8.3pt !important; /* +10% desde 7.5pt */
     }
 
         .tabla-instrumentos th, .tabla-instrumentos td,
@@ -186,7 +198,7 @@
 
         .tabla-instrumentos th,
         .tabla-comprobaciones th {
-            font-size: 7pt !important;
+            font-size: 7.7pt !important; /* +10% desde 7pt */
             hyphens: auto;
         }
 
@@ -212,21 +224,45 @@
     .tabla-comprobaciones .col-observaciones { width: 33% !important; }
 
     /* 7. ÁREA VERTICAL en impresión */
+    .col-area {
+        overflow: hidden !important;
+    }
+
     .area-vertical {
         writing-mode: vertical-lr !important;
         text-align: center !important;
         vertical-align: middle !important;
+        font-size: 6pt !important;  /* reducido para caber más texto en el espacio del rowspan */
+        overflow: hidden !important;
     }
 
-    /* 8. LÍNEAS MANUALES */
-    .linea-manual-pequena,
+    /* 8. ALTURA DE CELDAS: 3 líneas (equivalente pt a los em de pantalla) */
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo {
+        vertical-align: top !important;
+    }
+
+    .celda-equipo {
+        min-height: 27pt !important; /* 3em × 8.3pt — 3 líneas en impresión */
+    }
+
+    /* 9. LÍNEAS MANUALES — alturas en pt equivalentes a los em de pantalla */
+    .linea-manual-pequena {
+        height: 10pt !important;  /* 1.2em × 8.3pt */
+        border: none !important;
+        margin-top: 0;
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .linea-manual-larga {
-        height: auto;
+        height: 27pt !important;  /* 3em × 8.3pt — igual que celda-equipo */
         border: none !important;
         margin-top: 0;
     }
 
-    /* 9. CONTROL DE SALTO DE PÁGINA */
+    /* 10. CONTROL DE SALTO DE PÁGINA */
     .tabla-instrumentos tr,
     .tabla-comprobaciones tr {
         page-break-inside: avoid !important;

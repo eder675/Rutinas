@@ -377,7 +377,7 @@ namespace Rutinas
         #endregion
         #region fase2
         // -------------------------------------------------------------------------
-        // FASE 2: SELECCIÓN DE INSTRUMENTOS (3x Área: 1 Alta, 1 Media, 1 Baja)
+        // FASE 2: SELECCIÓN DE INSTRUMENTOS (5x Área: 1 Alta, 1 Media, 3 Baja)
         // -------------------------------------------------------------------------
         private List<ItemRutina> SeleccionarInstrumentos(int idGrupo, string turnoActual)
         {
@@ -390,9 +390,11 @@ namespace Rutinas
 
             // 2. Determinar el índice del bloque según el turno
             // Bloque 0: Mañana, Bloque 1: Tarde, Bloque 2: Noche
+            // NOTA: No usar Contains("14:00") porque "06:00 A 14:00" (mañana) también lo contiene.
+            // Se usa "A 22:00" que es exclusivo del turno tarde.
             int indiceBloque = 0;
-            if (turnoActual.Contains("14:00") || turnoActual.Contains("18:00 A 22:00")) indiceBloque = 1;
-            else if (turnoActual.Contains("22:00") || turnoActual.Contains("18:00 A 06:00")) indiceBloque = 2;
+            if (turnoActual.Contains("A 22:00")) indiceBloque = 1;
+            else if (turnoActual.Contains("22:00") || turnoActual.Contains("A 06:00")) indiceBloque = 2;
 
             // 3. Calcular rango (Ej: 12 áreas / 3 turnos = 4 áreas por turno)
             int areasPorTurno = totalAreas / 3;
@@ -404,7 +406,7 @@ namespace Rutinas
             // 4. Tomar solo el subconjunto de áreas que corresponden a este turno
             List<int> areasFiltradas = todasLasAreas.GetRange(inicio, fin - inicio);
 
-            // 5. Generar instrumentos solo para esas áreas
+            // 5. Generar instrumentos solo para esas áreas: 1 Alta, 2 Media, 3 Baja
             foreach (int idArea in areasFiltradas)
             {
                 var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", 1, tagsExcluidos);
@@ -417,6 +419,7 @@ namespace Rutinas
 
                 var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", 1, tagsExcluidos);
                 rutina.AddRange(baja);
+                tagsExcluidos.AddRange(baja.Select(i => i.TAG).ToList());
             }
 
             return rutina;
@@ -452,42 +455,58 @@ namespace Rutinas
             return rutina;
         }*/
 
-        // --- MÉTODO MODIFICADO: Selecciona un equipo por Área y Prioridad ---
+        // Intenta seleccionar instrumentos respetando el historial de 24h.
+        // Si no hay suficientes disponibles, reinicia la lista negra e intenta de nuevo.
         private List<ItemRutina> ObtenerInstrumentosPorAreaPrioridad(int idArea, string prioridadNombre, int cantidad, List<string> tagsExcluidos)
+        {
+            // Intento 1: respetando la exclusión de las últimas 24 horas
+            var lista = ConsultarInstrumentos(idArea, prioridadNombre, cantidad, tagsExcluidos, excluir24h: true);
+
+            // Intento 2: si se agotaron los disponibles, se reinicia la lista negra
+            if (lista.Count < cantidad)
+                lista = ConsultarInstrumentos(idArea, prioridadNombre, cantidad, tagsExcluidos, excluir24h: false);
+
+            return lista;
+        }
+
+        private List<ItemRutina> ConsultarInstrumentos(int idArea, string prioridadNombre, int cantidad, List<string> tagsExcluidos, bool excluir24h)
         {
             List<ItemRutina> lista = new List<ItemRutina>();
             DataTable dt = new DataTable();
 
-            string tagsYaSeleccionados = tagsExcluidos.Any() ?
-                "AND I.TAG NOT IN ('" + string.Join("','", tagsExcluidos) + "')" :
-                string.Empty;
+            string filtroSesion = tagsExcluidos.Any()
+                ? "AND I.TAG NOT IN ('" + string.Join("','", tagsExcluidos) + "')"
+                : string.Empty;
 
-            // Consulta SQL: El filtro se aplica directamente al IDarea
-            string sql = $@"
-            SELECT TOP {cantidad} 
-                I.TAG, 
-                I.Nombre AS NombreInstrumento, 
-                I.Actividad, 
-                A.Nombre AS NombreArea
-            FROM Instrumentos I
-            INNER JOIN Area A ON I.IDarea = A.IDarea
-            WHERE 
-                I.IDarea = @IDArea -- << FILTRO POR EL ÁREA ESPECÍFICA
-                AND I.IDprioridad = (SELECT IDprioridad FROM Prioridad WHERE Nombre = @PrioridadNombre)
-                {tagsYaSeleccionados}
-                AND I.TAG NOT IN (
+            string filtro24h = excluir24h
+                ? @"AND I.TAG NOT IN (
                     SELECT RI.TAG
                     FROM Rutinas R
                     INNER JOIN Rutina_instrumento RI ON R.Correlativo = RI.Correlativo
-                    WHERE R.Fecha >= DATEADD(hour, -24, GETDATE()) 
-                )
-            ORDER BY NEWID()"; // La aleatoriedad se aplica al equipo dentro de esta Area/Prioridad
+                    WHERE R.Fecha >= DATEADD(hour, -24, GETDATE())
+                )"
+                : string.Empty;
+
+            string sql = $@"
+            SELECT TOP {cantidad}
+                I.TAG,
+                I.Nombre AS NombreInstrumento,
+                I.Actividad,
+                A.Nombre AS NombreArea
+            FROM Instrumentos I
+            INNER JOIN Area A ON I.IDarea = A.IDarea
+            WHERE
+                I.IDarea = @IDArea
+                AND I.IDprioridad = (SELECT IDprioridad FROM Prioridad WHERE Nombre = @PrioridadNombre)
+                {filtroSesion}
+                {filtro24h}
+            ORDER BY NEWID()";
 
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@IDArea", idArea); // NUEVO PARÁMETRO
+                cmd.Parameters.AddWithValue("@IDArea", idArea);
                 cmd.Parameters.AddWithValue("@PrioridadNombre", prioridadNombre);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
@@ -497,10 +516,10 @@ namespace Rutinas
             {
                 lista.Add(new ItemRutina
                 {
-                    NombreArea = row["NombreArea"].ToString(),
-                    TAG = row["TAG"].ToString(),
-                    NombreInstrumento = row["NombreInstrumento"].ToString(),
-                    Actividad = row["Actividad"].ToString()
+                    NombreArea = row["NombreArea"].ToString().Trim(),
+                    TAG = row["TAG"].ToString().Trim(),
+                    NombreInstrumento = row["NombreInstrumento"].ToString().Trim(),
+                    Actividad = row["Actividad"].ToString().Trim()
                 });
             }
             return lista;
@@ -640,9 +659,9 @@ namespace Rutinas
             {
                 lista.Add(new ItemRutina
                 {
-                    NombreArea = row["NombreArea"].ToString(),
-                    TAG = row["TAG"].ToString(),
-                    NombreInstrumento = row["NombreInstrumento"].ToString(),
+                    NombreArea = row["NombreArea"].ToString().Trim(),
+                    TAG = row["TAG"].ToString().Trim(),
+                    NombreInstrumento = row["NombreInstrumento"].ToString().Trim(),
                     Actividad = string.Empty
                 });
             }
@@ -702,15 +721,15 @@ namespace Rutinas
 
             // --- B. CARGAR TODOS LOS INSTRUMENTOS USANDO EL CORRELATIVO ENCONTRADO ---
             string sqlCargarDetalle = @"
-        SELECT 
-            A.Nombre AS NombreArea, 
-            I.TAG, 
-            I.Nombre AS NombreInstrumento, 
-            I.Actividad
+        SELECT
+            LTRIM(RTRIM(A.Nombre)) AS NombreArea,
+            LTRIM(RTRIM(I.TAG))    AS TAG,
+            LTRIM(RTRIM(I.Nombre)) AS NombreInstrumento,
+            LTRIM(RTRIM(I.Actividad)) AS Actividad
         FROM Rutina_instrumento RI
         INNER JOIN Instrumentos I ON RI.TAG = I.TAG
         INNER JOIN Area A ON I.IDarea = A.IDarea
-        WHERE 
+        WHERE
             RI.Correlativo = @Correlativo
         ORDER BY A.IDarea ASC"; // Ordenamos por área para mantener el orden geográfico
 

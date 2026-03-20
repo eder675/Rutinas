@@ -73,7 +73,7 @@
         <br />
         
     <h3>DETALLE DE INSTRUMENTOS</h3>
-    
+
     <table class="tabla-instrumentos" cellspacing="0" cellpadding="0">
         <asp:Repeater ID="rptRutina" runat="server">
             
@@ -97,8 +97,10 @@
                         <asp:Label ID="lblArea" runat="server" Text='<%# Eval("NombreArea") %>' />
                     </td>
                     
-                    <td class="col-equipo"> 
-                        <asp:Label ID="lblEquipo" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+                    <td class="col-equipo">
+                        <div class="celda-equipo">
+                            <asp:Label ID="lblEquipo" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+                        </div>
                     </td>
                     
                     <td class="col-detalle"> 
@@ -129,7 +131,7 @@
 </table> 
 
     <h3>DETALLE DE COMPROBACIONES OBLIGATORIAS</h3>
-    
+
     <table class="tabla-comprobaciones" cellspacing="0" cellpadding="0">
         <asp:Repeater ID="rptObligatorios" runat="server">
             
@@ -154,8 +156,10 @@
                         <asp:Label ID="lblArea0" runat="server" Text='<%# Eval("NombreArea") %>' />
                     </td>
                     
-                    <td class="col-equipo"> 
-                        <asp:Label ID="lblEquipo0" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+                    <td class="col-equipo">
+                        <div class="celda-equipo">
+                            <asp:Label ID="lblEquipo0" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+                        </div>
                     </td>
                     
                     <td class="col-lecturaeq"> 
@@ -230,6 +234,34 @@
         window.addEventListener('load', function () {
             mergeAreaCells('.tabla-instrumentos');
             mergeAreaCells('.tabla-comprobaciones');
+        });
+
+        // AUTO-AJUSTE AL IMPRIMIR
+        // Carta portrait con márgenes 0.4in: área imprimible = 10.2in = 979px a 96dpi
+        var ALTO_CARTA_PX = 10.2 * 96;
+
+        window.addEventListener('beforeprint', function () {
+            var carta = document.querySelector('.formato-carta');
+            if (!carta) return;
+            // Resetear escala previa para medir la altura real
+            carta.style.transform = '';
+            carta.style.width = '';
+            var altoContenido = carta.scrollHeight;
+            if (altoContenido > ALTO_CARTA_PX) {
+                var escala = ALTO_CARTA_PX / altoContenido;
+                carta.style.transformOrigin = 'top left';
+                carta.style.transform = 'scale(' + escala + ')';
+                // Compensar el ancho para que el contenido escalado ocupe el 100% del papel
+                carta.style.width = (100 / escala).toFixed(2) + '%';
+            }
+        });
+
+        window.addEventListener('afterprint', function () {
+            var carta = document.querySelector('.formato-carta');
+            if (carta) {
+                carta.style.transform = '';
+                carta.style.width = '';
+            }
         });
     </script>
 </body>

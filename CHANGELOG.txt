@@ -1,0 +1,362 @@
+================================================================================
+REGISTRO DE CAMBIOS - PROYECTO RUTINAS
+Ingenio La Cabaña - Departamento de Metrologia y Tecnologia Industrial
+================================================================================
+
+--------------------------------------------------------------------------------
+CAMBIO #1 - 2026-03-15
+Archivo: LoginDeveloper.aspx
+Descripcion: Correccion en la insercion de instrumentos — columnas EsObligatorio
+             y TipoAnalisis no se guardaban en la base de datos.
+--------------------------------------------------------------------------------
+CAUSA: El InsertCommand del SqlDataSource3 no incluia EsObligatorio ni
+       TipoAnalisis a pesar de que los parametros estaban declarados y
+       asignados correctamente en el code-behind.
+
+ANTES (LoginDeveloper.aspx, SqlDataSource3 InsertCommand):
+    InsertCommand="INSERT INTO [Instrumentos]
+        ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad])
+        VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad)"
+
+DESPUES:
+    InsertCommand="INSERT INTO [Instrumentos]
+        ([TAG], [Nombre], [Actividad], [IDarea], [IDprioridad], [EsObligatorio], [TipoAnalisis])
+        VALUES (@TAG, @Nombre, @Actividad, @IDarea, @IDprioridad, @EsObligatorio, @TipoAnalisis)"
+
+--------------------------------------------------------------------------------
+CAMBIO #2 - 2026-03-15
+Archivo: Generadorrutinas.aspx y Generadorrutinas.aspx.cs
+Descripcion: Nueva tabla DETALLE DE COMPROBACIONES OBLIGATORIAS — se agrego
+             logica para poblarla automaticamente al generar la rutina.
+--------------------------------------------------------------------------------
+LOGICA AGREGADA (Generadorrutinas.aspx.cs):
+  - Nuevo metodo SeleccionarEquiposObligatorios(string areaCalculada):
+      * Area = "Extraccion": 2 equipos pH + 1 bascula servo + 1 bascula
+        neumatica del area SECADORA Y EMPAQUE.
+      * Area = "Alcalizado": 4 equipos Brix aleatorios de 11 disponibles.
+  - Nuevo metodo EjecutarConsultaObligatorios(string sql): helper reutilizable.
+  - Page_Load: se bindea rptObligatorios con los equipos obligatorios.
+  - CargarUltimaRutina: tambien bindea rptObligatorios al reimprimir.
+
+ANTES (Page_Load, despues de rptRutina.DataBind()):
+    // No existia ningun codigo para rptObligatorios
+
+DESPUES:
+    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado);
+    rptObligatorios.DataSource = obligatorios;
+    rptObligatorios.DataBind();
+
+--------------------------------------------------------------------------------
+CAMBIO #3 - 2026-03-15
+Archivos: estilosgenerador.css, Generadorrutinas.aspx
+Descripcion: Rediseno de estilos del formulario generado — reduccion de fuente,
+             ajuste de anchos de columna, fusion de celdas de area repetidas
+             con texto vertical mediante JavaScript.
+--------------------------------------------------------------------------------
+CAMBIOS EN estilosgenerador.css:
+  - font-size tablas pantalla: no definido → 0.78em
+  - font-size tablas impresion: no definido → 7.5pt
+  - font-size body impresion: no definido → 8pt
+  - font-size th impresion: no definido → 7pt
+  - col-area: 10% → 5% (texto vertical al fusionar)
+  - tabla-comprobaciones .col-observaciones: 25% → 33%
+  - Suma de columnas tabla-comprobaciones corregida a 100%
+  - Eliminadas lineas border-bottom de celdas vacias (linea-manual)
+
+CAMBIOS EN Generadorrutinas.aspx:
+  - Agregado script JavaScript mergeAreaCells() que fusiona celdas de la
+    columna AREA con el mismo valor usando rowspan y aplica writing-mode
+    vertical-lr para mostrar el nombre del area de forma vertical.
+
+ANTES (estilosgenerador.css, .tabla-instrumentos):
+    .tabla-instrumentos { width: 100%; border-collapse: collapse; }
+    .col-area { width: 10%; }
+
+DESPUES:
+    .tabla-instrumentos { width: 100%; border-collapse: collapse;
+                          table-layout: fixed; font-size: 0.78em; }
+    .col-area { width: 5%; text-align: center; vertical-align: middle; }
+    .area-vertical { writing-mode: vertical-lr; font-weight: bold; }
+
+--------------------------------------------------------------------------------
+CAMBIO #4 - 2026-03-15
+Archivo: estilosgenerador.css
+Descripcion: Eliminacion de lineas en celdas vacias de las tablas.
+--------------------------------------------------------------------------------
+ANTES (@media print, .linea-manual-pequena):
+    .linea-manual-pequena, .linea-manual-larga {
+        height: auto;
+        border: none !important;
+        border-bottom: 1px solid #000 !important;
+        margin-top: 4px;
+    }
+
+DESPUES:
+    .linea-manual-pequena, .linea-manual-larga {
+        height: auto;
+        border: none !important;
+        margin-top: 0;
+    }
+
+--------------------------------------------------------------------------------
+CAMBIO #5 - 2026-03-18
+Archivo: LoginDeveloper.aspx
+Descripcion: Correccion del error al editar y actualizar instrumentos en el
+             GridView gvinstrumentos.
+--------------------------------------------------------------------------------
+CAUSA: Tres problemas en los EditItemTemplate del GridView:
+  1. DropDownList2 (Actividad) no tenia SelectedValue con Bind() — el
+     parametro @Actividad llegaba NULL al UPDATE causando error de BD.
+  2. TextBox3 (IDarea) mostraba el ID numerico, no el nombre del area.
+  3. TextBox4 (IDprioridad) mostraba el ID numerico, no el nombre.
+
+ANTES (EditItemTemplate Actividad):
+    <asp:DropDownList ID="DropDownList2" runat="server"
+        DataSourceID="SqlDataSource4"
+        DataTextField="Actividad" DataValueField="Actividad">
+    </asp:DropDownList>
+    <asp:SqlDataSource ID="SqlDataSource4" runat="server"
+        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString5 %>"
+        ProviderName="..." SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]">
+    </asp:SqlDataSource>
+
+DESPUES:
+    <asp:DropDownList ID="DropDownList2" runat="server"
+        DataSourceID="SqlDataSource4"
+        DataTextField="Actividad" DataValueField="Actividad"
+        SelectedValue='<%# Bind("Actividad") %>'>
+    </asp:DropDownList>
+    <asp:SqlDataSource ID="SqlDataSource4" runat="server"
+        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>"
+        SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]">
+    </asp:SqlDataSource>
+
+ANTES (EditItemTemplate IDarea):
+    <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("IDarea") %>'>
+    </asp:TextBox>
+
+DESPUES:
+    <asp:DropDownList ID="DropDownList1" runat="server"
+        DataSourceID="SqlDataSourceEditAreas"
+        DataTextField="Nombre" DataValueField="IDarea"
+        SelectedValue='<%# Bind("IDarea") %>'>
+    </asp:DropDownList>
+    <asp:SqlDataSource ID="SqlDataSourceEditAreas" runat="server"
+        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>"
+        SelectCommand="SELECT [IDarea], [Nombre] FROM [Area]">
+    </asp:SqlDataSource>
+
+ANTES (EditItemTemplate IDprioridad):
+    <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("IDprioridad") %>'>
+    </asp:TextBox>
+
+DESPUES:
+    <asp:DropDownList ID="DropDownList5" runat="server"
+        DataSourceID="SqlDataSourceEditPrioridad"
+        DataTextField="Nombre" DataValueField="IDprioridad"
+        SelectedValue='<%# Bind("IDprioridad") %>'>
+    </asp:DropDownList>
+    <asp:SqlDataSource ID="SqlDataSourceEditPrioridad" runat="server"
+        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>"
+        SelectCommand="SELECT [IDprioridad], [Nombre] FROM [Prioridad]">
+    </asp:SqlDataSource>
+
+--------------------------------------------------------------------------------
+CAMBIO #6 - 2026-03-18
+Archivo: Generadorrutinas.aspx.cs
+Descripcion: Cambio en la distribucion de instrumentos por area y logica de
+             reinicio de lista negra cuando se agotan los disponibles.
+--------------------------------------------------------------------------------
+DISTRIBUCION ANTERIOR: 1 Alta + 1 Media + 1 Baja = 3 por area
+DISTRIBUCION NUEVA:    1 Alta + 2 Media + 3 Baja = 6 por area
+
+ANTES (SeleccionarInstrumentos, foreach por area):
+    var alta  = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta",  1, tagsExcluidos);
+    rutina.AddRange(alta);
+    tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList());
+
+    var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", 1, tagsExcluidos);
+    rutina.AddRange(media);
+    tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
+
+    var baja  = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja",  1, tagsExcluidos);
+    rutina.AddRange(baja);
+    // NOTA: tagsExcluidos para baja no se actualizaba (bug corregido)
+
+DESPUES:
+    var alta  = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta",  1, tagsExcluidos);
+    rutina.AddRange(alta);
+    tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList());
+
+    var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", 2, tagsExcluidos);
+    rutina.AddRange(media);
+    tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
+
+    var baja  = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja",  3, tagsExcluidos);
+    rutina.AddRange(baja);
+    tagsExcluidos.AddRange(baja.Select(i => i.TAG).ToList());
+
+LOGICA DE REINICIO DE LISTA NEGRA:
+  ObtenerInstrumentosPorAreaPrioridad() ahora delega en ConsultarInstrumentos()
+  con dos intentos:
+    Intento 1: excluir24h = true  (comportamiento normal)
+    Intento 2: excluir24h = false (si resultado < cantidad pedida, ignora
+                                   historial de 24h para ese bloque)
+
+ANTES (ObtenerInstrumentosPorAreaPrioridad — metodo unico):
+    string sql = $@"SELECT TOP {cantidad} ...
+        AND I.TAG NOT IN (
+            SELECT RI.TAG FROM Rutinas R
+            INNER JOIN Rutina_instrumento RI ON R.Correlativo = RI.Correlativo
+            WHERE R.Fecha >= DATEADD(hour, -24, GETDATE())
+        )
+        ORDER BY NEWID()";
+    // Sin reintento — si no habia instrumentos disponibles, retornaba lista vacia
+
+DESPUES:
+    private List<ItemRutina> ObtenerInstrumentosPorAreaPrioridad(...) {
+        var lista = ConsultarInstrumentos(..., excluir24h: true);
+        if (lista.Count < cantidad)
+            lista = ConsultarInstrumentos(..., excluir24h: false); // reinicio lista negra
+        return lista;
+    }
+    private List<ItemRutina> ConsultarInstrumentos(..., bool excluir24h) {
+        string filtro24h = excluir24h ? "AND I.TAG NOT IN (SELECT ...24h...)" : string.Empty;
+        // SQL con o sin filtro de 24h segun parametro
+    }
+
+--------------------------------------------------------------------------------
+CAMBIO #7 - 2026-03-18
+Archivo: estilosgenerador.css
+Descripcion: Aumento de tamaño de letra en un 10% en todo el documento
+             generado, y altura minima de 3+ lineas en columna EQUIPO.
+--------------------------------------------------------------------------------
+CAMBIOS DE FUENTE (+10%):
+    font-size tablas pantalla:    0.78em  → 0.86em
+    font-size th pantalla:        0.82em  → 0.90em
+    font-size body impresion:     8pt     → 8.8pt
+    font-size tablas impresion:   7.5pt   → 8.3pt
+    font-size th impresion:       7pt     → 7.7pt
+
+ANTES (pantalla, tablas):
+    .tabla-instrumentos, .tabla-comprobaciones { font-size: 0.78em; }
+    .tabla-instrumentos th, .tabla-comprobaciones th { font-size: 0.82em; }
+
+DESPUES:
+    .tabla-instrumentos, .tabla-comprobaciones { font-size: 0.86em; }
+    .tabla-instrumentos th, .tabla-comprobaciones th { font-size: 0.90em; }
+
+ANTES (impresion):
+    body { font-size: 8pt; }
+    .tabla-instrumentos, .tabla-comprobaciones { font-size: 7.5pt !important; }
+    .tabla-instrumentos th, .tabla-comprobaciones th { font-size: 7pt !important; }
+
+DESPUES:
+    body { font-size: 8.8pt; }
+    .tabla-instrumentos, .tabla-comprobaciones { font-size: 8.3pt !important; }
+    .tabla-instrumentos th, .tabla-comprobaciones th { font-size: 7.7pt !important; }
+
+CAMBIO DE ALTURA EN COLUMNA EQUIPO:
+ANTES: sin altura definida — la celda colapsaba al contenido
+
+DESPUES (pantalla):
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo {
+        height: 4em;
+        vertical-align: top;
+    }
+
+DESPUES (impresion):
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo {
+        height: 36pt !important;   /* ~3 lineas a 8.3pt con line-height 1.4 */
+        vertical-align: top !important;
+    }
+
+--------------------------------------------------------------------------------
+CAMBIO #8 - 2026-03-18
+Archivos: Generadorrutinas.aspx, estilosgenerador.css
+Descripcion: Correccion de altura de celdas EQUIPO en impresion — la vista
+             previa de impresion no respetaba la altura definida en pantalla.
+             Las alturas ahora son iguales en ambas tablas.
+--------------------------------------------------------------------------------
+CAUSA: El motor de impresion de Chrome/Edge ignora la propiedad `height` en
+       elementos <td> de tablas. Solo `min-height` en elementos bloque (div)
+       es confiable tanto en pantalla como en impresion.
+
+SOLUCION: Se envolvio el Label del campo EQUIPO en un <div class="celda-equipo">
+          en ambos Repeaters. La regla de altura se aplica ahora sobre ese div.
+
+ANTES (Generadorrutinas.aspx — primera tabla):
+    <td class="col-equipo">
+        <asp:Label ID="lblEquipo" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+    </td>
+
+DESPUES:
+    <td class="col-equipo">
+        <div class="celda-equipo">
+            <asp:Label ID="lblEquipo" runat="server" Text='<%# Eval("NombreInstrumento") %>' />
+        </div>
+    </td>
+
+(Mismo cambio aplicado a lblEquipo0 en la segunda tabla — rptObligatorios)
+
+ANTES (estilosgenerador.css — pantalla):
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo {
+        height: 4em;
+        vertical-align: top;
+    }
+
+DESPUES:
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo { vertical-align: top; }
+
+    .celda-equipo { min-height: 4em; }
+
+ANTES (estilosgenerador.css — @media print):
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo {
+        height: 36pt !important;
+        vertical-align: top !important;
+    }
+
+DESPUES:
+    .tabla-instrumentos td.col-equipo,
+    .tabla-comprobaciones td.col-equipo { vertical-align: top !important; }
+
+    .celda-equipo { min-height: 36pt !important; }
+
+--------------------------------------------------------------------------------
+CAMBIO #9 - 2026-03-18
+Archivo: Generadorrutinas.aspx.cs
+Descripcion: Correccion del bug en la deteccion del turno para la seleccion
+             de areas — mañana y tarde recibían el mismo bloque de areas.
+--------------------------------------------------------------------------------
+CAUSA: La condicion usaba Contains("14:00") para detectar el turno tarde,
+       pero el turno de mañana "06:00 A 14:00" TAMBIEN contiene "14:00",
+       por lo que indiceBloque quedaba en 1 para ambos turnos y los dos
+       recibían el mismo bloque de areas de la BD.
+
+Verificacion de todos los strings de turno posibles:
+  "06:00 A 14:00"  (mañana)          → indiceBloque debe ser 0
+  "14:00 A 22:00"  (tarde)           → indiceBloque debe ser 1
+  "22:00 - 06:00"  (noche)           → indiceBloque debe ser 2
+  "06:00 A 18:00"  (domingo dia)     → indiceBloque debe ser 0
+  "18:00 A 22:00"  (domingo tarde)   → indiceBloque debe ser 1
+  "18:00 A 06:00"  (domingo noche)   → indiceBloque debe ser 2
+
+ANTES (SeleccionarInstrumentos, deteccion de bloque):
+    if (turnoActual.Contains("14:00") || turnoActual.Contains("18:00 A 22:00")) indiceBloque = 1;
+    else if (turnoActual.Contains("22:00") || turnoActual.Contains("18:00 A 06:00")) indiceBloque = 2;
+    // BUG: "06:00 A 14:00" contiene "14:00" → mañana y tarde = mismo bloque (1)
+
+DESPUES:
+    if (turnoActual.Contains("A 22:00")) indiceBloque = 1;
+    else if (turnoActual.Contains("22:00") || turnoActual.Contains("A 06:00")) indiceBloque = 2;
+    // "A 22:00" es exclusivo de tarde: "14:00 A 22:00" y "18:00 A 22:00"
+    // "06:00 A 14:00" no contiene "A 22:00" → queda correctamente en 0
+
+================================================================================
+FIN DEL REGISTRO
+================================================================================

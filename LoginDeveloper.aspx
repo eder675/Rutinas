@@ -254,9 +254,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="Actividad" SortExpression="Actividad">
                             <EditItemTemplate>
-                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSource4" DataTextField="Actividad" DataValueField="Actividad">
+                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSource4" DataTextField="Actividad" DataValueField="Actividad" SelectedValue='<%# Bind("Actividad") %>'>
                                 </asp:DropDownList>
-                                <asp:SqlDataSource ID="SqlDataSource4" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString5 %>" ProviderName="<%$ ConnectionStrings:REPORTESConnectionString5.ProviderName %>" SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]"></asp:SqlDataSource>
+                                <asp:SqlDataSource ID="SqlDataSource4" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT DISTINCT [Actividad] FROM [Instrumentos]"></asp:SqlDataSource>
                             </EditItemTemplate>
                             <FooterTemplate>
                                 <asp:DropDownList ID="ddlactividad" runat="server" DataSourceID="SqlDataSourceactividad" DataTextField="Actividad" DataValueField="Actividad">
@@ -269,7 +269,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="IDarea" SortExpression="IDarea">
                             <EditItemTemplate>
-                                <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("IDarea") %>'></asp:TextBox>
+                                <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="SqlDataSourceEditAreas" DataTextField="Nombre" DataValueField="IDarea" SelectedValue='<%# Bind("IDarea") %>'>
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceEditAreas" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDarea], [Nombre] FROM [Area]"></asp:SqlDataSource>
                             </EditItemTemplate>
                             <FooterTemplate>
                                 <asp:DropDownList ID="ddlarea" runat="server" DataSourceID="SqlDataSourceIDAreas" DataTextField="Nombre" DataValueField="IDarea">
@@ -282,7 +284,9 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="IDprioridad" SortExpression="IDprioridad">
                             <EditItemTemplate>
-                                <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("IDprioridad") %>'></asp:TextBox>
+                                <asp:DropDownList ID="DropDownList5" runat="server" DataSourceID="SqlDataSourceEditPrioridad" DataTextField="Nombre" DataValueField="IDprioridad" SelectedValue='<%# Bind("IDprioridad") %>'>
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSourceEditPrioridad" runat="server" ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>" SelectCommand="SELECT [IDprioridad], [Nombre] FROM [Prioridad]"></asp:SqlDataSource>
                             </EditItemTemplate>
                             <FooterTemplate>
                                 <asp:DropDownList ID="ddlprioridad" runat="server" DataSourceID="SqlDataSourcePrioridad" DataTextField="Nombre" DataValueField="IDprioridad">
@@ -348,7 +352,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <asp:Parameter Name="Actividad" Type="String" />
                         <asp:Parameter Name="IDarea" Type="Int32" />
                         <asp:Parameter Name="IDprioridad" Type="Int32" />
-                        <asp:Parameter Name="EsObligatorio" Type="String" /> 
+                        <asp:Parameter Name="EsObligatorio" Type="String" />
                         <asp:Parameter Name="TipoAnalisis" Type="String" />
                     </InsertParameters>
                     <UpdateParameters>
@@ -357,10 +361,11 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <asp:Parameter Name="IDarea" Type="Int32" />
                         <asp:Parameter Name="IDprioridad" Type="Int32" />
                         <asp:Parameter Name="TAG" Type="String" />
-                        <asp:Parameter Name="EsObligatorio" Type="String" /> 
+                        <asp:Parameter Name="EsObligatorio" Type="String" />
                         <asp:Parameter Name="TipoAnalisis" Type="String" />
                     </UpdateParameters>
                 </asp:SqlDataSource>
+                <a id="anchorInsertInstrumento"></a>
             </asp:View>
         </asp:MultiView>
         </p>
@@ -393,9 +398,17 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
             });
         }
 
+        function scrollAlFormularioInsercion() {
+            var ancla = document.getElementById('anchorInsertInstrumento');
+            if (ancla) {
+                ancla.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+
         // Ejecución inicial
         $(document).ready(function () {
             setupSincronizacion();
+            scrollAlFormularioInsercion();
         });
 
         // RE-INICIALIZACIÓN (Crucial para Web Forms)
@@ -404,6 +417,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
             var prm = Sys.WebForms.PageRequestManager.getInstance();
             prm.add_endRequest(function () {
                 setupSincronizacion();
+                scrollAlFormularioInsercion();
             });
         }
     </script>
