@@ -455,16 +455,22 @@ namespace Rutinas
             return rutina;
         }*/
 
-        // Intenta seleccionar instrumentos respetando el historial de 24h.
-        // Si no hay suficientes disponibles, reinicia la lista negra e intenta de nuevo.
+        // Selecciona instrumentos con tres niveles de tolerancia:
+        //   Paso 1 — excluye 24h + sesión actual          (lo más variado)
+        //   Paso 2 — excluye solo sesión, ignora 24h      (reutiliza usados ayer)
+        //   Paso 3 — sin ninguna exclusión                (reutiliza cualquiera, incluso de esta sesión)
         private List<ItemRutina> ObtenerInstrumentosPorAreaPrioridad(int idArea, string prioridadNombre, int cantidad, List<string> tagsExcluidos)
         {
-            // Intento 1: respetando la exclusión de las últimas 24 horas
+            // Paso 1: preferido — respeta historial 24h y exclusión de sesión
             var lista = ConsultarInstrumentos(idArea, prioridadNombre, cantidad, tagsExcluidos, excluir24h: true);
 
-            // Intento 2: si se agotaron los disponibles, se reinicia la lista negra
+            // Paso 2: fallback — ignora 24h pero mantiene exclusión de sesión
             if (lista.Count < cantidad)
                 lista = ConsultarInstrumentos(idArea, prioridadNombre, cantidad, tagsExcluidos, excluir24h: false);
+
+            // Paso 3: último recurso — reutiliza cualquier instrumento del área/prioridad
+            if (lista.Count < cantidad)
+                lista = ConsultarInstrumentos(idArea, prioridadNombre, cantidad, new List<string>(), excluir24h: false);
 
             return lista;
         }

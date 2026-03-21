@@ -378,23 +378,71 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
     <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
 </footer>
     <script type="text/javascript">
+
+        // Secuencia de campos del formulario de inserción (en orden de llenado)
+        // Se usa [id$=] (termina con) para resolver IDs generados por ASP.NET GridView
+        var flujoInsercion = [
+            '[id$="ddlactividad"]',
+            '[id$="ddlarea"]',
+            '[id$="ddlprioridad"]',
+            '[id$="ddlobliga"]',
+            '[id$="ddlanalisis"]',
+            '[id$="btninsertinstrumento"]'
+        ];
+
+        function enfocarSiguiente(indice) {
+            var sig = flujoInsercion[indice];
+            if (sig) $(sig).first().focus();
+        }
+
         function setupSincronizacion() {
-            var $selectTag = $('.select2-busqueda');
+            var $selectTag  = $('.select2-busqueda');
             var $selectDesc = $('.select2-busqueda-desc');
 
-            // Inicializar Select2
-            $selectTag.select2({ tags: true, placeholder: "TAG...", width: '100%' });
-            $selectDesc.select2({ tags: true, placeholder: "Descripcion...", width: '100%' });
+            if ($selectTag.length === 0 || $selectDesc.length === 0) return;
 
-            // Sincronizar por índice
-            $selectTag.on('select2:select', function (e) {
-                var index = e.params.data.element.index;
-                $selectDesc.prop('selectedIndex', index).trigger('change.select2');
+            // --- 1. INICIALIZAR SELECT2 ---
+            $selectTag.select2({  tags: true, placeholder: 'TAG...',         width: '100%' });
+            $selectDesc.select2({ tags: true, placeholder: 'Descripcion...', width: '100%' });
+
+            // --- 2. AUTO-FOCO EN CAJA DE BÚSQUEDA AL ABRIR CUALQUIER SELECT2 ---
+            // Elimina la necesidad del doble clic: al abrir el dropdown el cursor
+            // queda directamente en el campo de texto de búsqueda.
+            $(document).off('select2:open.flujo').on('select2:open.flujo', function () {
+                setTimeout(function () {
+                    var campo = document.querySelector(
+                        '.select2-container--open .select2-search__field');
+                    if (campo) campo.focus();
+                }, 10);
             });
 
-            $selectDesc.on('select2:select', function (e) {
-                var index = e.params.data.element.index;
-                $selectTag.prop('selectedIndex', index).trigger('change.select2');
+            // --- 3. SINCRONIZAR TAG ↔ DESCRIPCIÓN Y AVANZAR AL SIGUIENTE CAMPO ---
+            // Al elegir en cualquiera de los dos, el otro se sincroniza y el foco
+            // pasa automáticamente al primer DropDownList (Actividad).
+            $selectTag.off('select2:select.flujo').on('select2:select.flujo', function (e) {
+                var idx = e.params.data.element ? e.params.data.element.index : 0;
+                $selectDesc.prop('selectedIndex', idx).trigger('change.select2');
+                setTimeout(function () { enfocarSiguiente(0); }, 150);
+            });
+
+            $selectDesc.off('select2:select.flujo').on('select2:select.flujo', function (e) {
+                var idx = e.params.data.element ? e.params.data.element.index : 0;
+                $selectTag.prop('selectedIndex', idx).trigger('change.select2');
+                setTimeout(function () { enfocarSiguiente(0); }, 150);
+            });
+
+            // --- 4. NAVEGACIÓN CON ENTER ENTRE DROPDOWNLISTS ---
+            // Pulsar Enter en un campo avanza al siguiente sin enviar el formulario.
+            // El último campo (btninsertinstrumento) recibe foco y Enter lo activa.
+            $(document).off('keydown.flujo');
+            $.each(flujoInsercion, function (i, selector) {
+                if (i >= flujoInsercion.length - 1) return; // el botón no necesita handler
+                $(document).on('keydown.flujo', selector, function (e) {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        enfocarSiguiente(i + 1);
+                    }
+                });
             });
         }
 
@@ -411,8 +459,7 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
             scrollAlFormularioInsercion();
         });
 
-        // RE-INICIALIZACIÓN (Crucial para Web Forms)
-        // Esto hace que funcione después de insertar o cambiar de página en el GridView
+        // RE-INICIALIZACIÓN tras postback (insertar, paginar GridView, etc.)
         if (typeof (Sys) !== 'undefined') {
             var prm = Sys.WebForms.PageRequestManager.getInstance();
             prm.add_endRequest(function () {
