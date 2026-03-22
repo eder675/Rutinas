@@ -1,4 +1,5 @@
-﻿/* Asegura que el body y html ocupen toda la altura */
+/* styles3.css — Página Acerca de */
+
 html, body {
     height: 100%;
     margin: 0;
@@ -8,36 +9,77 @@ html, body {
     flex-direction: column;
 }
 
-/* Sección principal con fondo */
+/* ── FONDO CON IMAGEN ── */
 #acerca-de {
     background-image: url('media/paisajeILC.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
-    flex: 1; /* Esto permite que la sección crezca y empuje el footer hacia abajo */
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 60px 20px;
 }
 
-/* Caja de desarrolladores */
+/* ── TARJETA PRINCIPAL ── */
 .caja-desarrolladores {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 30px 40px;
-    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 36px 44px;
+    max-width: 520px;
     width: 100%;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.20), 0 2px 8px rgba(0,0,0,0.08);
     text-align: center;
+    border-top: 4px solid #62D151;
+    animation: scaleIn 0.42s cubic-bezier(0.34,1.26,0.64,1) both;
 }
 
-/* Footer al final */
+.titulo-acerca {
+    color: #2E7D32;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    font-size: 1.7em;
+}
+
+.caja-desarrolladores h2 {
+    color: #388E3C;
+    font-size: 1.05em;
+    margin-top: 18px;
+    margin-bottom: 10px;
+}
+
+.caja-desarrolladores p {
+    color: #444;
+    margin: 0 0 8px 0;
+}
+
+/* ── LISTA DE DESARROLLADORES ── */
+.lista-desarrolladores {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-desarrolladores li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e8e8e8;
+    color: #333;
+    font-size: 0.97em;
+}
+
+.lista-desarrolladores li:last-child {
+    border-bottom: none;
+}
+
+/* ── FOOTER ── */
 .footer-acerca {
-    background-color: #222;
-    color: #fff;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 100%);
+    color: #e0e0e0;
     text-align: center;
-    padding: 20px;
-    font-size: 0.9em;
+    padding: 18px;
+    font-size: 0.87em;
 }

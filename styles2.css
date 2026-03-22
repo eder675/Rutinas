@@ -1,116 +1,167 @@
-﻿
- body{
+/* styles2.css — Página Principal / Dashboard */
+
+body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: var(--c-bg, #F2F5F2);
 }
 
+/* ── HEADER ── */
 header {
-    background-color: #62D151;
+    background: linear-gradient(135deg, #2E7D32 0%, #388E3C 60%, #62D151 100%);
     color: white;
     padding: 20px;
     text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 }
 
+header h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.6em;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.22);
+}
+
+/* ── SECCIÓN BIENVENIDA ── */
 #inicio {
     text-align: center;
     padding: 40px;
 }
 
+/* ── NAV ── */
 nav ul {
     list-style: none;
     padding: 0;
     display: flex;
     justify-content: center;
+    margin: 8px 0 0 0;
+    gap: 6px;
 }
 
-    nav ul li {
-        margin: 0 15px;
-    }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-        }
-
-.contenedor-panel {
-    display: flex;
-    justify-content: space-around;
-    gap: 5px;
-    padding: 20px;
+nav ul li {
+    margin: 0;
 }
 
-
-
-.panel {
-    background: white;
-    padding: 15px;
-    text-align: center;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    /* Propiedades para que el enlace se comporte como una caja */
-    display: block;
-    text-decoration: none; /* Quita el subrayado */
-    color: #333; /* Color del texto para que no sea azul */
-    transition: transform 0.3s ease; /* Transición suave para el efecto */
-}
-
-    .panel:hover {
-        /* Efecto visual al pasar el ratón para indicar que es clicable */
-        box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
-        transform: translateY(-5px); /* Pequeño levantamiento */
-        /*cursor: pointer;*/
-    }
-
-    .panel img {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 5px;
-    }
-
+/* ── BOTONES DE NAV ── */
 .nav-button-link {
-    /* Mantenemos las propiedades para que se vea como texto de navegación */
     background: none;
-    border: none;
+    border: 1.5px solid rgba(255,255,255,0.45) !important;
     color: white;
     text-decoration: none;
     cursor: pointer;
     font-size: inherit;
     font-family: inherit;
-    text-transform: uppercase; /* Para mantener las mayúsculas de tu texto */
-    /* 1. Bordes Redondeados */
-    border-radius: 8px; /* Valor para un borde redondeado suave */
-    /* 2. Un poco de relleno para que el borde se vea bien */
-    padding: 8px 12px;
-    /* 3. Color de fondo sutil (transparente por ahora) */
+    text-transform: uppercase;
+    border-radius: 8px;
+    padding: 8px 14px;
     background-color: transparent;
-    /* 4. Transición para un efecto de hover suave */
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+    font-weight: 600;
+    letter-spacing: 0.03em;
 }
 
-    .nav-button-link:hover {
-        /* 1. Color de fondo que se ilumina al pasar el ratón */
-        background-color: rgba(255, 255, 255, 0.2); /* Blanco semitransparente */
-        /* 2. Opcional: Cambiar el color del texto para resaltarlo */
-        color: #f4f4f4; /* Blanco muy claro */
-        /* 3. (Ya está definido por el cursor: pointer del nav-button-link) */
-        text-decoration: none; /* Asegurar que no se subraye */
-    }
+.nav-button-link:hover {
+    background-color: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.75) !important;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
 
+.nav-button-link:active {
+    transform: translateY(0);
+}
+
+/* ── PANELS ── */
+.contenedor-panel {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    padding: 32px 20px;
+}
+
+.panel {
+    background: white;
+    padding: 24px 20px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    display: block;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    border-top: 3px solid transparent;
+}
+
+.panel:hover {
+    box-shadow: 0 8px 28px rgba(56,142,60,0.22);
+    transform: translateY(-6px);
+    border-top-color: #62D151;
+}
+
+.panel img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: filter 0.22s ease;
+}
+
+.panel:hover img {
+    filter: brightness(1.06);
+}
+
+.panel h3 {
+    margin: 14px 0 6px 0;
+    color: #2E7D32;
+}
+
+.panel p {
+    color: #666;
+    font-size: 0.92em;
+    margin: 0;
+}
+
+/* ── PANEL DESHABILITADO ── */
+.panel.deshabilitado {
+    background-color: #cccccc !important;
+    color: #555555 !important;
+    opacity: 0.7;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+    pointer-events: none;
+    border-top-color: transparent !important;
+}
+
+.panel.deshabilitado:hover {
+    box-shadow: none !important;
+    transform: none !important;
+    background-color: #cccccc !important;
+    opacity: 0.7 !important;
+}
+
+.panel.deshabilitado img {
+    filter: grayscale(100%);
+    transition: none;
+}
+
+/* ── FOOTER ── */
 footer {
     text-align: center;
-    background-color: #333;
-    color: white;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 100%);
+    color: #e0e0e0;
     padding: 15px;
+    font-size: 0.87em;
 }
 
-
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
     nav ul {
         flex-direction: column;
-        text-align: center;
+        align-items: center;
     }
 
     .contenedor-panel {
@@ -122,33 +173,3 @@ footer {
         width: 80%;
     }
 }
-
-/* CLASE .panel.deshabilitado (El estado inactivo) */
-.panel.deshabilitado {
-    background-color: #cccccc !important; /* Fondo gris fijo */
-    color: #555555 !important; /* Texto gris */
-    opacity: 0.7; /* Atenuación general */
-    cursor: not-allowed !important; /* Icono de no permitido */
-    box-shadow: none !important; /* Eliminar box-shadow base */
-    transform: none !important; /* Anular el transform base */
-    transition: none !important; /* CRÍTICO: Anular la transición del panel */
-    pointer-events: none; /* CRÍTICO: Ignora eventos del mouse */
-}
-
-    /* 2. ANULAR EL EFECTO :HOVER DE LEVANTAMIENTO */
-    /* Sobreescribimos específicamente el :hover para el estado deshabilitado */
-    .panel.deshabilitado:hover {
-        box-shadow: none !important; /* Anula el box-shadow:hover */
-        transform: none !important; /* Anula el transform:hover */
-        /* Mantenemos el mismo color y opacidad del estado inactivo */
-        background-color: #cccccc !important;
-        opacity: 0.7 !important;
-    }
-
-    /* 3. ESCALA DE GRISES PARA LA IMAGEN (Selector específico) */
-    .panel.deshabilitado img {
-        /* Aplica el filtro de escala de grises al 100% */
-        filter: grayscale(100%);
-        /* Opcional: Si la imagen tenía una transición, anularla */
-        transition: none;
-    }

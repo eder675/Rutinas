@@ -1,51 +1,106 @@
-﻿body {
+/* styles.css — Página de Login */
+
+body {
     font-family: Arial, sans-serif;
     background: #f2f2f2;
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 50px;
-    background-image: url('media/IngenioLaCabana.jpg'); /* Cambia esto por la ruta de tu imagen */
-    background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
-    background-position: center center; /* Centra la imagen */
+    min-height: 100vh;
+    padding: 40px 20px;
+    background-image: url('media/IngenioLaCabana.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
     background-attachment: fixed;
-
+    margin: 0;
 }
 
-
-
+/* ── TARJETA DE LOGIN ── */
+.auto-style1,
 .CONTENEDOR {
-    background-position: 0% 0%;
-    padding: 20px 30px;
+    padding: 30px 36px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    background-color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    width: 440px;
+    max-width: 95vw;
+    border-top: 4px solid #62D151;
+    animation: scaleIn 0.42s cubic-bezier(0.34,1.26,0.64,1) both;
+}
+
+.auto-style1 h1,
+.CONTENEDOR h1 {
+    color: #2E7D32;
+    margin-top: 4px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+/* ── INPUTS dentro del login ── */
+.auto-style1 input[type="text"],
+.auto-style1 input[type="number"],
+.CONTENEDOR input[type="text"],
+.CONTENEDOR input[type="number"] {
+    width: 60%;
+    padding: 8px 12px;
+    font-size: 0.97em;
+}
+
+/* ── RADIO BUTTONS ── */
+.auto-style1 label,
+.auto-style1 span {
+    color: #2E7D32;
+    font-weight: 600;
+}
+
+/* ── BOTÓN PRINCIPAL ── */
+#btnentrar {
+    background: linear-gradient(135deg, #2E7D32 0%, #62D151 100%);
+    color: #fff;
+    padding: 10px 26px;
+    font-size: 1em;
     border-radius: 8px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    background-color: rgba(255, 255, 255, 0.90);
-    width: 416px;
-    background-image: none;
-    background-repeat: repeat;
-    background-attachment: scroll;
+    animation: pulseGreen 2.8s ease infinite;
+    box-shadow: 0 3px 10px rgba(56,142,60,0.35);
+}
+
+/* ── BOTÓN SECUNDARIO "Acerca de" ── */
+#btnAbout {
+    background: rgba(255,255,255,0.6);
+    border: 1.5px solid #c8c8c8 !important;
+    color: #555;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border-style: solid !important;
+}
+#btnAbout:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: #888 !important;
+}
+
+/* ── NOTIFICACIÓN TOAST ── */
+#divNotificacion {
+    animation: fadeUp 0.4s ease both;
+    border-radius: 8px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18) !important;
 }
 
 footer {
     text-align: center;
-    background-color: #333;
-    color: white;
-    padding: 15px;
+    padding: 14px;
+    margin-top: 16px;
+    width: 100%;
 }
 
 @media (max-width: 768px) {
-    nav ul {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .contenedor-servicios {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    form {
-        width: 80%;
+    .auto-style1,
+    .CONTENEDOR {
+        width: 95%;
+        padding: 20px;
     }
 }
-

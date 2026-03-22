@@ -32,6 +32,7 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Rutinas Cabana</title>
+    <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="styles.css" />
     </head>
 <body>
@@ -69,5 +70,6 @@
 <footer>
         <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
     </footer>  
+    <script src="shared.js"></script>
 </body>
 </html>

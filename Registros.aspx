@@ -5,7 +5,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title></title>
+    <title>Registros de Rutinas</title>
+    <link rel="stylesheet" href="styles-shared.css"/>
+    <link rel="stylesheet" href="styles2.css"/>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -51,5 +53,6 @@
             </asp:GridView>
         </div>
     </form>
+    <script src="shared.js"></script>
 </body>
 </html>

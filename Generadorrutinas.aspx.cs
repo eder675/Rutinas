@@ -406,7 +406,11 @@ namespace Rutinas
             // 4. Tomar solo el subconjunto de áreas que corresponden a este turno
             List<int> areasFiltradas = todasLasAreas.GetRange(inicio, fin - inicio);
 
-            // 5. Generar instrumentos solo para esas áreas: 1 Alta, 2 Media, 3 Baja
+            // Alcalizado (idGrupo == 2) recibe 2 instrumentos de Baja por área porque
+            // su rutina es más corta al tener menos áreas asignadas por turno.
+            int cantidadBaja = (idGrupo == 2) ? 2 : 1;
+
+            // 5. Generar instrumentos solo para esas áreas: 1 Alta, 1 Media, 1-2 Baja
             foreach (int idArea in areasFiltradas)
             {
                 var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", 1, tagsExcluidos);
@@ -417,7 +421,7 @@ namespace Rutinas
                 rutina.AddRange(media);
                 tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
 
-                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", 1, tagsExcluidos);
+                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", cantidadBaja, tagsExcluidos);
                 rutina.AddRange(baja);
                 tagsExcluidos.AddRange(baja.Select(i => i.TAG).ToList());
             }

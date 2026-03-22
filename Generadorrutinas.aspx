@@ -6,6 +6,7 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Creando Formulario</title>
+    <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="estilosgenerador.css"/>
     <style type="text/css">
         .auto-style1 {
@@ -237,7 +238,7 @@
         });
 
         // AUTO-AJUSTE AL IMPRIMIR
-        // Carta portrait con márgenes 0.4in: área imprimible = 10.2in = 979px a 96dpi
+        // Carta portrait con márgenes 0.4in arriba/abajo: área imprimible vertical ≈ 10.2in = 979px a 96dpi
         var ALTO_CARTA_PX = 10.2 * 96;
 
         window.addEventListener('beforeprint', function () {
@@ -249,10 +250,10 @@
             var altoContenido = carta.scrollHeight;
             if (altoContenido > ALTO_CARTA_PX) {
                 var escala = ALTO_CARTA_PX / altoContenido;
-                carta.style.transformOrigin = 'top left';
+                // Escalar desde el centro superior para no desbordar el margen derecho
+                carta.style.transformOrigin = 'top center';
                 carta.style.transform = 'scale(' + escala + ')';
-                // Compensar el ancho para que el contenido escalado ocupe el 100% del papel
-                carta.style.width = (100 / escala).toFixed(2) + '%';
+                // NO se expande el ancho: el contenido escalado cabe dentro del área imprimible
             }
         });
 

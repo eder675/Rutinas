@@ -1,15 +1,36 @@
-﻿body {
-    background-color: #f0f0f0;
+/* styleslogin.css — Panel de Administración (LoginDeveloper.aspx) */
+
+body {
+    background-color: var(--c-bg, #F2F5F2);
     font-family: Arial, sans-serif;
-    font-size: 18px;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
 }
 
+/* ── HEADER ── */
 header {
-    background-color: #333;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 70%, #388E3C 100%);
     color: white;
-    padding: 20px;
+    padding: 18px 24px;
     text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.28);
 }
+
+header h1 {
+    margin: 0 0 4px 0;
+    font-size: 1.4em;
+    letter-spacing: 0.04em;
+}
+
+header h2 {
+    margin: 0;
+    font-size: 1em;
+    font-weight: 400;
+    opacity: 0.82;
+}
+
+/* ── NAV HORIZONTAL ── */
 nav ul {
     list-style: none;
     padding: 0;
@@ -17,43 +38,51 @@ nav ul {
     justify-content: center;
 }
 
-
 ul.menu {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    background-color: #333;
+    background: linear-gradient(90deg, #222 0%, #333 100%);
+    border-bottom: 2px solid #388E3C;
+    flex-wrap: wrap;
 }
 
-    ul.menu li {
-        margin: 0;
-    }
+ul.menu li {
+    margin: 0;
+}
 
-        /* Enlaces del menú */
-        ul.menu li a {
-            display: block;
-            padding: 15px 20px;
-            color: #fff;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
+ul.menu li a,
+ul.menu li a:link,
+ul.menu li a:visited {
+    display: block;
+    padding: 13px 18px;
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: background-color 0.22s ease, color 0.22s ease;
+    font-size: 0.92em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    position: relative;
+}
 
-            /* Cambio de color al pasar el mouse */
-            ul.menu li a:hover {
-                background-color: #555;
-            }
+ul.menu li a::before {
+    content: "▸ ";
+    color: #62D151;
+    margin-right: 4px;
+    font-size: 0.9em;
+}
 
-            ul.menu li a::before {
-                content: "➤ ";
-                color: #ffcc00;
-                margin-right: 5px;
-            }
+ul.menu li a:hover {
+    background-color: #388E3C;
+    color: #fff;
+}
 
-/* Pie de Página */
+/* ── FOOTER ── */
 footer {
     text-align: center;
-    background-color: #333;
-    color: white;
-    padding: 15px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 100%);
+    color: #e0e0e0;
+    padding: 14px;
+    font-size: 0.87em;
 }
