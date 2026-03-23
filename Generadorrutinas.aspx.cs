@@ -15,7 +15,7 @@ namespace Rutinas
 {
     public partial class Generadorrutinas : System.Web.UI.Page
     {
-        private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 24);
+        private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 25);
         
         private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
@@ -215,8 +215,7 @@ namespace Rutinas
         public string ObtenerAreaDeterminista(string codigoEmpleado)
         {
             DateTime ahora = DateTime.Now;
-            DateTime fechaInicioZafra = new DateTime(2025, 11, 24);
-            int diaZafra = (ahora - fechaInicioZafra).Days + 1;
+            int diaZafra = (ahora - FECHA_INICIO_ZAFRA).Days + 1;
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
             int diaJuliano = ahora.DayOfYear;
 
@@ -236,16 +235,26 @@ namespace Rutinas
                 int h = ahora.Hour;
                 int m = ahora.Minute;
 
-                // ¿A quién releva hoy?
+                // Verificación BD: si hay un trabajador de turno corto (18:00 A 22:00) que
+                // ya generó su rutina, el cuarto turno debe acompañarlo (misma área), nunca
+                // al trabajador de 12h. Esto cubre el domingo y cualquier escenario similar.
+                string areaCompaneroTurnoCorto = ObtenerAreaTrabajadorTurnoCorto();
+                if (areaCompaneroTurnoCorto != null)
+                    return areaCompaneroTurnoCorto;
+
+                // ¿A quién releva hoy? (lógica determinista para días normales)
                 bool relevaAlPuesto1 = false;
 
                 // Martes/Jueves (Mañana/Tarde) -> Releva al Puesto 1
                 if (dia == DayOfWeek.Tuesday || dia == DayOfWeek.Thursday) relevaAlPuesto1 = true;
 
-                // Domingo Noche / Lunes Noche
-                else if ((dia == DayOfWeek.Sunday || dia == DayOfWeek.Monday) && (h > 21 || (h == 21 && m >= 41)))
+                // Domingo Noche (≥22:00) / Lunes Noche (≥21:41)
+                // CORRECCIÓN: el domingo usa h >= 22 porque el turno de 4h termina
+                // exactamente a las 22:00; usar 21:41 mezcla la lógica nocturna con
+                // los últimos minutos del turno de 4h y puede asignar el área incorrecta.
+                else if ((dia == DayOfWeek.Sunday && h >= 22) ||
+                         (dia == DayOfWeek.Monday && (h > 21 || (h == 21 && m >= 41))))
                 {
-                    // El domingo noche releva al Puesto 2 si es semana par
                     relevaAlPuesto1 = esSemanaPar ? false : true;
                 }
                 else if ((dia == DayOfWeek.Monday || dia == DayOfWeek.Tuesday) && h < 6)
@@ -311,6 +320,32 @@ namespace Rutinas
                 }
             }
             return (puesto, esRelevo);
+        }
+
+        // Busca en BD si un trabajador de puesto fijo (no cuarto turno) ya generó una rutina
+        // con el turno corto "18:00 A 22:00" en las últimas 12 horas.
+        // Si existe, devuelve su área para que el cuarto turno lo acompañe.
+        // Retorna null si no se encontró ese escenario.
+        private string ObtenerAreaTrabajadorTurnoCorto()
+        {
+            string sql = @"
+                SELECT TOP 1
+                    CASE WHEN R.IDgrupo = 1 THEN 'Extracción' ELSE 'Alcalizado' END
+                FROM Rutinas R
+                INNER JOIN Empleado E ON R.Codigo_empleado = E.Codigo_empleado
+                WHERE R.Fecha >= @LimiteTiempo
+                  AND (E.EsCuartoTurno = 0 OR E.EsCuartoTurno IS NULL)
+                  AND R.Turno = '18:00 A 22:00'
+                ORDER BY R.Correlativo DESC";
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@LimiteTiempo", DateTime.Now.AddHours(-12));
+                object result = cmd.ExecuteScalar();
+                return result != null ? result.ToString() : null;
+            }
         }
         #endregion
         #endregion
@@ -694,16 +729,22 @@ namespace Rutinas
             // Almacenará el Correlativo y la Fecha/Hora de la última rutina encontrada
             int correlativoUltimaRutina = 0;
             string fechaRutinaGuardada = "";
+            string turnoGuardado = turnoActual; // fallback: usar el calculado
 
             // --- A. BUSCAR EL CORRELATIVO MÁS RECIENTE ---
+            // Se filtra por las últimas 8 horas (igual que RutinaRecienteExiste) en lugar de
+            // filtrar por turno, porque al reimprimir la sesión ya fue destruida y
+            // DeterminarTurnoActual() puede devolver un turno distinto al que se guardó
+            // (especialmente en los turnos especiales de domingo donde se pierde Session["JornadaDomingo"]).
             string sqlBuscarCorrelativo = @"
-        SELECT TOP 1 
-            Correlativo, 
-            CONVERT(VARCHAR, Fecha, 120) AS FechaRutina -- Formato ISO 8601 para fácil manejo
+        SELECT TOP 1
+            Correlativo,
+            CONVERT(VARCHAR, Fecha, 120) AS FechaRutina,
+            Turno
         FROM Rutinas
-        WHERE 
-            Codigo_empleado = @CodigoEmpleado 
-            AND Turno = @TurnoActual
+        WHERE
+            Codigo_empleado = @CodigoEmpleado
+            AND Fecha >= @LimiteTiempo
         ORDER BY Correlativo DESC";
 
             using (SqlConnection conn = new SqlConnection(ConnString))
@@ -711,13 +752,14 @@ namespace Rutinas
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sqlBuscarCorrelativo, conn);
                 cmd.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
-                cmd.Parameters.AddWithValue("@TurnoActual", turnoActual);
+                cmd.Parameters.AddWithValue("@LimiteTiempo", DateTime.Now.AddHours(-8));
 
                 SqlDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     correlativoUltimaRutina = reader.GetInt32(0); // Columna Correlativo
-                    fechaRutinaGuardada = reader.GetString(1); // Columna FechaRutina
+                    fechaRutinaGuardada = reader.GetString(1);    // Columna FechaRutina
+                    turnoGuardado = reader.GetString(2);           // Turno tal como fue guardado
                 }
                 reader.Close();
             }
@@ -758,8 +800,8 @@ namespace Rutinas
 
             // 1. Hora Correcta: Usamos la hora guardada en la BD
             lblname.Text = nombreEmpleado;
-            lblfecha.Text = fechaRutinaGuardada; // ¡CORRECCIÓN APLICADA!
-            lblturno.Text = turnoActual;
+            lblfecha.Text = fechaRutinaGuardada;
+            lblturno.Text = turnoGuardado; // Turno leído de BD, no recalculado
 
             // 2. Repeater Completo: Llenamos con el DataTable completo de detalles
             rptRutina.DataSource = dt;

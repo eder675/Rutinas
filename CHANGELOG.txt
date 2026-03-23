@@ -357,6 +357,153 @@ DESPUES:
     // "A 22:00" es exclusivo de tarde: "14:00 A 22:00" y "18:00 A 22:00"
     // "06:00 A 14:00" no contiene "A 22:00" → queda correctamente en 0
 
+--------------------------------------------------------------------------------
+CAMBIO #10 - 2026-03-22
+Archivo: Generadorrutinas.aspx.cs
+Descripcion: Correccion del bug en CargarUltimaRutina — al reimprimir en turno
+             especial de domingo noche se cargaba la rutina del dia anterior
+             en lugar de la recien generada.
+--------------------------------------------------------------------------------
+CAUSA: CargarUltimaRutina() filtraba la consulta SQL usando
+       AND Turno = @TurnoActual, donde @TurnoActual viene de DeterminarTurnoActual().
+       El problema es que al reimprimir, la sesion ya fue destruida por
+       closesession.aspx (incluida Session["JornadaDomingo"]), entonces
+       DeterminarTurnoActual() no podia determinar el turno especial de domingo
+       y caia a la logica normal devolviendo "14:00 A 22:00" (tarde).
+       La rutina generada tenia Turno = "18:00 A 22:00" (domingo noche), pero la
+       consulta buscaba "14:00 A 22:00", encontrando la rutina del sabado tarde.
+
+ESCENARIO DEL FALLO:
+  1. Domingo 20:59 — se genera rutina, turno guardado = "18:00 A 22:00"
+  2. closesession.aspx destruye la sesion (incluyendo Session["JornadaDomingo"])
+  3. Usuario vuelve a entrar y pulsa Reimprimir
+  4. DeterminarTurnoActual() ve domingo + 20:59 + Session["JornadaDomingo"] = null
+     → no retorna en el bloque domingo → cae a logica normal
+     → 20:59 cumple 13:41-21:40 → devuelve "14:00 A 22:00"
+  5. SQL busca Turno = "14:00 A 22:00" → encuentra rutina del sabado
+
+SOLUCION: Eliminar el filtro AND Turno = @TurnoActual de la consulta de
+          CargarUltimaRutina y reemplazarlo por un filtro de fecha de las
+          ultimas 8 horas (AND Fecha >= @LimiteTiempo), consistente con
+          RutinaRecienteExiste(). Ademas, se agrega la columna Turno al SELECT
+          para leerla directamente de la BD y mostrarla correctamente en el
+          encabezado lblturno, sin depender de DeterminarTurnoActual().
+
+ANTES (CargarUltimaRutina, consulta SQL y parametros):
+    SELECT TOP 1
+        Correlativo,
+        CONVERT(VARCHAR, Fecha, 120) AS FechaRutina
+    FROM Rutinas
+    WHERE
+        Codigo_empleado = @CodigoEmpleado
+        AND Turno = @TurnoActual
+    ORDER BY Correlativo DESC
+
+    cmd.Parameters.AddWithValue("@TurnoActual", turnoActual);
+    ...
+    lblturno.Text = turnoActual;
+
+DESPUES:
+    SELECT TOP 1
+        Correlativo,
+        CONVERT(VARCHAR, Fecha, 120) AS FechaRutina,
+        Turno
+    FROM Rutinas
+    WHERE
+        Codigo_empleado = @CodigoEmpleado
+        AND Fecha >= @LimiteTiempo
+    ORDER BY Correlativo DESC
+
+    cmd.Parameters.AddWithValue("@LimiteTiempo", DateTime.Now.AddHours(-8));
+    ...
+    turnoGuardado = reader.GetString(2); // Turno leido de BD
+    lblturno.Text = turnoGuardado;       // No recalculado
+
+--------------------------------------------------------------------------------
+CAMBIO #11 - 2026-03-22
+Archivo: Generadorrutinas.aspx.cs
+Descripcion: Correccion del area asignada al cuarto turno en domingo — se le
+             asignaba el area del trabajador de 12h en lugar del area del
+             trabajador de 4h (turno corto 18:00 A 22:00).
+--------------------------------------------------------------------------------
+CAUSA 1 — Limite de horario incorrecto para domingo (bug principal):
+  La condicion para detectar "noche de domingo" usaba >= 21:41 (igual que los
+  demas dias), pero el turno de 4h del domingo termina exactamente a las 22:00.
+  Un cuarto turno que generara su rutina entre 21:41 y 21:59 del domingo caía
+  dentro del bloque de semana par/impar del turno nocturno y podía recibir el
+  area del trabajador de 12h en lugar del area del de 4h.
+
+  ANTES:
+    else if ((dia == DayOfWeek.Sunday || dia == DayOfWeek.Monday) && (h > 21 || (h == 21 && m >= 41)))
+
+  DESPUES:
+    else if ((dia == DayOfWeek.Sunday && h >= 22) ||
+             (dia == DayOfWeek.Monday && (h > 21 || (h == 21 && m >= 41))))
+
+  El domingo ahora usa h >= 22 como limite (inicio real del turno nocturno).
+  El lunes mantiene 21:41 porque su noche sigue el horario estandar.
+
+CAUSA 2 — Ausencia de verificacion en BD para el caso de 3 trabajadores:
+  Cuando en un turno hay 3 personas (trabajador 12h + trabajador 4h + cuarto
+  turno), el algoritmo determinista no consultaba la BD para confirmar quien
+  ya tenia rutina generada. Si el calculo determinista resultaba en la misma
+  area que el trabajador de 12h, el cuarto turno quedaba mal asignado.
+
+SOLUCION 2 — Nuevo metodo ObtenerAreaTrabajadorTurnoCorto():
+  Antes de aplicar el algoritmo determinista, se consulta la BD buscando si
+  existe una rutina de un trabajador de puesto fijo con Turno = '18:00 A 22:00'
+  en las ultimas 12 horas. Si existe, el cuarto turno recibe esa misma area
+  (acompana al trabajador de turno corto). Solo si no se encuentra ese escenario
+  se cae al algoritmo determinista normal.
+
+  NUEVO METODO:
+    private string ObtenerAreaTrabajadorTurnoCorto()
+    Retorna: nombre del area ("Extraccion"/"Alcalizado") o null si no aplica.
+
+  NUEVO FLUJO EN ObtenerAreaDeterminista() para cuarto turno:
+    1. Consultar BD: ¿hay un trabajador con Turno = '18:00 A 22:00' activo?
+       SI → asignar su misma area al cuarto turno → return
+       NO → continuar con algoritmo determinista (comportamiento previo)
+
+--------------------------------------------------------------------------------
+CAMBIO #12 - 2026-03-22
+Archivo: Generadorrutinas.aspx.cs
+Descripcion: Correccion de FECHA_INICIO_ZAFRA — fecha incorrecta causaba que
+             la paridad de semana (esSemanaPar) fuera la contraria a la calculada
+             en Default.aspx, asignando el area equivocada al cuarto turno en
+             los turnos nocturnos (domingo/lunes/madrugada martes).
+--------------------------------------------------------------------------------
+CAUSA: FECHA_INICIO_ZAFRA estaba declarada como 2025-11-24 en Generadorrutinas
+       mientras que Default.aspx usa 2025-11-25. Esa diferencia de 1 dia
+       desplaza el conteo acumulado de dias (diaZafra) en 1, lo que puede
+       cambiar la division entera de semanas (diaZafra / 7) y con ello voltear
+       la paridad (par vs impar), invirtiendo quien hace 12h y quien hace 4h
+       segun la logica del cuarto turno.
+
+EFECTO CONCRETO (domingo 22 de marzo 2026):
+  Con 2025-11-24: diaZafra = 119, semana = 17 (impar) → esSemanaPar = false
+                  → relevaAlPuesto1 = true → Area 1 (Extraccion) para cuarto turno
+  Con 2025-11-25: diaZafra = 118, semana = 16 (par)   → esSemanaPar = true
+                  → relevaAlPuesto1 = false → Area 2 (Alcalizado) para cuarto turno
+
+  Como Puesto 1 hace 12h (semana par) y tiene Area 1, el cuarto turno con la
+  fecha incorrecta tambien calculaba Area 1 — conflicto exacto del bug reportado.
+
+ANTES:
+  private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 24);
+  ...
+  DateTime fechaInicioZafra = new DateTime(2025, 11, 24); // redeclarada localmente
+  int diaZafra = (ahora - fechaInicioZafra).Days + 1;
+
+DESPUES:
+  private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 25); // alineada con Default.aspx
+  ...
+  int diaZafra = (ahora - FECHA_INICIO_ZAFRA).Days + 1; // usa la constante de clase
+
+NOTA: El cambio #11 (verificacion en BD via ObtenerAreaTrabajadorTurnoCorto)
+      sigue siendo util como capa de seguridad adicional para el caso del domingo,
+      pero la causa raiz era esta fecha incorrecta.
+
 ================================================================================
 FIN DEL REGISTRO
 ================================================================================
