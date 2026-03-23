@@ -504,6 +504,35 @@ NOTA: El cambio #11 (verificacion en BD via ObtenerAreaTrabajadorTurnoCorto)
       sigue siendo util como capa de seguridad adicional para el caso del domingo,
       pero la causa raiz era esta fecha incorrecta.
 
+--------------------------------------------------------------------------------
+CAMBIO #13 - 2026-03-22
+Archivos: LoginDeveloper.aspx, LoginDeveloper.aspx.cs
+Descripcion: Eliminacion del panel de busqueda y filtros de la vista vinstrumentos
+             que causaba que el GridView gvinstrumentos desapareciera.
+--------------------------------------------------------------------------------
+CAUSA: El SqlDataSource3 tenia su SelectCommand condicionado a 4 parametros
+       (Busqueda, FiltroArea, FiltroPrioridad, FiltroObligatorio) enlazados a
+       controles del panel externo. Cuando los controles no devolvian valores
+       esperados (o habia un PostBack de otro control), la consulta fallaba
+       silenciosamente y el GridView quedaba sin datos / invisible.
+
+ELIMINADO en LoginDeveloper.aspx:
+  - Imports jQuery y Select2 del <head>
+  - Div #panelBusqueda completo (TextBox txtBusqueda, DropDownList ddlFiltroArea,
+    ddlFiltroPrioridad, ddlFiltroObligatorio y sus SqlDataSources asociados)
+  - Atributos OnSelectedIndexChanged y OnRowDataBound del GridView gvinstrumentos
+  - Clausula WHERE con los 4 parametros de filtro del SelectCommand de SqlDataSource3
+  - Seccion <SelectParameters> de SqlDataSource3
+  - Bloque JavaScript completo (setupSincronizacion, scrollAlBuscador, Select2 init)
+
+ELIMINADO en LoginDeveloper.aspx.cs:
+  - Metodo gvinstrumentos_SelectedIndexChanged (vacio)
+  - Metodo gvinstrumentos_RowDataBound (filtraba ListBox del footer via HashSet)
+
+RESULTADO: SqlDataSource3 ahora ejecuta un SELECT simple sin condiciones,
+           el GridView muestra todos los instrumentos y sus controles internos
+           (TextBox, DropDownList de edicion e insercion) funcionan normalmente.
+
 ================================================================================
 FIN DEL REGISTRO
 ================================================================================

@@ -224,36 +224,6 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                 </asp:SqlDataSource>
             </asp:View>
             <asp:View ID="vinstrumentos" runat="server">
-                <!-- PANEL DE BÚSQUEDA Y FILTROS -->
-                <div id="panelBusqueda" style="margin-bottom:10px; padding:8px; background:#f5f5f5; border:1px solid #ccc; border-radius:4px;">
-                    <asp:Label runat="server" Text="Buscar:" />&nbsp;
-                    <asp:TextBox ID="txtBusqueda" runat="server" AutoPostBack="true" placeholder="TAG o descripción..." Width="190px" />
-                    &nbsp;&nbsp;
-                    <asp:Label runat="server" Text="Área:" />&nbsp;
-                    <asp:DropDownList ID="ddlFiltroArea" runat="server" AutoPostBack="true" AppendDataBoundItems="true"
-                        DataSourceID="SqlDataSourceFiltroAreas" DataTextField="Nombre" DataValueField="IDarea">
-                        <asp:ListItem Value="0" Text="-- Todas --" />
-                    </asp:DropDownList>
-                    <asp:SqlDataSource ID="SqlDataSourceFiltroAreas" runat="server"
-                        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>"
-                        SelectCommand="SELECT [IDarea], [Nombre] FROM [Area] ORDER BY [Nombre]" />
-                    &nbsp;&nbsp;
-                    <asp:Label runat="server" Text="Prioridad:" />&nbsp;
-                    <asp:DropDownList ID="ddlFiltroPrioridad" runat="server" AutoPostBack="true" AppendDataBoundItems="true"
-                        DataSourceID="SqlDataSourceFiltroPrioridad" DataTextField="Nombre" DataValueField="IDprioridad">
-                        <asp:ListItem Value="0" Text="-- Todas --" />
-                    </asp:DropDownList>
-                    <asp:SqlDataSource ID="SqlDataSourceFiltroPrioridad" runat="server"
-                        ConnectionString="<%$ ConnectionStrings:REPORTESConnectionString3 %>"
-                        SelectCommand="SELECT [IDprioridad], [Nombre] FROM [Prioridad]" />
-                    &nbsp;&nbsp;
-                    <asp:Label runat="server" Text="Obligatorio:" />&nbsp;
-                    <asp:DropDownList ID="ddlFiltroObligatorio" runat="server" AutoPostBack="true">
-                        <asp:ListItem Value="" Text="-- Todos --" />
-                        <asp:ListItem Value="1" Text="Sí" />
-                        <asp:ListItem Value="0" Text="No" />
-                    </asp:DropDownList>
-                </div>
                 <asp:Label ID="Label7" runat="server" Text="LISTA DE INSTRUMENTOS"></asp:Label>
                 <br />
                 <asp:GridView ID="gvinstrumentos" runat="server" AutoGenerateColumns="False" DataKeyNames="TAG" DataSourceID="SqlDataSource3" ShowFooter="True" OnRowCommand="gvinstrumentos_RowCommand" OnSelectedIndexChanged="gvinstrumentos_SelectedIndexChanged" OnRowDataBound="gvinstrumentos_RowDataBound">
@@ -378,18 +348,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                     SelectCommand="SELECT I.TAG, I.Nombre, I.Actividad, I.IDarea, I.IDprioridad, A.Nombre AS Expr1, P.Nombre AS Expr2, I.EsObligatorio, I.TipoAnalisis
                         FROM Instrumentos I
                         INNER JOIN Prioridad P ON I.IDprioridad = P.IDprioridad
-                        INNER JOIN Area A ON I.IDarea = A.IDarea
-                        WHERE (@Busqueda = '' OR I.TAG LIKE '%' + @Busqueda + '%' OR I.Nombre LIKE '%' + @Busqueda + '%')
-                          AND (@FiltroArea = 0 OR I.IDarea = @FiltroArea)
-                          AND (@FiltroPrioridad = 0 OR I.IDprioridad = @FiltroPrioridad)
-                          AND (@FiltroObligatorio = '' OR I.EsObligatorio = @FiltroObligatorio)"
+                        INNER JOIN Area A ON I.IDarea = A.IDarea"
                     UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad, [EsObligatorio] = @EsObligatorio, [TipoAnalisis] = @TipoAnalisis WHERE [TAG] = @TAG">
-                    <SelectParameters>
-                        <asp:ControlParameter Name="Busqueda" ControlID="txtBusqueda" PropertyName="Text" Type="String" DefaultValue="" />
-                        <asp:ControlParameter Name="FiltroArea" ControlID="ddlFiltroArea" PropertyName="SelectedValue" Type="Int32" DefaultValue="0" />
-                        <asp:ControlParameter Name="FiltroPrioridad" ControlID="ddlFiltroPrioridad" PropertyName="SelectedValue" Type="Int32" DefaultValue="0" />
-                        <asp:ControlParameter Name="FiltroObligatorio" ControlID="ddlFiltroObligatorio" PropertyName="SelectedValue" Type="String" DefaultValue="" />
-                    </SelectParameters>
                     <DeleteParameters>
                         <asp:Parameter Name="TAG" Type="String" />
                     </DeleteParameters>
@@ -417,50 +377,58 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
         </p>
 
 
-    </form>
-
-
-    <footer class="footer-acerca">
-    <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
-</footer>
-    <script type="text/javascript">
+        <script type="text/javascript">
         function setupSincronizacion() {
             var $selectTag = $('.select2-busqueda');
             var $selectDesc = $('.select2-busqueda-desc');
 
-            // Inicializar Select2
+            if ($selectTag.length === 0) return;
+
             $selectTag.select2({ tags: true, placeholder: "TAG...", width: '100%' });
             $selectDesc.select2({ tags: true, placeholder: "Descripcion...", width: '100%' });
 
-            // Sincronizar por índice
-            $selectTag.on('select2:select', function (e) {
+            // Al hacer clic en cualquiera de los dos campos, abrir el dropdown
+            // y enfocar automaticamente el campo de busqueda interno de Select2
+            $(document).off('select2:open').on('select2:open', function () {
+                setTimeout(function () {
+                    var campo = document.querySelector('.select2-container--open .select2-search__field');
+                    if (campo) campo.focus();
+                }, 50);
+            });
+
+            // Sincronizar por indice: seleccionar TAG mueve Descripcion y viceversa
+            $selectTag.off('select2:select').on('select2:select', function (e) {
                 var index = e.params.data.element.index;
                 $selectDesc.prop('selectedIndex', index).trigger('change.select2');
             });
 
-            $selectDesc.on('select2:select', function (e) {
+            $selectDesc.off('select2:select').on('select2:select', function (e) {
                 var index = e.params.data.element.index;
                 $selectTag.prop('selectedIndex', index).trigger('change.select2');
             });
         }
 
         function scrollAlBuscador() {
-            var panel = document.getElementById('panelBusqueda');
-            if (panel) {
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                var caja = document.getElementById('<%= txtBusqueda.ClientID %>');
-                if (caja) { setTimeout(function () { caja.focus(); }, 300); }
-            }
+            // Se usa window.scrollTo con posicion absoluta en lugar de scrollIntoView
+            // porque en postbacks completos de Web Forms el navegador restaura el
+            // scroll despues de que scrollIntoView ya ejecuto, sobreescribiendo el
+            // resultado. Calcular la coordenada Y y llamar window.scrollTo con un
+            // timeout de 500ms garantiza que corre despues de la restauracion nativa.
+            setTimeout(function () {
+                var footer = document.querySelector('#gvinstrumentos tfoot');
+                if (!footer) return;
+                var y = footer.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }, 500);
         }
 
-        // Ejecución inicial
-        $(document).ready(function () {
+        // window.onload (no document.ready) para garantizar que el layout
+        // ya esta calculado y el footer tiene su posicion final en el DOM.
+        $(window).on('load', function () {
             setupSincronizacion();
             scrollAlBuscador();
         });
 
-        // RE-INICIALIZACIÓN (Crucial para Web Forms)
-        // Esto hace que funcione después de insertar o cambiar de página en el GridView
         if (typeof (Sys) !== 'undefined') {
             var prm = Sys.WebForms.PageRequestManager.getInstance();
             prm.add_endRequest(function () {
@@ -469,5 +437,11 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
             });
         }
     </script>
+</form>
+
+
+    <footer class="footer-acerca">
+    <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
+</footer>
 </body>
 </html>
