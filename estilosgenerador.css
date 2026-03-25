@@ -11,6 +11,8 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+
+
 .titulo-rutina {
     text-align: center;
     border-bottom: 2px solid #333;
@@ -148,6 +150,50 @@
 }
 
 /* ---------------------------------------------------- */
+/* ENCABEZADO DE LA RUTINA                              */
+/* ---------------------------------------------------- */
+
+.encabezado-rutina {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.logo-ilc {
+    position: absolute;
+    top: 566px;
+    right: 748px;
+    max-height: 65px;
+    width: 815px;
+    height: 215px;
+}
+
+.encabezado-titulos {
+    text-align: center;
+    padding-left: 75px;
+    padding-right: 75px; /* reserva espacio para el logo */
+    line-height: 1.5;
+}
+
+.encabezado-info {
+    margin-top: 6px;
+}
+
+.fila-firma {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 30px;
+}
+
+.fila-centro {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+}
+
+/* ---------------------------------------------------- */
 /* REGLAS CRÍTICAS PARA LA IMPRESIÓN (@media print)     */
 /* ---------------------------------------------------- */
 @media print {
@@ -161,6 +207,16 @@
     /* 2. OCULTAR ELEMENTOS NO IMPRIMIBLES */
     header, nav, footer, .acciones-web, .boton-imprimir {
         display: none !important;
+    }
+
+    /* ENCABEZADO EN IMPRESIÓN */
+    .logo-ilc {
+        max-height: 55pt;
+    }
+
+    .encabezado-titulos {
+        padding-left: 65pt;
+        padding-right: 65pt;
     }
 
     /* 3. REINICIO DE ESTILOS DEL CUERPO */

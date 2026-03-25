@@ -8,71 +8,30 @@
     <title>Creando Formulario</title>
     <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="estilosgenerador.css"/>
-    <style type="text/css">
-        .auto-style1 {
-            width: 10%;
-            height: 46px;
-        }
-        .auto-style2 {
-            width: 20%;
-            height: 46px;
-        }
-        .auto-style3 {
-            width: 29%;
-            height: 46px;
-        }
-        .auto-style4 {
-            width: 8%;
-            text-align: center;
-            height: 46px;
-        }
-        .auto-style5 {
-            width: 25%;
-            height: 46px;
-        }
-        .auto-style6 {
-            width: 10%;
-            height: 54px;
-        }
-        .auto-style7 {
-            width: 20%;
-            height: 54px;
-        }
-        .auto-style8 {
-            width: 29%;
-            height: 54px;
-        }
-        .auto-style9 {
-            width: 8%;
-            text-align: center;
-            height: 54px;
-        }
-        .auto-style10 {
-            width: 25%;
-            height: 54px;
-        }
-    </style>
-</head>
+    </head>
 <body>
     <form id="form1" runat="server">
         
-        <asp:Label ID="Label1" runat="server" Text="INGENIO LA CABAÑA"></asp:Label>
-        <br />
-        <asp:Label ID="Label2" runat="server" Text="DEPARTAMENTO DE TECNOLOGIA INDUSTRIAL"></asp:Label>
-        <br />
-        <asp:Label ID="Label3" runat="server" Text="LISTA DE VERIFICACION DE RUTINA DE INSTRUMENTISTA"></asp:Label>
-        <br />
-        <asp:Label ID="Label6" runat="server" Text="Instrumentista:"></asp:Label>
-&nbsp;<asp:Label ID="lblname" runat="server" Text="Nombre"></asp:Label>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Firma: _______________<br />
-        <asp:Label ID="Label4" runat="server" Text="Fecha:"></asp:Label>
-&nbsp;<asp:Label ID="lblfecha" runat="server" Text="fecha actual"></asp:Label>
-&nbsp;<br />
-        <asp:Label ID="Label5" runat="server" Text="Turno"></asp:Label>
-        :
-        <asp:Label ID="lblturno" runat="server" Text="Turno Actual"></asp:Label>
-        <br />
-        
+        <div class="encabezado-rutina">
+            &nbsp;<div class="encabezado-titulos">
+                <asp:Label ID="Label1" runat="server" Text="INGENIO LA CABAÑA"></asp:Label><br />
+                <asp:Label ID="Label2" runat="server" Text="DEPARTAMENTO DE TECNOLOGIA INDUSTRIAL"></asp:Label><br />
+                <asp:Label ID="Label3" runat="server" Text="LISTA DE VERIFICACION DE RUTINA DE INSTRUMENTISTA"></asp:Label>
+            </div>
+            <div class="encabezado-info">
+                <div class="fila-firma">
+                    <span><asp:Label ID="Label6" runat="server" Text="Instrumentista:"></asp:Label>&nbsp;<asp:Label ID="lblname" runat="server" Text="Nombre" Font-Bold="True" Font-Overline="False" Font-Strikeout="False" Font-Underline="False"></asp:Label></span>
+                    <span>Firma: __________________ Revisó y aprobó:___________________</span>
+                </div>
+                <div class="fila-centro">
+                    <asp:Label ID="Label4" runat="server" Text="Fecha:"></asp:Label>&nbsp;<asp:Label ID="lblfecha" runat="server" Text="fecha actual" Font-Bold="True"></asp:Label>
+                </div>
+                <div class="fila-centro">
+                    <asp:Label ID="Label5" runat="server" Text="Turno"></asp:Label>:&nbsp;<asp:Label ID="lblturno" runat="server" Text="Turno Actual" Font-Bold="True"></asp:Label>
+                </div>
+            </div>
+        </div>
+
     <h3>DETALLE DE INSTRUMENTOS</h3>
 
     <table class="tabla-instrumentos" cellspacing="0" cellpadding="0">
