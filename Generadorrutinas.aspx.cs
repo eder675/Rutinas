@@ -631,17 +631,30 @@ namespace Rutinas
 
             if (areaCalculada == "Extracción")
             {
-                // 2 equipos que miden pH (de cualquier área)
-                string sqlPH = @"
-                    SELECT TOP 2
+                // 1er equipo pH fijo: Transmisor De Ph Jugo Alcalizado E+H
+                string sqlPhFijo = @"
+                    SELECT TOP 1
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
                     FROM Instrumentos I
                     INNER JOIN Area A ON I.IDarea = A.IDarea
                     WHERE I.TipoAnalisis = 'pH'
+                      AND I.Nombre = 'Transmisor De Ph Jugo Alcalizado E+H'";
+                lista.AddRange(EjecutarConsultaObligatorios(sqlPhFijo));
+
+                // 2do equipo pH aleatorio (excluyendo el fijo)
+                string sqlPhAleatorio = @"
+                    SELECT TOP 1
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE I.TipoAnalisis = 'pH'
+                      AND I.Nombre <> 'Transmisor De Ph Jugo Alcalizado E+H'
                     ORDER BY NEWID()";
-                lista.AddRange(EjecutarConsultaObligatorios(sqlPH));
+                lista.AddRange(EjecutarConsultaObligatorios(sqlPhAleatorio));
 
                 // 1 báscula servo del área SECADORA Y EMPAQUE
                 string sqlServo = @"
