@@ -378,6 +378,14 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
 
 
         <script type="text/javascript">
+        // Deshabilitar la restauracion automatica de scroll del navegador.
+        // Sin esto, la restauracion nativa (history.scrollRestoration='auto')
+        // puede ejecutarse despues del timeout de 500ms y cancelar el scrollTo,
+        // impidiendo que la pagina baje al footer del grid tras un postback completo.
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         function setupSincronizacion() {
             var $selectTag = $('.select2-busqueda');
             var $selectDesc = $('.select2-busqueda-desc');
