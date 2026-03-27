@@ -348,7 +348,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                     SelectCommand="SELECT I.TAG, I.Nombre, I.Actividad, I.IDarea, I.IDprioridad, A.Nombre AS Expr1, P.Nombre AS Expr2, I.EsObligatorio, I.TipoAnalisis
                         FROM Instrumentos I
                         INNER JOIN Prioridad P ON I.IDprioridad = P.IDprioridad
-                        INNER JOIN Area A ON I.IDarea = A.IDarea"
+                        INNER JOIN Area A ON I.IDarea = A.IDarea
+                        ORDER BY I.IDarea"
                     UpdateCommand="UPDATE [Instrumentos] SET [Nombre] = @Nombre, [Actividad] = @Actividad, [IDarea] = @IDarea, [IDprioridad] = @IDprioridad, [EsObligatorio] = @EsObligatorio, [TipoAnalisis] = @TipoAnalisis WHERE [TAG] = @TAG">
                     <DeleteParameters>
                         <asp:Parameter Name="TAG" Type="String" />
