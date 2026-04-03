@@ -34,9 +34,9 @@ namespace Rutinas
         //   [0] = Mañana  |  [1] = Tarde  |  [2] = Noche
         private static readonly int[] CANT_OBL_PH_FIJO_G1      = { 1, 1, 1 }; // pH fijo (Transmisor Alcalizado E+H)    — Extracción
         private static readonly int[] CANT_OBL_PH_ALEATORIO_G1 = { 1, 1, 1 }; // pH aleatorio (resto de transmisores)    — Extracción
-        private static readonly int[] CANT_OBL_SERVO_G1         = { 1, 1, 1 }; // Báscula servo (SECADORA Y EMPAQUE)      — Extracción
-        private static readonly int[] CANT_OBL_NEUMATICA_G1     = { 1, 1, 1 }; // Báscula neumática (SECADORA Y EMPAQUE)  — Extracción
-        private static readonly int[] CANT_OBL_BRIX_G2          = { 4, 4, 4 }; // Equipos Brix aleatorios                 — Alcalizado
+        private static readonly int[] CANT_OBL_SERVO_G1         = { 0, 0, 0 }; // Báscula servo (SECADORA Y EMPAQUE)      — Extracción
+        private static readonly int[] CANT_OBL_NEUMATICA_G1     = { 0, 0, 0 }; // Báscula neumática (SECADORA Y EMPAQUE)  — Extracción
+        private static readonly int[] CANT_OBL_BRIX_G2          = { 2, 3, 4 }; // Equipos Brix aleatorios                 — Alcalizado
         // ─────────────────────────────────────────────────────────────────────────
 
         protected void Page_Load(object sender, EventArgs e)
