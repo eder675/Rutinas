@@ -18,6 +18,27 @@ namespace Rutinas
         private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 25);
         
         private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+
+        // ─── CONFIGURACIÓN DE GENERACIÓN ─────────────────────────────────────────
+        // Cantidad de instrumentos por prioridad, por área asignada al turno.
+        // Modificar estos valores cambia cuántos equipos se incluyen en la rutina.
+        private const int CANT_ALTA_G1  = 1; // Alta prioridad  — Grupo 1 (Extracción)
+        private const int CANT_MEDIA_G1 = 1; // Media prioridad — Grupo 1 (Extracción)
+        private const int CANT_BAJA_G1  = 1; // Baja prioridad  — Grupo 1 (Extracción)
+
+        private const int CANT_ALTA_G2  = 1; // Alta prioridad  — Grupo 2 (Alcalizado)
+        private const int CANT_MEDIA_G2 = 1; // Media prioridad — Grupo 2 (Alcalizado)
+        private const int CANT_BAJA_G2  = 2; // Baja prioridad  — Grupo 2 (Alcalizado)
+
+        // Equipos en la tabla de comprobaciones obligatorias, indexados por turno:
+        //   [0] = Mañana  |  [1] = Tarde  |  [2] = Noche
+        private static readonly int[] CANT_OBL_PH_FIJO_G1      = { 1, 1, 1 }; // pH fijo (Transmisor Alcalizado E+H)    — Extracción
+        private static readonly int[] CANT_OBL_PH_ALEATORIO_G1 = { 1, 1, 1 }; // pH aleatorio (resto de transmisores)    — Extracción
+        private static readonly int[] CANT_OBL_SERVO_G1         = { 1, 1, 1 }; // Báscula servo (SECADORA Y EMPAQUE)      — Extracción
+        private static readonly int[] CANT_OBL_NEUMATICA_G1     = { 1, 1, 1 }; // Báscula neumática (SECADORA Y EMPAQUE)  — Extracción
+        private static readonly int[] CANT_OBL_BRIX_G2          = { 4, 4, 4 }; // Equipos Brix aleatorios                 — Alcalizado
+        // ─────────────────────────────────────────────────────────────────────────
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -71,7 +92,7 @@ namespace Rutinas
                     rptRutina.DataBind();
 
                     // Llenar el Repeater de comprobaciones obligatorias
-                    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado);
+                    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado, turnoActual);
                     rptObligatorios.DataSource = obligatorios;
                     rptObligatorios.DataBind();
 
@@ -441,22 +462,23 @@ namespace Rutinas
             // 4. Tomar solo el subconjunto de áreas que corresponden a este turno
             List<int> areasFiltradas = todasLasAreas.GetRange(inicio, fin - inicio);
 
-            // Alcalizado (idGrupo == 2) recibe 2 instrumentos de Baja por área porque
-            // su rutina es más corta al tener menos áreas asignadas por turno.
-            int cantidadBaja = (idGrupo == 2) ? 2 : 1;
+            // Cantidades leídas de las constantes de configuración al inicio de la clase.
+            int cantAlta  = (idGrupo == 2) ? CANT_ALTA_G2  : CANT_ALTA_G1;
+            int cantMedia = (idGrupo == 2) ? CANT_MEDIA_G2 : CANT_MEDIA_G1;
+            int cantBaja  = (idGrupo == 2) ? CANT_BAJA_G2  : CANT_BAJA_G1;
 
-            // 5. Generar instrumentos solo para esas áreas: 1 Alta, 1 Media, 1-2 Baja
+            // 5. Generar instrumentos solo para esas áreas
             foreach (int idArea in areasFiltradas)
             {
-                var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", 1, tagsExcluidos);
+                var alta = ObtenerInstrumentosPorAreaPrioridad(idArea, "Alta", cantAlta, tagsExcluidos);
                 rutina.AddRange(alta);
                 tagsExcluidos.AddRange(alta.Select(i => i.TAG).ToList());
 
-                var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", 1, tagsExcluidos);
+                var media = ObtenerInstrumentosPorAreaPrioridad(idArea, "Media", cantMedia, tagsExcluidos);
                 rutina.AddRange(media);
                 tagsExcluidos.AddRange(media.Select(i => i.TAG).ToList());
 
-                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", cantidadBaja, tagsExcluidos);
+                var baja = ObtenerInstrumentosPorAreaPrioridad(idArea, "Baja", cantBaja, tagsExcluidos);
                 rutina.AddRange(baja);
                 tagsExcluidos.AddRange(baja.Select(i => i.TAG).ToList());
             }
@@ -625,15 +647,20 @@ namespace Rutinas
 
         #endregion
         #region comprobaciones obligatorias
-        private List<ItemRutina> SeleccionarEquiposObligatorios(string areaCalculada)
+        private List<ItemRutina> SeleccionarEquiposObligatorios(string areaCalculada, string turnoActual)
         {
             List<ItemRutina> lista = new List<ItemRutina>();
 
+            // Determinar índice de turno: 0=Mañana, 1=Tarde, 2=Noche
+            int t = 0;
+            if (turnoActual.Contains("A 22:00")) t = 1;
+            else if (turnoActual.Contains("22:00") || turnoActual.Contains("A 06:00")) t = 2;
+
             if (areaCalculada == "Extracción")
             {
-                // 1er equipo pH fijo: Transmisor De Ph Jugo Alcalizado E+H
-                string sqlPhFijo = @"
-                    SELECT TOP 1
+                // pH fijo: Transmisor De Ph Jugo Alcalizado E+H
+                string sqlPhFijo = $@"
+                    SELECT TOP {CANT_OBL_PH_FIJO_G1[t]}
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
@@ -643,9 +670,9 @@ namespace Rutinas
                       AND I.Nombre = 'Transmisor De Ph Jugo Alcalizado E+H'";
                 lista.AddRange(EjecutarConsultaObligatorios(sqlPhFijo));
 
-                // 2do equipo pH aleatorio (excluyendo el fijo)
-                string sqlPhAleatorio = @"
-                    SELECT TOP 1
+                // pH aleatorio (excluyendo el fijo)
+                string sqlPhAleatorio = $@"
+                    SELECT TOP {CANT_OBL_PH_ALEATORIO_G1[t]}
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
@@ -656,9 +683,9 @@ namespace Rutinas
                     ORDER BY NEWID()";
                 lista.AddRange(EjecutarConsultaObligatorios(sqlPhAleatorio));
 
-                // 1 báscula servo del área SECADORA Y EMPAQUE
-                string sqlServo = @"
-                    SELECT TOP 1
+                // Báscula servo del área SECADORA Y EMPAQUE
+                string sqlServo = $@"
+                    SELECT TOP {CANT_OBL_SERVO_G1[t]}
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
@@ -669,9 +696,9 @@ namespace Rutinas
                     ORDER BY NEWID()";
                 lista.AddRange(EjecutarConsultaObligatorios(sqlServo));
 
-                // 1 báscula neumática del área SECADORA Y EMPAQUE
-                string sqlNeumatica = @"
-                    SELECT TOP 1
+                // Báscula neumática del área SECADORA Y EMPAQUE
+                string sqlNeumatica = $@"
+                    SELECT TOP {CANT_OBL_NEUMATICA_G1[t]}
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
@@ -684,9 +711,9 @@ namespace Rutinas
             }
             else // Alcalizado
             {
-                // 4 equipos Brix aleatorios (de los 11 disponibles)
-                string sqlBrix = @"
-                    SELECT TOP 4
+                // Equipos Brix aleatorios
+                string sqlBrix = $@"
+                    SELECT TOP {CANT_OBL_BRIX_G2[t]}
                         I.TAG,
                         I.Nombre AS NombreInstrumento,
                         A.Nombre AS NombreArea
@@ -823,7 +850,7 @@ namespace Rutinas
 
             // 3. Llenar el Repeater de comprobaciones obligatorias
             string areaObligatorios = ObtenerAreaDeterminista(codigoEmpleado);
-            List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(areaObligatorios);
+            List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(areaObligatorios, turnoGuardado);
             rptObligatorios.DataSource = obligatorios;
             rptObligatorios.DataBind();
 
