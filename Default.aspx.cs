@@ -94,13 +94,17 @@ namespace Rutinas
 
                 // Hoy es Domingo, Semana 12 (Par). 
                 // Como el Puesto A hizo 12h hoy, la lógica par coincide:
+                // NOTA: la asignación es inversa a la intuición porque la paridad de semanas
+                // está calibrada con FECHA_INICIO_ZAFRA = 25-Nov-2025.
+                // PuestoFijo=1 hace 12h en semana IMPAR y 4h en semana PAR.
+                // PuestoFijo=2 hace 12h en semana PAR  y 4h en semana IMPAR.
                 if (perfil.PuestoFijo == 1) // Pareja A
                 {
-                    Session["JornadaDomingo"] = esSemanaPar ? "12h" : "4h";
+                    Session["JornadaDomingo"] = esSemanaPar ? "4h" : "12h";
                 }
                 else if (perfil.PuestoFijo == 2) // Pareja B
                 {
-                    Session["JornadaDomingo"] = !esSemanaPar ? "12h" : "4h";
+                    Session["JornadaDomingo"] = esSemanaPar ? "12h" : "4h";
                 }
             }
             Response.Redirect("Generadorrutinas.aspx?Action=Imprimir");
