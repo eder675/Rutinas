@@ -236,9 +236,18 @@ namespace Rutinas
         public string ObtenerAreaDeterminista(string codigoEmpleado)
         {
             DateTime ahora = DateTime.Now;
-            int diaZafra = (ahora - FECHA_INICIO_ZAFRA).Days + 1;
+
+            // CORRECCIÓN TURNO NOCHE: el turno 22:00-06:00 abarca dos días calendario.
+            // Entre las 00:00 y las 05:40 el turno ya inició el día anterior; usar
+            // DateTime.Now.DayOfYear provocaría que la paridad cambie al cruzar medianoche
+            // y se asigne un área distinta a la del compañero (o a la de reimpresión).
+            // Se ancla toda la jornada al día en que el turno comenzó.
+            TimeSpan horaActual = ahora.TimeOfDay;
+            DateTime diaLaboral = (horaActual < new TimeSpan(5, 41, 0)) ? ahora.AddDays(-1) : ahora;
+
+            int diaZafra = (diaLaboral - FECHA_INICIO_ZAFRA).Days + 1;
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
-            int diaJuliano = ahora.DayOfYear;
+            int diaJuliano = diaLaboral.DayOfYear;
 
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
             bool esCuartoTurno = empleado.EsCuartoTurno;
