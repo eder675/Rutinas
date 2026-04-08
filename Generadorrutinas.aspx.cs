@@ -249,6 +249,19 @@ namespace Rutinas
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
             int diaJuliano = diaLaboral.DayOfYear;
 
+            // CORRECCIÓN TURNO MAÑANA: la pareja que trabajó el turno de noche (Lun–Sáb)
+            // descansa el domingo y regresa el lunes de mañana. Sábado (D) y lunes (D+2)
+            // tienen la misma paridad → el área se repetiría. Restar 1 al diaJuliano durante
+            // toda la semana de turno mañana (lun–sáb 05:41–13:40 y domingo 05:41–17:40 para
+            // las 12h) ancla la rotación al domingo intermedio (D+1), manteniendo la
+            // alternación correcta para todo el bloque sin consultar el historial de BD.
+            bool esTurnoManiana = diaLaboral.DayOfWeek == DayOfWeek.Sunday
+                ? (horaActual >= new TimeSpan(5, 41, 0) && horaActual <= new TimeSpan(17, 40, 59))
+                : (horaActual >= new TimeSpan(5, 41, 0) && horaActual <= new TimeSpan(13, 40, 59));
+
+            if (esTurnoManiana)
+                diaJuliano -= 1;
+
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
             bool esCuartoTurno = empleado.EsCuartoTurno;
             int puestoFijo = empleado.PuestoFijo;
