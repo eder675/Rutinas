@@ -659,10 +659,10 @@ namespace Rutinas
 
                     nuevoCorrelativo = Convert.ToInt32(cmdRutina.ExecuteScalar());
 
-                    // 2. Insertar Detalle de Instrumentos
+                    // 2. Insertar Detalle de Instrumentos (regulares: EsObligatorio = 0)
                     string sqlInsertDetalle = @"
-                    INSERT INTO Rutina_instrumento (Correlativo, TAG)
-                    VALUES (@Correlativo, @TAG);";
+                    INSERT INTO Rutina_instrumento (Correlativo, TAG, EsObligatorio)
+                    VALUES (@Correlativo, @TAG, 0);";
 
                     foreach (var item in instrumentos)
                     {
@@ -687,7 +687,11 @@ namespace Rutinas
         {
             if (correlativo <= 0 || obligatorios == null || obligatorios.Count == 0) return;
 
-            string sql = "INSERT INTO Rutina_instrumento (Correlativo, TAG) VALUES (@Correlativo, @TAG)";
+            string sql = @"
+                IF EXISTS (SELECT 1 FROM Rutina_instrumento WHERE Correlativo = @Correlativo AND TAG = @TAG)
+                    UPDATE Rutina_instrumento SET EsObligatorio = 1 WHERE Correlativo = @Correlativo AND TAG = @TAG
+                ELSE
+                    INSERT INTO Rutina_instrumento (Correlativo, TAG, EsObligatorio) VALUES (@Correlativo, @TAG, 1)";
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
@@ -741,6 +745,7 @@ namespace Rutinas
                           FROM Rutina_instrumento RI
                           INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
                           WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                            AND RI.EsObligatorio = 1
                       )
                     ORDER BY NEWID()";
                 var phAleatorio = EjecutarConsultaObligatorios(sqlPhAleatorio);
@@ -803,6 +808,7 @@ namespace Rutinas
                           FROM Rutina_instrumento RI
                           INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
                           WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                            AND RI.EsObligatorio = 1
                       )
                     ORDER BY NEWID()";
                 var brix = EjecutarConsultaObligatorios(sqlBrix);
@@ -911,9 +917,8 @@ namespace Rutinas
             }
 
             // --- B. CARGAR TODOS LOS INSTRUMENTOS USANDO EL CORRELATIVO ENCONTRADO ---
-            // Se excluyen los equipos obligatorios (EsObligatorio = 1) porque se guardan
-            // en Rutina_instrumento como lista negra para el siguiente turno, pero se
-            // muestran de forma independiente en rptObligatorios via SeleccionarEquiposObligatorios.
+            // RI.EsObligatorio = 0: solo instrumentos regulares en rptRutina.
+            // Los obligatorios (EsObligatorio = 1) se cargan por separado en rptObligatorios.
             string sqlCargarDetalle = @"
         SELECT
             LTRIM(RTRIM(A.Nombre)) AS NombreArea,
@@ -925,7 +930,7 @@ namespace Rutinas
         INNER JOIN Area A ON I.IDarea = A.IDarea
         WHERE
             RI.Correlativo = @Correlativo
-            AND (I.EsObligatorio = 0 OR I.EsObligatorio IS NULL)
+            AND RI.EsObligatorio = 0
         ORDER BY A.IDarea ASC"; // Ordenamos por área para mantener el orden geográfico
 
             DataTable dt = new DataTable();
@@ -951,9 +956,8 @@ namespace Rutinas
             rptRutina.DataBind();
             rptRutina.Visible = true;
 
-            // 3. Llenar el Repeater de comprobaciones obligatorias
-            string areaObligatorios = ObtenerAreaDeterminista(codigoEmpleado);
-            List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(areaObligatorios, turnoGuardado);
+            // 3. Llenar obligatorios desde BD (EsObligatorio=1) para que sean idénticos a la impresión original
+            List<ItemRutina> obligatorios = CargarObligatoriosDesdeRutina(correlativoUltimaRutina);
             rptObligatorios.DataSource = obligatorios;
             rptObligatorios.DataBind();
 
@@ -1004,6 +1008,42 @@ namespace Rutinas
             // Usamos RegisterClientScriptBlock para que cargue en el HEAD y maneje el evento onload.
             ClientScript.RegisterClientScriptBlock(this.GetType(), "ReimprimirRutina", scriptReimpresion, false);
             // Nota: Se usa 'false' para indicar que la etiqueta <script> ya está incluida en la cadena.
+        }
+        #endregion
+        #region carga obligatorios reimpresion
+        private List<ItemRutina> CargarObligatoriosDesdeRutina(int correlativo)
+        {
+            List<ItemRutina> lista = new List<ItemRutina>();
+            string sql = @"
+                SELECT
+                    LTRIM(RTRIM(A.Nombre)) AS NombreArea,
+                    LTRIM(RTRIM(I.TAG))    AS TAG,
+                    LTRIM(RTRIM(I.Nombre)) AS NombreInstrumento,
+                    ''                     AS Actividad
+                FROM Rutina_instrumento RI
+                INNER JOIN Instrumentos I ON RI.TAG = I.TAG
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                WHERE RI.Correlativo = @Correlativo
+                  AND RI.EsObligatorio = 1";
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Correlativo", correlativo);
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(new ItemRutina
+                    {
+                        NombreArea        = reader["NombreArea"].ToString(),
+                        TAG               = reader["TAG"].ToString(),
+                        NombreInstrumento = reader["NombreInstrumento"].ToString(),
+                        Actividad         = string.Empty
+                    });
+                }
+            }
+            return lista;
         }
         #endregion
     }
