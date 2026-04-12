@@ -22,6 +22,8 @@
                 <div class="fila-firma">
                     <span><asp:Label ID="Label6" runat="server" Text="Instrumentista:"></asp:Label>&nbsp;<asp:Label ID="lblname" runat="server" Text="Nombre" Font-Bold="True" Font-Overline="False" Font-Strikeout="False" Font-Underline="False"></asp:Label></span>
                     <span>Firma: __________________ Revisó y aprobó:___________________</span>
+                    <asp:Label ID="Label7" runat="server" Text="Dia Zafra: "></asp:Label>
+                    <asp:Label ID="lblzafra" runat="server" Text="Label"></asp:Label>
                 </div>
                 <div class="fila-centro">
                     <asp:Label ID="Label4" runat="server" Text="Fecha:"></asp:Label>&nbsp;<asp:Label ID="lblfecha" runat="server" Text="fecha actual" Font-Bold="True"></asp:Label>

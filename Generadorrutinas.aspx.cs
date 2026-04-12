@@ -75,7 +75,8 @@ namespace Rutinas
 
                     // 3. EJECUCIÓN DEL ALGORITMO COMPLEJO
                     string nombreGrupoAsignado;
-                    List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado);
+                    int correlativoGenerado;
+                    List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado, out correlativoGenerado);
 
                     // 4. LLENADO DE ENCABEZADO Y REPEATER
 
@@ -95,6 +96,9 @@ namespace Rutinas
                     List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado, turnoActual);
                     rptObligatorios.DataSource = obligatorios;
                     rptObligatorios.DataBind();
+                    // Guardar obligatorios en Rutina_instrumento para que sirvan como lista negra
+                    // del siguiente turno (evita repetición de pH aleatorio y Brix).
+                    GuardarObligatoriosEnRutinaInstrumento(correlativoGenerado, obligatorios);
 
                     // --- Dentro del Page_Load de la página de Impresión/PDF ---
 
@@ -152,6 +156,16 @@ namespace Rutinas
                 }
             }
         }
+
+        #region DiaZafra
+        private void MostrarDiaZafra()
+             {
+                //calculo dia zafra
+                DateTime fechaInicioZafraReal = new DateTime(2025, 11, 21);
+                int diaZafra = (DateTime.Now - fechaInicioZafraReal).Days + 1;
+                lblzafra.Text = "Día " + diaZafra;
+              }
+        #endregion
 
         #region metodos auxiliares
         #region turno actual
@@ -319,7 +333,7 @@ namespace Rutinas
         // MÉTODO COORDINADOR PRINCIPAL
         // -------------------------------------------------------------------------------------
 
-        private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado)
+        private List<ItemRutina> EjecutarAlgoritmoComplejo(string codigoEmpleado, string turnoActual, out string nombreGrupoAsignado, out int correlativoGenerado)
         {
             // 1. DETERMINAR EL ÁREA USANDO EL NUEVO MOTOR
             // Esto reemplaza la búsqueda de "quién lo hizo hace una hora"
@@ -332,12 +346,12 @@ namespace Rutinas
             nombreGrupoAsignado = areaCalculada; // Ahora el nombre es el área misma
 
             // 3. SELECCIÓN DE INSTRUMENTOS
-            // El algoritmo de selección de 5 Alta, 5 Media, 5 Baja sigue igual, 
+            // El algoritmo de selección de 5 Alta, 5 Media, 5 Baja sigue igual,
             // pero ahora recibe el grupo correcto por calendario.
             //List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado);
             List<ItemRutina> instrumentosSeleccionados = SeleccionarInstrumentos(idGrupoAsignado, turnoActual);
             // 4. GUARDADO DE LA RUTINA
-            GuardarNuevaRutina(codigoEmpleado, turnoActual, idGrupoAsignado, instrumentosSeleccionados);
+            correlativoGenerado = GuardarNuevaRutina(codigoEmpleado, turnoActual, idGrupoAsignado, instrumentosSeleccionados);
 
             return instrumentosSeleccionados;
         }
@@ -618,9 +632,9 @@ namespace Rutinas
         // ----------------------------------------------------
         // FASE 3: GUARDADO DE LA RUTINA (Transacción)
         // ----------------------------------------------------
-        private void GuardarNuevaRutina(string codigoEmpleado, string turnoActual, int idGrupo, List<ItemRutina> instrumentos)
+        private int GuardarNuevaRutina(string codigoEmpleado, string turnoActual, int idGrupo, List<ItemRutina> instrumentos)
         {
-            if (instrumentos == null || instrumentos.Count == 0) return;
+            if (instrumentos == null || instrumentos.Count == 0) return 0;
 
             int nuevoCorrelativo = 0;
 
@@ -662,7 +676,26 @@ namespace Rutinas
                 catch (Exception)
                 {
                     transaction.Rollback();
-                    // Aquí deberías añadir un sistema de logging para ver los errores de base de datos
+                    nuevoCorrelativo = 0;
+                }
+            }
+            return nuevoCorrelativo;
+        }
+
+        private void GuardarObligatoriosEnRutinaInstrumento(int correlativo, List<ItemRutina> obligatorios)
+        {
+            if (correlativo <= 0 || obligatorios == null || obligatorios.Count == 0) return;
+
+            string sql = "INSERT INTO Rutina_instrumento (Correlativo, TAG) VALUES (@Correlativo, @TAG)";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                foreach (var item in obligatorios)
+                {
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@Correlativo", correlativo);
+                    cmd.Parameters.AddWithValue("@TAG", item.TAG);
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
@@ -692,7 +725,7 @@ namespace Rutinas
                       AND I.Nombre = 'Transmisor De Ph Jugo Alcalizado E+H'";
                 lista.AddRange(EjecutarConsultaObligatorios(sqlPhFijo));
 
-                // pH aleatorio (excluyendo el fijo)
+                // pH aleatorio (excluyendo el fijo y los usados en el turno anterior)
                 string sqlPhAleatorio = $@"
                     SELECT TOP {CANT_OBL_PH_ALEATORIO_G1[t]}
                         I.TAG,
@@ -702,8 +735,30 @@ namespace Rutinas
                     INNER JOIN Area A ON I.IDarea = A.IDarea
                     WHERE I.TipoAnalisis = 'pH'
                       AND I.Nombre <> 'Transmisor De Ph Jugo Alcalizado E+H'
+                      AND I.TAG NOT IN (
+                          SELECT RI.TAG
+                          FROM Rutina_instrumento RI
+                          INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
+                          WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                      )
                     ORDER BY NEWID()";
-                lista.AddRange(EjecutarConsultaObligatorios(sqlPhAleatorio));
+                var phAleatorio = EjecutarConsultaObligatorios(sqlPhAleatorio);
+                if (phAleatorio.Count < CANT_OBL_PH_ALEATORIO_G1[t])
+                {
+                    // Fallback: no hay suficientes instrumentos nuevos, se permite repetir
+                    string sqlPhFallback = $@"
+                        SELECT TOP {CANT_OBL_PH_ALEATORIO_G1[t]}
+                            I.TAG,
+                            I.Nombre AS NombreInstrumento,
+                            A.Nombre AS NombreArea
+                        FROM Instrumentos I
+                        INNER JOIN Area A ON I.IDarea = A.IDarea
+                        WHERE I.TipoAnalisis = 'pH'
+                          AND I.Nombre <> 'Transmisor De Ph Jugo Alcalizado E+H'
+                        ORDER BY NEWID()";
+                    phAleatorio = EjecutarConsultaObligatorios(sqlPhFallback);
+                }
+                lista.AddRange(phAleatorio);
 
                 // Báscula servo del área SECADORA Y EMPAQUE
                 string sqlServo = $@"
@@ -733,7 +788,7 @@ namespace Rutinas
             }
             else // Alcalizado
             {
-                // Equipos Brix aleatorios
+                // Equipos Brix aleatorios, excluyendo los usados en el turno anterior
                 string sqlBrix = $@"
                     SELECT TOP {CANT_OBL_BRIX_G2[t]}
                         I.TAG,
@@ -742,8 +797,29 @@ namespace Rutinas
                     FROM Instrumentos I
                     INNER JOIN Area A ON I.IDarea = A.IDarea
                     WHERE I.TipoAnalisis = 'Brix'
+                      AND I.TAG NOT IN (
+                          SELECT RI.TAG
+                          FROM Rutina_instrumento RI
+                          INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
+                          WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                      )
                     ORDER BY NEWID()";
-                lista.AddRange(EjecutarConsultaObligatorios(sqlBrix));
+                var brix = EjecutarConsultaObligatorios(sqlBrix);
+                if (brix.Count < CANT_OBL_BRIX_G2[t])
+                {
+                    // Fallback: no hay suficientes instrumentos Brix nuevos, se permite repetir
+                    string sqlBrixFallback = $@"
+                        SELECT TOP {CANT_OBL_BRIX_G2[t]}
+                            I.TAG,
+                            I.Nombre AS NombreInstrumento,
+                            A.Nombre AS NombreArea
+                        FROM Instrumentos I
+                        INNER JOIN Area A ON I.IDarea = A.IDarea
+                        WHERE I.TipoAnalisis = 'Brix'
+                        ORDER BY NEWID()";
+                    brix = EjecutarConsultaObligatorios(sqlBrixFallback);
+                }
+                lista.AddRange(brix);
             }
 
             return lista;
