@@ -910,6 +910,9 @@ namespace Rutinas
             }
 
             // --- B. CARGAR TODOS LOS INSTRUMENTOS USANDO EL CORRELATIVO ENCONTRADO ---
+            // Se excluyen los equipos obligatorios (EsObligatorio = 1) porque se guardan
+            // en Rutina_instrumento como lista negra para el siguiente turno, pero se
+            // muestran de forma independiente en rptObligatorios via SeleccionarEquiposObligatorios.
             string sqlCargarDetalle = @"
         SELECT
             LTRIM(RTRIM(A.Nombre)) AS NombreArea,
@@ -921,6 +924,7 @@ namespace Rutinas
         INNER JOIN Area A ON I.IDarea = A.IDarea
         WHERE
             RI.Correlativo = @Correlativo
+            AND (I.EsObligatorio = 0 OR I.EsObligatorio IS NULL)
         ORDER BY A.IDarea ASC"; // Ordenamos por área para mantener el orden geográfico
 
             DataTable dt = new DataTable();
