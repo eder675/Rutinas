@@ -85,6 +85,7 @@ namespace Rutinas
                     lblname.Text = nombreEmpleado;
                     lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
                     lblturno.Text = turnoActual;
+                    MostrarDiaZafra();
                     //lblGrupoAsignado.Text = nombreGrupoAsignado;
 
 
