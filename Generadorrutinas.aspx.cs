@@ -161,9 +161,9 @@ namespace Rutinas
         private void MostrarDiaZafra()
         {
              //calculo dia zafra
-             DateTime fechaInicioZafraReal = new DateTime(2025, 11, 21);
+             DateTime fechaInicioZafraReal = new DateTime(2025, 11, 24);
              int diaZafra = (DateTime.Now - fechaInicioZafraReal).Days + 1;
-             lblzafra.Text = "Día " + diaZafra;
+             lblzafra.Text =""+diaZafra;//concateno sin convertir de entero a texto usando las comas
         }
         #endregion
 
