@@ -159,12 +159,12 @@ namespace Rutinas
 
         #region DiaZafra
         private void MostrarDiaZafra()
-             {
-                //calculo dia zafra
-                DateTime fechaInicioZafraReal = new DateTime(2025, 11, 21);
-                int diaZafra = (DateTime.Now - fechaInicioZafraReal).Days + 1;
-                lblzafra.Text = "Día " + diaZafra;
-              }
+        {
+             //calculo dia zafra
+             DateTime fechaInicioZafraReal = new DateTime(2025, 11, 21);
+             int diaZafra = (DateTime.Now - fechaInicioZafraReal).Days + 1;
+             lblzafra.Text = "Día " + diaZafra;
+        }
         #endregion
 
         #region metodos auxiliares
@@ -940,7 +940,7 @@ namespace Rutinas
             lblname.Text = nombreEmpleado;
             lblfecha.Text = fechaRutinaGuardada;
             lblturno.Text = turnoGuardado; // Turno leído de BD, no recalculado
-
+            MostrarDiaZafra();
             // 2. Repeater Completo: Llenamos con el DataTable completo de detalles
             rptRutina.DataSource = dt;
             rptRutina.DataBind();
