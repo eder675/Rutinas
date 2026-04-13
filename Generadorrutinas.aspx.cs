@@ -252,11 +252,9 @@ namespace Rutinas
         {
             DateTime ahora = DateTime.Now;
 
-            // CORRECCIÓN TURNO NOCHE: el turno 22:00-06:00 abarca dos días calendario.
-            // Entre las 00:00 y las 05:40 el turno ya inició el día anterior; usar
-            // DateTime.Now.DayOfYear provocaría que la paridad cambie al cruzar medianoche
-            // y se asigne un área distinta a la del compañero (o a la de reimpresión).
-            // Se ancla toda la jornada al día en que el turno comenzó.
+            // El turno noche (22:00-06:00) abarca dos días calendario.
+            // diaLaboral ancla la jornada al día en que inició el turno para que
+            // cruzar medianoche no cambie el área asignada.
             TimeSpan horaActual = ahora.TimeOfDay;
             DateTime diaLaboral = (horaActual < new TimeSpan(5, 41, 0)) ? ahora.AddDays(-1) : ahora;
 
@@ -264,18 +262,15 @@ namespace Rutinas
             bool esSemanaPar = ((diaZafra / 7) % 2 == 0);
             int diaJuliano = diaLaboral.DayOfYear;
 
-            // CORRECCIÓN TURNO MAÑANA: la pareja que trabajó el turno de noche (Lun–Sáb)
-            // descansa el domingo y regresa el lunes de mañana. Sábado (D) y lunes (D+2)
-            // tienen la misma paridad → el área se repetiría. Restar 1 al diaJuliano durante
-            // toda la semana de turno mañana (lun–sáb 05:41–13:40 y domingo 05:41–17:40 para
-            // las 12h) ancla la rotación al domingo intermedio (D+1), manteniendo la
-            // alternación correcta para todo el bloque sin consultar el historial de BD.
-            bool esTurnoManiana = diaLaboral.DayOfWeek == DayOfWeek.Sunday
-                ? (horaActual >= new TimeSpan(5, 41, 0) && horaActual <= new TimeSpan(17, 40, 59))
-                : (horaActual >= new TimeSpan(5, 41, 0) && horaActual <= new TimeSpan(13, 40, 59));
-
-            if (esTurnoManiana)
-                diaJuliano -= 1;
+            // CORRECCIÓN TURNO NOCHE: se suma 1 al diaJuliano para que el área nocturna
+            // use la paridad del día siguiente. Así el turno del sábado noche ya refleja
+            // el domingo, y al regresar el lunes de mañana (día siguiente al domingo)
+            // la paridad es naturalmente distinta → no hay repetición de área.
+            // A su vez, esto hace que el domingo mañana (sin ajuste) y el lunes tarde
+            // sean días consecutivos con paridades opuestas → también sin repetición.
+            bool esTurnoNoche = horaActual >= new TimeSpan(22, 0, 0) || horaActual < new TimeSpan(5, 41, 0);
+            if (esTurnoNoche)
+                diaJuliano += 1;
 
             var empleado = ConsultarDatosEmpleado(codigoEmpleado);
             bool esCuartoTurno = empleado.EsCuartoTurno;
