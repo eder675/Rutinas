@@ -89,12 +89,18 @@ namespace Rutinas
                     //lblGrupoAsignado.Text = nombreGrupoAsignado;
 
 
-                    // Llenar el Repeater
+                    // Llenar el Repeater de comprobaciones obligatorias primero
+                    // para poder excluir esos TAGs de la tabla principal.
+                    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado, turnoActual);
+                    HashSet<string> tagsObligatorios = new HashSet<string>(
+                        obligatorios.Select(o => o.TAG.Trim()),
+                        StringComparer.OrdinalIgnoreCase);
+                    rutinaGenerada = rutinaGenerada
+                        .Where(i => !tagsObligatorios.Contains(i.TAG.Trim()))
+                        .ToList();
+
                     rptRutina.DataSource = rutinaGenerada;
                     rptRutina.DataBind();
-
-                    // Llenar el Repeater de comprobaciones obligatorias
-                    List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado, turnoActual);
                     rptObligatorios.DataSource = obligatorios;
                     rptObligatorios.DataBind();
                     // Guardar obligatorios en Rutina_instrumento para que sirvan como lista negra
