@@ -34,6 +34,10 @@
         <asp:DropDownList ID="DropDownList2" runat="server">
         </asp:DropDownList>
         <br />
+        <asp:Label ID="Label9" runat="server" Text="COMENTARIOS ADICIONALES:"></asp:Label>
+        <br />
+        <asp:TextBox ID="TextBox3" runat="server"></asp:TextBox>
+        <br />
         <p>
             <asp:Label ID="Label5" runat="server" Text="¿REEMPLAZAR POR NUEVO EL PROXIMO MANTENIMIENTO? (indica si el equipo es necesario cambiarlo por uno nuevo) "></asp:Label>
         </p>
@@ -44,12 +48,18 @@
         </p>
         <asp:Label ID="Label6" runat="server" Text="INTERVIENE EN EL PROCESO: "></asp:Label>
         <br />
+        <asp:RadioButton ID="RadioButton5" runat="server" Text="SI" />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <asp:RadioButton ID="RadioButton6" runat="server" Text="NO" />
         <br />
         <p>
             <asp:Label ID="Label7" runat="server" Text="SOLUCION ACTUAL: (determina que tipo de solucion se le ha dado actualmente)"></asp:Label>
         </p>
         <p>
             <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+        </p>
+        <p>
+            <asp:Button ID="Button1" runat="server" Text="INSERTAR DATOS" />
         </p>
     </form>
 </body>
