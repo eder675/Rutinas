@@ -56,7 +56,8 @@
             <p>
                 <asp:Button ID="btnentrar" runat="server" button type="submit" Text="INICIAR SESION" OnClick="btnentrar_Click" />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:Button ID="btnAbout" runat="server" BorderColor="#CCFF66" BorderStyle="Outset" OnClick="Button1_Click" Text="Acerca de." CausesValidation="False" />
+                <asp:Button ID="btnAbout" runat="server" BorderColor="#CCFF66" BorderStyle="Outset" OnClick="Button1_Click" Text="Acerca de." CausesValidation="False" Width="143px" />
+                <asp:Button ID="btnregistrador" runat="server" BorderColor="#CCFF66" BorderStyle="Outset" Height="41px" OnClick="Button2_Click" CausesValidation="False" Text="REGISTROS DE FALLOS" Width="235px" />
             </p
         </div>
 

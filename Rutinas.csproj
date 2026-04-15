@@ -75,6 +75,7 @@
     <Content Include="media\iconoimpresora.jpg" />
     <Content Include="media\IngenioLaCabana.jpg" />
     <Content Include="media\paisajeILC.jpg" />
+    <Content Include="Registrofallos.aspx" />
     <Content Include="Registros.aspx" />
     <Content Include="styles.css" />
     <Content Include="styles2.css" />
@@ -127,6 +128,13 @@
     </Compile>
     <Compile Include="Models\RutinaDataModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Registrofallos.aspx.cs">
+      <DependentUpon>Registrofallos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Registrofallos.aspx.designer.cs">
+      <DependentUpon>Registrofallos.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Registros.aspx.cs">
       <DependentUpon>Registros.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

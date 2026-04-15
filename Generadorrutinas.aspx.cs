@@ -36,7 +36,7 @@ namespace Rutinas
         private static readonly int[] CANT_OBL_PH_ALEATORIO_G1 = { 1, 1, 1 }; // pH aleatorio (resto de transmisores)    — Extracción
         private static readonly int[] CANT_OBL_SERVO_G1         = { 0, 0, 0 }; // Báscula servo (SECADORA Y EMPAQUE)      — Extracción
         private static readonly int[] CANT_OBL_NEUMATICA_G1     = { 0, 0, 0 }; // Báscula neumática (SECADORA Y EMPAQUE)  — Extracción
-        private static readonly int[] CANT_OBL_BRIX_G2          = { 2, 3, 4 }; // Equipos Brix aleatorios                 — Alcalizado
+        private static readonly int[] CANT_OBL_BRIX_G2          = { 2, 2, 3 }; // Equipos Brix aleatorios                 — Alcalizado
         // ─────────────────────────────────────────────────────────────────────────
 
         protected void Page_Load(object sender, EventArgs e)
