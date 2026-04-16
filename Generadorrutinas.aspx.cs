@@ -274,7 +274,7 @@ namespace Rutinas
             // la paridad es naturalmente distinta → no hay repetición de área.
             // A su vez, esto hace que el domingo mañana (sin ajuste) y el lunes tarde
             // sean días consecutivos con paridades opuestas → también sin repetición.
-            bool esTurnoNoche = horaActual >= new TimeSpan(22, 0, 0) || horaActual < new TimeSpan(5, 41, 0);
+            bool esTurnoNoche = horaActual >= new TimeSpan(21, 41, 0) || horaActual < new TimeSpan(5, 41, 0);
             if (esTurnoNoche)
                 diaJuliano += 1;
 
