@@ -25,7 +25,7 @@ SELECT TOP 5
     CASE R.IDgrupo WHEN 1 THEN 'Extracción' ELSE 'Alcalizado' END AS Area
 FROM Rutinas R
 INNER JOIN Empleado E ON R.Codigo_empleado = E.Codigo_empleado
-WHERE R.Codigo_empleado = '????'          -- <-- reemplazar con el código del empleado
+WHERE R.Codigo_empleado = 1055          -- <-- reemplazar con el código del empleado
 ORDER BY R.Correlativo DESC;
 
 --  2. Verificar los instrumentos asociados al correlativo encontrado:
@@ -37,7 +37,7 @@ SELECT
     CASE RI.EsObligatorio WHEN 1 THEN 'OBLIGATORIO' ELSE 'regular' END AS Tipo
 FROM Rutina_instrumento RI
 INNER JOIN Instrumentos I ON RI.TAG = I.TAG
-WHERE RI.Correlativo = ????;              -- <-- reemplazar con el Correlativo
+WHERE RI.Correlativo = 130;              -- <-- reemplazar con el Correlativo
 
 -- ============================================================
 --  ELIMINACIÓN (ejecutar en este orden — respetar la FK)
@@ -47,11 +47,11 @@ BEGIN TRANSACTION;
 
     -- Paso 1: eliminar el detalle de instrumentos (tabla hija)
     DELETE FROM Rutina_instrumento
-    WHERE Correlativo = ????;             -- <-- reemplazar con el Correlativo
+    WHERE Correlativo = 130;             -- <-- reemplazar con el Correlativo
 
     -- Paso 2: eliminar la cabecera de la rutina (tabla padre)
     DELETE FROM Rutinas
-    WHERE Correlativo = ????;             -- <-- reemplazar con el Correlativo
+    WHERE Correlativo = 130;             -- <-- reemplazar con el Correlativo
 
 COMMIT TRANSACTION;
 -- Si algo falla, reemplazar COMMIT por ROLLBACK TRANSACTION;
@@ -61,8 +61,8 @@ COMMIT TRANSACTION;
 -- ============================================================
 
 -- Confirmar que ya no existen registros:
-SELECT * FROM Rutinas           WHERE Correlativo = ????;
-SELECT * FROM Rutina_instrumento WHERE Correlativo = ????;
+SELECT * FROM Rutinas           WHERE Correlativo = 130;
+SELECT * FROM Rutina_instrumento WHERE Correlativo = 130;
 -- Ambas consultas deben devolver 0 filas.
 
 -- ============================================================
