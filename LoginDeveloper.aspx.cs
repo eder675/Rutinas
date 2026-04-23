@@ -349,6 +349,12 @@ namespace Rutinas
 
         protected void btnGuardarAsignaciones_Click(object sender, EventArgs e)
         {
+            // Re-enlazar primero para que los controles existan con UniqueIDs correctos.
+            // Los valores del usuario se leen desde Request.Form (el post real),
+            // no desde SelectedValue/Text que quedan vacíos cuando el Repeater
+            // no se reenlaza automáticamente en el postback del botón.
+            CargarAsignacionesEmpleados();
+
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
@@ -358,18 +364,22 @@ namespace Rutinas
                         item.ItemType != System.Web.UI.WebControls.ListItemType.AlternatingItem)
                         continue;
 
-                    HiddenField   hf   = (HiddenField)item.FindControl("hfCodigo");
-                    DropDownList  ddl1 = (DropDownList)item.FindControl("ddlArea1Emp");
-                    DropDownList  ddl2 = (DropDownList)item.FindControl("ddlArea2Emp");
+                    HiddenField  hf   = (HiddenField)item.FindControl("hfCodigo");
+                    DropDownList ddl1 = (DropDownList)item.FindControl("ddlArea1Emp");
+                    DropDownList ddl2 = (DropDownList)item.FindControl("ddlArea2Emp");
+                    TextBox      txt1 = (TextBox)item.FindControl("txtKw1Emp");
+                    TextBox      txt2 = (TextBox)item.FindControl("txtKw2Emp");
 
-                    TextBox   txt1  = (TextBox)item.FindControl("txtKw1Emp");
-                    TextBox   txt2  = (TextBox)item.FindControl("txtKw2Emp");
+                    string codigo   = hf.Value;
+                    string area1Raw = Request.Form[ddl1.UniqueID];
+                    string area2Raw = Request.Form[ddl2.UniqueID];
+                    string kw1Raw   = Request.Form[txt1.UniqueID];
+                    string kw2Raw   = Request.Form[txt2.UniqueID];
 
-                    string codigo = hf.Value;
-                    object area1  = string.IsNullOrEmpty(ddl1.SelectedValue) ? (object)DBNull.Value : Convert.ToInt32(ddl1.SelectedValue);
-                    object area2  = string.IsNullOrEmpty(ddl2.SelectedValue) ? (object)DBNull.Value : Convert.ToInt32(ddl2.SelectedValue);
-                    object kw1    = string.IsNullOrWhiteSpace(txt1?.Text) ? (object)DBNull.Value : txt1.Text.Trim();
-                    object kw2    = string.IsNullOrWhiteSpace(txt2?.Text) ? (object)DBNull.Value : txt2.Text.Trim();
+                    object area1 = string.IsNullOrEmpty(area1Raw) ? (object)DBNull.Value : Convert.ToInt32(area1Raw);
+                    object area2 = string.IsNullOrEmpty(area2Raw) ? (object)DBNull.Value : Convert.ToInt32(area2Raw);
+                    object kw1   = string.IsNullOrWhiteSpace(kw1Raw) ? (object)DBNull.Value : kw1Raw.Trim();
+                    object kw2   = string.IsNullOrWhiteSpace(kw2Raw) ? (object)DBNull.Value : kw2Raw.Trim();
 
                     // Si ambas áreas son nulas, eliminar la fila para mantener la tabla limpia
                     if (area1 == DBNull.Value && area2 == DBNull.Value)
