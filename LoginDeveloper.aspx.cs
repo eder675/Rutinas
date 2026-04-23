@@ -285,33 +285,21 @@ namespace Rutinas
 
         private void CargarAsignacionesEmpleados()
         {
-            string sql = @"
-                SELECT E.Codigo_empleado, E.Nombre,
-                       DEA.Area1Id, DEA.Area2Id,
-                       DEA.Keyword1, DEA.Keyword2
-                FROM Empleado E
-                LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
-                WHERE E.Cargo <> 'Administrador'
-                ORDER BY E.Nombre";
-            DataTable dt = new DataTable();
+            // Empleados (sin admins) con su asignación actual
+            DataTable dtEmps = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                new SqlDataAdapter(new SqlCommand(sql, conn)).Fill(dt);
+                new SqlDataAdapter(@"
+                    SELECT E.Codigo_empleado, E.Nombre,
+                           DEA.Area1Id, DEA.Area2Id, DEA.Keyword1, DEA.Keyword2
+                    FROM Empleado E
+                    LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
+                    WHERE E.Cargo <> 'Administrador'
+                    ORDER BY E.Nombre", conn).Fill(dtEmps);
             }
-            rptEmpleadosArea.DataSource = dt;
-            rptEmpleadosArea.DataBind();
-        }
 
-        protected void rptEmpleadosArea_ItemDataBound(object sender, System.Web.UI.WebControls.RepeaterItemEventArgs e)
-        {
-            if (e.Item.ItemType != System.Web.UI.WebControls.ListItemType.Item &&
-                e.Item.ItemType != System.Web.UI.WebControls.ListItemType.AlternatingItem)
-                return;
-
-            DataRowView row = (DataRowView)e.Item.DataItem;
-
-            // Cargar áreas disponibles
+            // Áreas disponibles
             DataTable dtAreas = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
@@ -319,70 +307,93 @@ namespace Rutinas
                 new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
             }
 
-            DropDownList ddl1 = (DropDownList)e.Item.FindControl("ddlArea1Emp");
-            DropDownList ddl2 = (DropDownList)e.Item.FindControl("ddlArea2Emp");
+            // __doPostBack con UniqueID es el mecanismo nativo de ASP.NET para disparar
+            // el evento servidor desde JS; es más fiable que getElementById(...).click()
+            // porque no depende de que el ClientID coincida exactamente con el id renderizado.
+            string btnUniqueId = btnGuardarAsignaciones.UniqueID;
+            string onEnter = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
 
-            // Opción vacía = usar rotación automática
-            ddl1.Items.Add(new System.Web.UI.WebControls.ListItem("-- Automático --", ""));
-            ddl2.Items.Add(new System.Web.UI.WebControls.ListItem("-- Ninguna --", ""));
-
-            foreach (DataRow areaRow in dtAreas.Rows)
+            var sb = new System.Text.StringBuilder();
+            foreach (DataRow row in dtEmps.Rows)
             {
-                string id   = areaRow["IDarea"].ToString();
-                string name = areaRow["Nombre"].ToString();
-                ddl1.Items.Add(new System.Web.UI.WebControls.ListItem(name, id));
-                ddl2.Items.Add(new System.Web.UI.WebControls.ListItem(name, id));
+                string cod    = System.Web.HttpUtility.HtmlEncode(row["Codigo_empleado"].ToString());
+                string nombre = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
+                string a1Val  = row["Area1Id"]  != DBNull.Value ? row["Area1Id"].ToString()  : "";
+                string a2Val  = row["Area2Id"]  != DBNull.Value ? row["Area2Id"].ToString()  : "";
+                // HtmlAttributeEncode codifica también la comilla simple, evitando HTML malformado
+                string kw1Val = row["Keyword1"] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["Keyword1"].ToString()) : "";
+                string kw2Val = row["Keyword2"] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["Keyword2"].ToString()) : "";
+
+                sb.Append("<tr>");
+                sb.Append($"<td style='padding:5px 10px;border:1px solid #ccc;'>{nombre}</td>");
+
+                // Columna Área 1 + keyword 1
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
+                sb.Append(BuildSelect($"area1_{cod}", dtAreas, a1Val, "", "-- Automático --"));
+                sb.Append($"<br/><input type=\"text\" name=\"kw1_{cod}\" value=\"{kw1Val}\" placeholder=\"palabra clave...\" maxlength=\"100\" style=\"margin-top:3px;font-size:0.85em;width:175px;\" onkeydown=\"{onEnter}\" />");
+                sb.Append("</td>");
+
+                // Columna Área 2 + keyword 2
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
+                sb.Append(BuildSelect($"area2_{cod}", dtAreas, a2Val, "", "-- Ninguna --"));
+                sb.Append($"<br/><input type=\"text\" name=\"kw2_{cod}\" value=\"{kw2Val}\" placeholder=\"palabra clave...\" maxlength=\"100\" style=\"margin-top:3px;font-size:0.85em;width:175px;\" onkeydown=\"{onEnter}\" />");
+                sb.Append("</td>");
+
+                sb.Append("</tr>");
             }
 
-            // Pre-seleccionar la asignación actual
-            if (row["Area1Id"] != DBNull.Value)
-                ddl1.SelectedValue = row["Area1Id"].ToString();
-            if (row["Area2Id"] != DBNull.Value)
-                ddl2.SelectedValue = row["Area2Id"].ToString();
+            litEmpleadosArea.Text = sb.ToString();
+        }
 
-            // Pre-cargar palabras clave
-            TextBox txt1 = (TextBox)e.Item.FindControl("txtKw1Emp");
-            TextBox txt2 = (TextBox)e.Item.FindControl("txtKw2Emp");
-            if (txt1 != null && row["Keyword1"] != DBNull.Value) txt1.Text = row["Keyword1"].ToString();
-            if (txt2 != null && row["Keyword2"] != DBNull.Value) txt2.Text = row["Keyword2"].ToString();
+        private string BuildSelect(string name, DataTable dtAreas, string selectedValue, string primerVal, string primerLabel)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"<select name='{name}' style='width:180px;'>");
+            string sel = (selectedValue == primerVal) ? " selected" : "";
+            sb.Append($"<option value='{primerVal}'{sel}>{System.Web.HttpUtility.HtmlEncode(primerLabel)}</option>");
+            foreach (DataRow row in dtAreas.Rows)
+            {
+                string id  = row["IDarea"].ToString();
+                string nom = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
+                sel = (id == selectedValue && !string.IsNullOrEmpty(selectedValue)) ? " selected" : "";
+                sb.Append($"<option value='{id}'{sel}>{nom}</option>");
+            }
+            sb.Append("</select>");
+            return sb.ToString();
         }
 
         protected void btnGuardarAsignaciones_Click(object sender, EventArgs e)
         {
-            // Re-enlazar primero para que los controles existan con UniqueIDs correctos.
-            // Los valores del usuario se leen desde Request.Form (el post real),
-            // no desde SelectedValue/Text que quedan vacíos cuando el Repeater
-            // no se reenlaza automáticamente en el postback del botón.
-            CargarAsignacionesEmpleados();
+            // Los campos se llaman area1_CODIGO, area2_CODIGO, kw1_CODIGO, kw2_CODIGO
+            // (HTML puro, no controles ASP.NET) — Request.Form los lee directamente.
+            DataTable dtEmps = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(
+                    "SELECT Codigo_empleado FROM Empleado WHERE Cargo <> 'Administrador'", conn)
+                    .Fill(dtEmps);
+            }
 
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                foreach (System.Web.UI.WebControls.RepeaterItem item in rptEmpleadosArea.Items)
+                foreach (DataRow empRow in dtEmps.Rows)
                 {
-                    if (item.ItemType != System.Web.UI.WebControls.ListItemType.Item &&
-                        item.ItemType != System.Web.UI.WebControls.ListItemType.AlternatingItem)
-                        continue;
-
-                    HiddenField  hf   = (HiddenField)item.FindControl("hfCodigo");
-                    DropDownList ddl1 = (DropDownList)item.FindControl("ddlArea1Emp");
-                    DropDownList ddl2 = (DropDownList)item.FindControl("ddlArea2Emp");
-                    TextBox      txt1 = (TextBox)item.FindControl("txtKw1Emp");
-                    TextBox      txt2 = (TextBox)item.FindControl("txtKw2Emp");
-
-                    string codigo   = hf.Value;
-                    string area1Raw = Request.Form[ddl1.UniqueID];
-                    string area2Raw = Request.Form[ddl2.UniqueID];
-                    string kw1Raw   = Request.Form[txt1.UniqueID];
-                    string kw2Raw   = Request.Form[txt2.UniqueID];
+                    string codigo   = empRow["Codigo_empleado"].ToString();
+                    string area1Raw = Request.Form["area1_" + codigo];
+                    string area2Raw = Request.Form["area2_" + codigo];
+                    string kw1Raw   = Request.Form["kw1_"   + codigo];
+                    string kw2Raw   = Request.Form["kw2_"   + codigo];
 
                     object area1 = string.IsNullOrEmpty(area1Raw) ? (object)DBNull.Value : Convert.ToInt32(area1Raw);
                     object area2 = string.IsNullOrEmpty(area2Raw) ? (object)DBNull.Value : Convert.ToInt32(area2Raw);
                     object kw1   = string.IsNullOrWhiteSpace(kw1Raw) ? (object)DBNull.Value : kw1Raw.Trim();
                     object kw2   = string.IsNullOrWhiteSpace(kw2Raw) ? (object)DBNull.Value : kw2Raw.Trim();
 
-                    // Si ambas áreas son nulas, eliminar la fila para mantener la tabla limpia
-                    if (area1 == DBNull.Value && area2 == DBNull.Value)
+                    // Solo eliminar si no hay nada: ni área ni keyword
+                    if (area1 == DBNull.Value && area2 == DBNull.Value &&
+                        kw1 == DBNull.Value && kw2 == DBNull.Value)
                     {
                         SqlCommand cmdDel = new SqlCommand(
                             "DELETE FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);

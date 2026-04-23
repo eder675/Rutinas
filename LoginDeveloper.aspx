@@ -427,35 +427,12 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                 <th style="padding:6px 10px; border:1px solid #ccc;">Área 2 / Palabra clave</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <asp:Repeater ID="rptEmpleadosArea" runat="server"
-                                OnItemDataBound="rptEmpleadosArea_ItemDataBound">
-                                <ItemTemplate>
-                                    <tr>
-                                        <td style="padding:5px 10px; border:1px solid #ccc;">
-                                            <asp:HiddenField ID="hfCodigo" runat="server" Value='<%# Eval("Codigo_empleado") %>' />
-                                            <%# Eval("Nombre") %>
-                                        </td>
-                                        <td style="padding:5px 10px; border:1px solid #ccc; text-align:center;">
-                                            <asp:DropDownList ID="ddlArea1Emp" runat="server" Width="180px" /><br />
-                                            <asp:TextBox ID="txtKw1Emp" runat="server" Width="175px"
-                                                placeholder="palabra clave..." MaxLength="100"
-                                                style="margin-top:3px; font-size:0.85em;" />
-                                        </td>
-                                        <td style="padding:5px 10px; border:1px solid #ccc; text-align:center;">
-                                            <asp:DropDownList ID="ddlArea2Emp" runat="server" Width="180px" /><br />
-                                            <asp:TextBox ID="txtKw2Emp" runat="server" Width="175px"
-                                                placeholder="palabra clave..." MaxLength="100"
-                                                style="margin-top:3px; font-size:0.85em;" />
-                                        </td>
-                                    </tr>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </tbody>
+                        <asp:Literal ID="litEmpleadosArea" runat="server" />
                     </table>
                     <br />
                     <asp:Button ID="btnGuardarAsignaciones" runat="server" Text="GUARDAR ASIGNACIONES"
-                        OnClick="btnGuardarAsignaciones_Click" Style="padding:8px 20px;" />
+                        OnClick="btnGuardarAsignaciones_Click"
+                        Style="padding:8px 20px;" />
                     <asp:Label ID="lblAsignMsg" runat="server" Text="" ForeColor="Green" />
                 </fieldset>
 

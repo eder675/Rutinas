@@ -227,7 +227,7 @@ namespace Rutinas
 
         protected global::System.Web.UI.WebControls.GridView gvPoolDesmontaje;
 
-        protected global::System.Web.UI.WebControls.Repeater rptEmpleadosArea;
+        protected global::System.Web.UI.WebControls.Literal litEmpleadosArea;
 
         protected global::System.Web.UI.WebControls.Button btnGuardarAsignaciones;
 
