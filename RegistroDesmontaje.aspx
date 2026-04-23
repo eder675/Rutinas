@@ -64,9 +64,6 @@
                             </div>
                         </div>
                     </ItemTemplate>
-                    <EmptyDataTemplate>
-                        <p class="rdm-sin-pendientes">No hay equipos pendientes de reporte.</p>
-                    </EmptyDataTemplate>
                 </asp:Repeater>
 
                 <asp:Label ID="lblSinPendientes" runat="server" Text="" CssClass="rdm-sin-pendientes" Visible="false" />
