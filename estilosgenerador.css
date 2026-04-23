@@ -321,8 +321,65 @@ h3 {
 
     /* 10. CONTROL DE SALTO DE PÁGINA */
     .tabla-instrumentos tr,
-    .tabla-comprobaciones tr {
+    .tabla-comprobaciones tr,
+    .tabla-desmontaje tr {
         page-break-inside: avoid !important;
         page-break-after: auto !important;
     }
+
+    /* 11. SECCIÓN DESMONTAJE: siempre en página nueva */
+    .seccion-desmontaje {
+        page-break-before: always !important;
+    }
+}
+
+/* ---------------------------------------------------- */
+/* TABLA DE DESMONTAJE                                  */
+/* ---------------------------------------------------- */
+
+.tabla-desmontaje {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.86em;
+}
+
+    .tabla-desmontaje th, .tabla-desmontaje td {
+        border: 1px solid #333;
+        padding: 2px 3px;
+        vertical-align: middle;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .tabla-desmontaje th {
+        background-color: #e8f5e9;
+        text-align: center;
+        font-size: 0.90em;
+        hyphens: auto;
+    }
+
+/* Columnas tabla-desmontaje (5 cols = 100%)
+   col-area: 5%  col-equipo: 35%  col-hora-d: 13%
+   col-hora-d: 13%  col-obs-des: 34%               */
+.col-hora-d    { width: 13%; text-align: center; }
+.col-obs-des   { width: 34%; }
+
+@media print {
+    .tabla-desmontaje {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 8.3pt !important;
+    }
+    .tabla-desmontaje th, .tabla-desmontaje td {
+        border: 1px solid #000 !important;
+        padding: 2px 3px;
+        vertical-align: middle;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+    .tabla-desmontaje th { font-size: 7.7pt !important; hyphens: auto; }
+    .tabla-desmontaje td label { display: block !important; word-break: break-word; overflow-wrap: break-word; }
+    .col-hora-d  { width: 13% !important; }
+    .col-obs-des { width: 34% !important; }
 }

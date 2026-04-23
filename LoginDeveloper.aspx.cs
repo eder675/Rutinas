@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml.Linq;
@@ -13,31 +15,241 @@ namespace Rutinas
 {
     public partial class LoginDeveloper : System.Web.UI.Page
     {
+        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             string Adminname = Session["NombreEmpleado"].ToString();
-            lblnameadmin.Text = "Administrador en sesion: "+ Adminname;
+            lblnameadmin.Text = "Administrador en sesion: " + Adminname;
         }
 
         protected void lnk_Click(object sender, EventArgs e)
         {
             LinkButton lnb = (LinkButton)sender;
-
-            // El CommandArgument es el índice de la vista a mostrar (0, 1, 2, 3)
             int viewIndex = Convert.ToInt32(lnb.CommandArgument);
-
-            // Cambia la vista activa del MultiView
-            
             mvadmin.ActiveViewIndex = viewIndex;
 
-            // Opcional: Recargar o enlazar los datos si es necesario al cambiar de vista
             if (viewIndex == 0) gvrutinas.DataBind();
             if (viewIndex == 1) gvempleados.DataBind();
             if (viewIndex == 2) gvarea.DataBind();
             if (viewIndex == 3) gvinstrumentos.DataBind();
-
-            // ... y así sucesivamente para las otras vistas
+            if (viewIndex == 4) CargarConfigDesmontaje();
         }
+
+        #region config desmontaje
+
+        private void CargarConfigDesmontaje()
+        {
+            // Cargar valores actuales de DesmontajeConfig
+            string sql = "SELECT MostrarTablaInstrumentos, MostrarTablaObligatorios, MostrarTablaDesmontaje, CantManana, CantTarde, CantNoche FROM DesmontajeConfig WHERE Id = 1";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        chkMostrarInstrumentos.Checked = Convert.ToBoolean(dr["MostrarTablaInstrumentos"]);
+                        chkMostrarObligatorios.Checked = Convert.ToBoolean(dr["MostrarTablaObligatorios"]);
+                        chkMostrarDesmontaje.Checked   = Convert.ToBoolean(dr["MostrarTablaDesmontaje"]);
+                        txtCantManana.Text             = dr["CantManana"].ToString();
+                        txtCantTarde.Text              = dr["CantTarde"].ToString();
+                        txtCantNoche.Text              = dr["CantNoche"].ToString();
+                    }
+                }
+            }
+
+            // Cargar áreas disponibles y marcar las habilitadas
+            DataTable dtAreas = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
+            }
+            cblAreas.DataSource     = dtAreas;
+            cblAreas.DataTextField  = "Nombre";
+            cblAreas.DataValueField = "IDarea";
+            cblAreas.DataBind();
+
+            // Marcar las áreas que ya están habilitadas
+            DataTable dtHabilitadas = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter("SELECT AreaId FROM DesmontajeAreaHabilitada", conn).Fill(dtHabilitadas);
+            }
+            HashSet<string> idsHabilitados = new HashSet<string>();
+            foreach (DataRow row in dtHabilitadas.Rows)
+                idsHabilitados.Add(row["AreaId"].ToString());
+
+            foreach (ListItem item in cblAreas.Items)
+                item.Selected = idsHabilitados.Contains(item.Value);
+
+            // Cargar pool de instrumentos
+            BindPoolDesmontaje();
+        }
+
+        private void BindPoolDesmontaje()
+        {
+            string sql = @"
+                SELECT DI.Id, DI.TAG, I.Nombre AS NombreInstrumento, A.Nombre AS NombreArea, DI.Estado
+                FROM DesmontajeInstrumento DI
+                INNER JOIN Instrumentos I ON DI.TAG = I.TAG
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                ORDER BY A.IDarea, I.Nombre";
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(new SqlCommand(sql, conn)).Fill(dt);
+            }
+            gvPoolDesmontaje.DataSource = dt;
+            gvPoolDesmontaje.DataBind();
+
+            // Poblar dropdown del footer con instrumentos que aún no están en el pool
+            DropDownList ddl = (DropDownList)gvPoolDesmontaje.FooterRow?.FindControl("ddlNuevoInstrumento");
+            if (ddl != null)
+            {
+                string sqlDisponibles = @"
+                    SELECT TAG, Nombre FROM Instrumentos
+                    WHERE TAG NOT IN (SELECT TAG FROM DesmontajeInstrumento)
+                    ORDER BY Nombre";
+                DataTable dtDisp = new DataTable();
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    new SqlDataAdapter(new SqlCommand(sqlDisponibles, conn)).Fill(dtDisp);
+                }
+                ddl.DataSource     = dtDisp;
+                ddl.DataTextField  = "Nombre";
+                ddl.DataValueField = "TAG";
+                ddl.DataBind();
+                ddl.Items.Insert(0, new ListItem("-- Seleccione instrumento --", ""));
+            }
+        }
+
+        protected void btnGuardarConfig_Click(object sender, EventArgs e)
+        {
+            int cantManana = 0, cantTarde = 0, cantNoche = 0;
+            int.TryParse(txtCantManana.Text.Trim(), out cantManana);
+            int.TryParse(txtCantTarde.Text.Trim(),  out cantTarde);
+            int.TryParse(txtCantNoche.Text.Trim(),  out cantNoche);
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlTransaction tx = conn.BeginTransaction();
+                try
+                {
+                    // Actualizar configuración global
+                    string sqlCfg = @"UPDATE DesmontajeConfig SET
+                        MostrarTablaInstrumentos = @Inst,
+                        MostrarTablaObligatorios = @Obl,
+                        MostrarTablaDesmontaje   = @Des,
+                        CantManana = @M, CantTarde = @T, CantNoche = @N
+                        WHERE Id = 1";
+                    SqlCommand cmdCfg = new SqlCommand(sqlCfg, conn, tx);
+                    cmdCfg.Parameters.AddWithValue("@Inst", chkMostrarInstrumentos.Checked ? 1 : 0);
+                    cmdCfg.Parameters.AddWithValue("@Obl",  chkMostrarObligatorios.Checked ? 1 : 0);
+                    cmdCfg.Parameters.AddWithValue("@Des",  chkMostrarDesmontaje.Checked   ? 1 : 0);
+                    cmdCfg.Parameters.AddWithValue("@M",    cantManana);
+                    cmdCfg.Parameters.AddWithValue("@T",    cantTarde);
+                    cmdCfg.Parameters.AddWithValue("@N",    cantNoche);
+                    cmdCfg.ExecuteNonQuery();
+
+                    // Reconstruir áreas habilitadas (borrar todo y re-insertar marcadas)
+                    new SqlCommand("DELETE FROM DesmontajeAreaHabilitada", conn, tx).ExecuteNonQuery();
+                    foreach (ListItem item in cblAreas.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            SqlCommand cmdArea = new SqlCommand(
+                                "INSERT INTO DesmontajeAreaHabilitada (AreaId) VALUES (@AreaId)", conn, tx);
+                            cmdArea.Parameters.AddWithValue("@AreaId", Convert.ToInt32(item.Value));
+                            cmdArea.ExecuteNonQuery();
+                        }
+                    }
+
+                    tx.Commit();
+                    lblConfigMsg.Text      = "Configuración guardada correctamente.";
+                    lblConfigMsg.ForeColor = System.Drawing.Color.Green;
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    lblConfigMsg.Text      = "Error al guardar: " + ex.Message;
+                    lblConfigMsg.ForeColor = System.Drawing.Color.Red;
+                }
+            }
+
+            BindPoolDesmontaje();
+        }
+
+        protected void gvPoolDesmontaje_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "resetPool")
+            {
+                int id = Convert.ToInt32(e.CommandArgument);
+                string sql = "UPDATE DesmontajeInstrumento SET Estado = 0, RazonExclusion = NULL, FechaActualizacion = NULL, EmpleadoId = NULL WHERE Id = @Id";
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.ExecuteNonQuery();
+                }
+                BindPoolDesmontaje();
+            }
+            else if (e.CommandName == "eliminarPool")
+            {
+                int id = Convert.ToInt32(e.CommandArgument);
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    // Eliminar registros de Rutina_desmontaje primero para evitar FK
+                    string tagSql = "SELECT TAG FROM DesmontajeInstrumento WHERE Id = @Id";
+                    SqlCommand cmdTag = new SqlCommand(tagSql, conn);
+                    cmdTag.Parameters.AddWithValue("@Id", id);
+                    object tagObj = cmdTag.ExecuteScalar();
+                    if (tagObj != null)
+                    {
+                        string tag = tagObj.ToString();
+                        SqlCommand cmdDelRd = new SqlCommand(
+                            "DELETE FROM Rutina_desmontaje WHERE TAG = @TAG", conn);
+                        cmdDelRd.Parameters.AddWithValue("@TAG", tag);
+                        cmdDelRd.ExecuteNonQuery();
+                    }
+                    new SqlCommand("DELETE FROM DesmontajeInstrumento WHERE Id = " + id, conn).ExecuteNonQuery();
+                }
+                BindPoolDesmontaje();
+            }
+            else if (e.CommandName == "agregarPool")
+            {
+                DropDownList ddl = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoInstrumento");
+                if (ddl == null || string.IsNullOrEmpty(ddl.SelectedValue)) return;
+
+                string tag = ddl.SelectedValue;
+                string sqlCheck = "SELECT COUNT(1) FROM DesmontajeInstrumento WHERE TAG = @TAG";
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    SqlCommand cmdChk = new SqlCommand(sqlCheck, conn);
+                    cmdChk.Parameters.AddWithValue("@TAG", tag);
+                    int exists = Convert.ToInt32(cmdChk.ExecuteScalar());
+                    if (exists == 0)
+                    {
+                        SqlCommand cmdIns = new SqlCommand(
+                            "INSERT INTO DesmontajeInstrumento (TAG, Estado) VALUES (@TAG, 0)", conn);
+                        cmdIns.Parameters.AddWithValue("@TAG", tag);
+                        cmdIns.ExecuteNonQuery();
+                    }
+                }
+                BindPoolDesmontaje();
+            }
+        }
+
+        #endregion
 
         protected void gvempleados_RowCommand(object sender, GridViewCommandEventArgs e)
         {

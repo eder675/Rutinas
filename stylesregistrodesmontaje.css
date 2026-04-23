@@ -1,0 +1,201 @@
+/* ================================================================
+   ESTILOS — RegistroDesmontaje.aspx
+   Prefijo: rdm-*
+   Depende de: styles-shared.css
+   ================================================================ */
+
+body {
+    background: url('media/IngenioLaCabana.jpg') center center / cover fixed;
+    background-color: var(--c-bg);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--c-text);
+}
+
+.rdm-wrapper {
+    max-width: 780px;
+    margin: 30px auto;
+    padding: 0 16px 40px;
+}
+
+.rdm-card {
+    background: rgba(255,255,255,0.93);
+    backdrop-filter: blur(14px);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    border-top: 4px solid var(--c-primary);
+    padding: 28px 32px;
+    animation: scaleIn 0.3s ease both;
+}
+
+.rdm-titulo {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--c-primary-dark);
+    text-align: center;
+    margin: 0 0 4px;
+}
+
+.rdm-subtitulo {
+    text-align: center;
+    color: var(--c-text-muted);
+    font-size: 0.9em;
+    margin: 0 0 20px;
+}
+
+.rdm-info-bloque {
+    background: #f0faf0;
+    border: 1px solid #c3e6c3;
+    border-radius: var(--r-md);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.rdm-instrucciones {
+    font-size: 0.88em;
+    color: var(--c-text-muted);
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    background: #fffdf0;
+    border-left: 3px solid var(--c-accent);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+
+/* ── Fila de instrumento ── */
+.rdm-item {
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: box-shadow var(--t-fast);
+}
+
+.rdm-item:hover {
+    box-shadow: var(--sh-sm);
+}
+
+.rdm-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rdm-area-badge {
+    font-size: 0.75em;
+    background: var(--c-primary);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+.rdm-nombre {
+    font-weight: 600;
+    flex: 1;
+}
+
+.rdm-chk-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-sm);
+    transition: background var(--t-fast), border-color var(--t-fast);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.rdm-chk-label:hover {
+    background: #f0faf0;
+    border-color: var(--c-primary-light);
+}
+
+.rdm-chk-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--c-primary);
+    cursor: pointer;
+}
+
+.rdm-chk-label.marcado {
+    background: #e8f5e9;
+    border-color: var(--c-primary);
+}
+
+/* ── Panel de razón (visible solo si NO desmontado) ── */
+.rdm-razon-panel {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #fff8f0;
+    border: 1px solid #f5cfa0;
+    border-radius: var(--r-sm);
+    gap: 10px;
+    flex-direction: column;
+}
+
+.rdm-razon-panel.visible {
+    display: flex;
+}
+
+.rdm-razon-panel label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    margin-bottom: 2px;
+}
+
+.rdm-select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-sm);
+    font-size: 0.9em;
+}
+
+.rdm-textarea {
+    width: 100%;
+    min-height: 56px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-sm);
+    font-size: 0.9em;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+/* ── Sin pendientes ── */
+.rdm-sin-pendientes {
+    text-align: center;
+    color: var(--c-text-muted);
+    padding: 30px 0;
+    font-style: italic;
+}
+
+/* ── Botón guardar ── */
+.rdm-btn-guardar {
+    display: block;
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    font-size: 1.05em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
+}
+
+.rdm-btn-guardar:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+    filter: brightness(1.08);
+}

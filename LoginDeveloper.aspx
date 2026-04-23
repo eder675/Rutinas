@@ -56,10 +56,18 @@
             CommandArgument="3" />
     </li>
         <li>
-            <asp:LinkButton 
-            ID="lnkLogout" 
-            runat="server" 
-            Text="Cerrar sesion." 
+            <asp:LinkButton
+            ID="lnkDesmontaje"
+            runat="server"
+            Text="Configuracion desmontaje."
+            OnClick="lnk_Click"
+            CommandArgument="4" />
+        </li>
+        <li>
+            <asp:LinkButton
+            ID="lnkLogout"
+            runat="server"
+            Text="Cerrar sesion."
             OnClick="lnkLogout_Click" />
         </li>
     </ul>
@@ -373,6 +381,68 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <asp:Parameter Name="TipoAnalisis" Type="String" />
                     </UpdateParameters>
                 </asp:SqlDataSource>
+            </asp:View>
+            <%-- VISTA 4: Configuración de Desmontaje --%>
+            <asp:View ID="vdesmontajeconfig" runat="server">
+                <h2>Configuración de Desmontaje de Equipos</h2>
+
+                <fieldset style="margin-bottom:16px; padding:12px;">
+                    <legend><b>Tablas visibles en la rutina</b></legend>
+                    <asp:CheckBox ID="chkMostrarInstrumentos" runat="server" Text=" Tabla 1 — Instrumentos regulares" /><br />
+                    <asp:CheckBox ID="chkMostrarObligatorios" runat="server" Text=" Tabla 2 — Comprobaciones obligatorias" /><br />
+                    <asp:CheckBox ID="chkMostrarDesmontaje"   runat="server" Text=" Tabla 3 — Desmontaje de equipos" />
+                </fieldset>
+
+                <fieldset style="margin-bottom:16px; padding:12px;">
+                    <legend><b>Equipos a desmontar por turno (Tabla 3)</b></legend>
+                    Mañana:&nbsp;<asp:TextBox ID="txtCantManana" runat="server" Width="50px" MaxLength="3" />
+                    &nbsp;&nbsp;Tarde:&nbsp;<asp:TextBox ID="txtCantTarde" runat="server" Width="50px" MaxLength="3" />
+                    &nbsp;&nbsp;Noche:&nbsp;<asp:TextBox ID="txtCantNoche" runat="server" Width="50px" MaxLength="3" />
+                </fieldset>
+
+                <fieldset style="margin-bottom:16px; padding:12px;">
+                    <legend><b>Áreas habilitadas para desmontaje</b></legend>
+                    <asp:CheckBoxList ID="cblAreas" runat="server" DataTextField="Nombre" DataValueField="IDarea" RepeatColumns="3" />
+                </fieldset>
+
+                <asp:Button ID="btnGuardarConfig" runat="server" Text="GUARDAR CONFIGURACIÓN"
+                    OnClick="btnGuardarConfig_Click" Style="margin-bottom:20px; padding:8px 20px;" />
+                <asp:Label ID="lblConfigMsg" runat="server" Text="" ForeColor="Green" />
+
+                <fieldset style="padding:12px;">
+                    <legend><b>Pool de instrumentos a desmontar</b></legend>
+                    <asp:GridView ID="gvPoolDesmontaje" runat="server"
+                        AutoGenerateColumns="False"
+                        DataKeyNames="Id"
+                        OnRowCommand="gvPoolDesmontaje_RowCommand"
+                        ShowFooter="True"
+                        EmptyDataText="No hay instrumentos en el pool.">
+                        <Columns>
+                            <asp:BoundField DataField="TAG"               HeaderText="TAG" />
+                            <asp:BoundField DataField="NombreInstrumento" HeaderText="Nombre" />
+                            <asp:BoundField DataField="NombreArea"        HeaderText="Área" />
+                            <asp:TemplateField HeaderText="Estado">
+                                <ItemTemplate>
+                                    <%# Convert.ToInt32(Eval("Estado")) == 0 ? "Pendiente" :
+                                        Convert.ToInt32(Eval("Estado")) == 1 ? "Desmontado" : "Excluido" %>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:DropDownList ID="ddlNuevoInstrumento" runat="server" Width="260px" />
+                                </FooterTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Acciones">
+                                <ItemTemplate>
+                                    <asp:Button ID="btnReset"    runat="server" Text="Resetear"  CommandName="resetPool"  CommandArgument='<%# Eval("Id") %>' />
+                                    &nbsp;
+                                    <asp:Button ID="btnEliminar" runat="server" Text="Eliminar"  CommandName="eliminarPool" CommandArgument='<%# Eval("Id") %>' />
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:Button ID="btnAgregar" runat="server" Text="AGREGAR" CommandName="agregarPool" />
+                                </FooterTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
+                </fieldset>
             </asp:View>
         </asp:MultiView>
         </p>

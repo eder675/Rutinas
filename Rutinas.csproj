@@ -76,7 +76,12 @@
     <Content Include="media\IngenioLaCabana.jpg" />
     <Content Include="media\paisajeILC.jpg" />
     <Content Include="Registrofallos.aspx" />
+    <Content Include="RegistroDesmontaje.aspx" />
     <Content Include="Registros.aspx" />
+    <Content Include="ScriptsDesmontaje.sql" />
+    <Content Include="styles-shared.css" />
+    <Content Include="stylesregistrofallos.css" />
+    <Content Include="stylesregistrodesmontaje.css" />
     <Content Include="styles.css" />
     <Content Include="styles2.css" />
     <Content Include="styles3.css" />
@@ -134,6 +139,13 @@
     </Compile>
     <Compile Include="Registrofallos.aspx.designer.cs">
       <DependentUpon>Registrofallos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RegistroDesmontaje.aspx.cs">
+      <DependentUpon>RegistroDesmontaje.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RegistroDesmontaje.aspx.designer.cs">
+      <DependentUpon>RegistroDesmontaje.aspx</DependentUpon>
     </Compile>
     <Compile Include="Registros.aspx.cs">
       <DependentUpon>Registros.aspx</DependentUpon>

@@ -39,27 +39,61 @@ namespace Rutinas
         private static readonly int[] CANT_OBL_BRIX_G2          = { 2, 2, 3 }; // Equipos Brix aleatorios                 — Alcalizado
         // ─────────────────────────────────────────────────────────────────────────
 
+        #region config desmontaje
+        private struct ConfigDesmontaje
+        {
+            public bool MostrarInstrumentos;
+            public bool MostrarObligatorios;
+            public bool MostrarDesmontaje;
+            public int  CantManana;
+            public int  CantTarde;
+            public int  CantNoche;
+        }
+
+        private ConfigDesmontaje ObtenerConfigDesmontaje()
+        {
+            var cfg = new ConfigDesmontaje
+            {
+                MostrarInstrumentos = true,
+                MostrarObligatorios = true,
+                MostrarDesmontaje   = false,
+                CantManana = 2, CantTarde = 2, CantNoche = 2
+            };
+            try
+            {
+                string sql = "SELECT MostrarTablaInstrumentos, MostrarTablaObligatorios, MostrarTablaDesmontaje, CantManana, CantTarde, CantNoche FROM DesmontajeConfig WHERE Id = 1";
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    using (SqlDataReader dr = new SqlCommand(sql, conn).ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            cfg.MostrarInstrumentos = Convert.ToBoolean(dr["MostrarTablaInstrumentos"]);
+                            cfg.MostrarObligatorios = Convert.ToBoolean(dr["MostrarTablaObligatorios"]);
+                            cfg.MostrarDesmontaje   = Convert.ToBoolean(dr["MostrarTablaDesmontaje"]);
+                            cfg.CantManana          = Convert.ToInt32(dr["CantManana"]);
+                            cfg.CantTarde           = Convert.ToInt32(dr["CantTarde"]);
+                            cfg.CantNoche           = Convert.ToInt32(dr["CantNoche"]);
+                        }
+                    }
+                }
+            }
+            catch { }
+            return cfg;
+        }
+        #endregion
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                // 1. OBTENER DATOS DE LA SESIÓN
-                // Validamos la sesión. Si no hay código, redirigimos al login.
-                /*if (Session["CodigoEmpleado"] == null || Session["NombreEmpleado"] == null)
-                {
-                    // Opcional: Redirigir al usuario si no ha iniciado sesión
-                    // Response.Redirect("Login.aspx");
-                    return;
-                }*/
-
                 if (Session["CodigoEmpleado"] == null || Session["NombreEmpleado"] == null)
                 {
-                    // Opcional: Redirigir si la sesión no existe
                     Response.Redirect("Login.aspx");
                     return;
                 }
 
-                // 2. Obtener la acción de la URL (QueryString)
                 string action = Request.QueryString["Action"];
                 if (action == "Reimprimir")
                 {
@@ -68,29 +102,41 @@ namespace Rutinas
                 else
                 {
                     string codigoEmpleado = Session["CodigoEmpleado"].ToString();
-                    string nombreEmpleado = Session["NombreEmpleado"].ToString(); // ¡Directo de la sesión!
+                    string nombreEmpleado = Session["NombreEmpleado"].ToString();
 
-                    // 2. PREPARACIÓN DE DATOS LOCALES
+                    // Cargar configuración de visibilidad de tablas
+                    ConfigDesmontaje config = ObtenerConfigDesmontaje();
+
+                    // Si la tabla de desmontaje está activa y hay pendientes, redirigir a reporte
+                    if (config.MostrarDesmontaje)
+                    {
+                        int pendiente = ObtenerRutinaConDesmontajePendiente(codigoEmpleado);
+                        if (pendiente > 0)
+                        {
+                            Response.Redirect("RegistroDesmontaje.aspx?RutinaId=" + pendiente);
+                            return;
+                        }
+                    }
+
+                    // Aplicar visibilidad de secciones
+                    pnlInstrumentos.Visible = config.MostrarInstrumentos;
+                    pnlObligatorios.Visible = config.MostrarObligatorios;
+                    pnlDesmontaje.Visible   = config.MostrarDesmontaje;
+
                     string turnoActual = DeterminarTurnoActual();
 
-                    // 3. EJECUCIÓN DEL ALGORITMO COMPLEJO
-                    string nombreGrupoAsignado;
-                    int correlativoGenerado;
-                    List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(codigoEmpleado, turnoActual, out nombreGrupoAsignado, out correlativoGenerado);
-
-                    // 4. LLENADO DE ENCABEZADO Y REPEATER
-
-                    // Descomenta y ajusta estos IDs según tu ASPX
-
-                    lblname.Text = nombreEmpleado;
+                    lblname.Text  = nombreEmpleado;
                     lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
                     lblturno.Text = turnoActual;
                     MostrarDiaZafra();
-                    //lblGrupoAsignado.Text = nombreGrupoAsignado;
 
+                    // Algoritmo principal (siempre corre para obtener el correlativo)
+                    string nombreGrupoAsignado;
+                    int correlativoGenerado;
+                    List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(
+                        codigoEmpleado, turnoActual,
+                        out nombreGrupoAsignado, out correlativoGenerado);
 
-                    // Llenar el Repeater de comprobaciones obligatorias primero
-                    // para poder excluir esos TAGs de la tabla principal.
                     List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(nombreGrupoAsignado, turnoActual);
                     HashSet<string> tagsObligatorios = new HashSet<string>(
                         obligatorios.Select(o => o.TAG.Trim()),
@@ -99,67 +145,54 @@ namespace Rutinas
                         .Where(i => !tagsObligatorios.Contains(i.TAG.Trim()))
                         .ToList();
 
-                    rptRutina.DataSource = rutinaGenerada;
-                    rptRutina.DataBind();
-                    rptObligatorios.DataSource = obligatorios;
-                    rptObligatorios.DataBind();
-                    // Guardar obligatorios en Rutina_instrumento para que sirvan como lista negra
-                    // del siguiente turno (evita repetición de pH aleatorio y Brix).
+                    if (config.MostrarInstrumentos)
+                    {
+                        rptRutina.DataSource = rutinaGenerada;
+                        rptRutina.DataBind();
+                    }
+                    if (config.MostrarObligatorios)
+                    {
+                        rptObligatorios.DataSource = obligatorios;
+                        rptObligatorios.DataBind();
+                    }
                     GuardarObligatoriosEnRutinaInstrumento(correlativoGenerado, obligatorios);
 
-                    // --- Dentro del Page_Load de la página de Impresión/PDF ---
+                    // Tabla de desmontaje
+                    if (config.MostrarDesmontaje && correlativoGenerado > 0)
+                    {
+                        int t = 0;
+                        if (turnoActual.Contains("A 22:00"))   t = 1;
+                        else if (turnoActual.Contains("22:00") || turnoActual.Contains("A 06:00")) t = 2;
+                        int cantTurno = t == 0 ? config.CantManana : t == 1 ? config.CantTarde : config.CantNoche;
 
-                    // 1. Definimos la URL de nuestra página de servicio para cerrar la sesión
-                    // Usamos ResolveClientUrl para garantizar la ruta correcta
+                        List<ItemRutina> desmontaje = SeleccionarInstrumentosDesmontaje(cantTurno);
+                        rptDesmontaje.DataSource = desmontaje;
+                        rptDesmontaje.DataBind();
+                        GuardarDesmontajeEnRutina(correlativoGenerado, desmontaje);
+                    }
+
                     string logoutUrl = ResolveClientUrl("~/closesession.aspx");
-
-                    // 2. Definimos el script que se ejecutará en el cliente (navegador)
                     string script = $@"
 <script type='text/javascript'>
-    
-    // Función que se llama cuando el usuario cierra el diálogo de impresión
     function cerrarSesionAlTerminarImpresion() {{
-        // Redirigimos la ventana actual a la página de servicio.
-        // Esto asegura que la autenticación (FormsAuth) y las variables de Session sean destruidas.
-        window.location.href = '{logoutUrl}'; 
+        window.location.href = '{logoutUrl}';
     }}
-
-    // Preparamos el listener para el evento 'onafterprint' (post-impresión)
     if (window.matchMedia) {{
-        // Listener moderno: Mejor detección del cierre del diálogo
         var mediaQueryList = window.matchMedia('print');
         mediaQueryList.addListener(function(mql) {{
-            // mql.matches es true durante la impresión, false cuando se cierra el diálogo
-            if (!mql.matches) {{
-                cerrarSesionAlTerminarImpresion();
-            }}
+            if (!mql.matches) {{ cerrarSesionAlTerminarImpresion(); }}
         }});
     }} else {{
-        // Fallback para navegadores antiguos
         window.onafterprint = cerrarSesionAlTerminarImpresion;
     }}
-    
     window.onload = function() {{
-        // Lógica existente para la impresión
         var originalTitle = document.title;
         document.title = '';
-        
-        // Abre el diálogo de impresión
         window.print();
-        
-        // Restaura el título (lo hace después de que el navegador inicia la impresión)
         document.title = originalTitle;
     }};
 </script>";
-
-                    // 3. Registramos el script en el cliente
                     this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirCerrarSesion", script);
-
-                    // -----------------------------------------------------------
-                    // IMPORTANTE: Si estás usando Response.End() o Server.Transfer(), 
-                    // asegúrate de que el código de impresión esté en un bloque que 
-                    // permita que el ResponseBuffer se complete antes de la redirección.
-                    // -----------------------------------------------------------
                 }
             }
         }
@@ -947,20 +980,36 @@ namespace Rutinas
 
             // --- C. LLENADO DE ENCABEZADO Y REPEATER ---
 
-            // 1. Hora Correcta: Usamos la hora guardada en la BD
-            lblname.Text = nombreEmpleado;
-            lblfecha.Text = fechaRutinaGuardada;
-            lblturno.Text = turnoGuardado; // Turno leído de BD, no recalculado
-            MostrarDiaZafra();
-            // 2. Repeater Completo: Llenamos con el DataTable completo de detalles
-            rptRutina.DataSource = dt;
-            rptRutina.DataBind();
-            rptRutina.Visible = true;
+            ConfigDesmontaje config = ObtenerConfigDesmontaje();
+            pnlInstrumentos.Visible = config.MostrarInstrumentos;
+            pnlObligatorios.Visible = config.MostrarObligatorios;
+            pnlDesmontaje.Visible   = config.MostrarDesmontaje;
 
-            // 3. Llenar obligatorios desde BD (EsObligatorio=1) para que sean idénticos a la impresión original
-            List<ItemRutina> obligatorios = CargarObligatoriosDesdeRutina(correlativoUltimaRutina);
-            rptObligatorios.DataSource = obligatorios;
-            rptObligatorios.DataBind();
+            lblname.Text  = nombreEmpleado;
+            lblfecha.Text = fechaRutinaGuardada;
+            lblturno.Text = turnoGuardado;
+            MostrarDiaZafra();
+
+            if (config.MostrarInstrumentos)
+            {
+                rptRutina.DataSource = dt;
+                rptRutina.DataBind();
+                rptRutina.Visible = true;
+            }
+
+            if (config.MostrarObligatorios)
+            {
+                List<ItemRutina> obligatorios = CargarObligatoriosDesdeRutina(correlativoUltimaRutina);
+                rptObligatorios.DataSource = obligatorios;
+                rptObligatorios.DataBind();
+            }
+
+            if (config.MostrarDesmontaje)
+            {
+                List<ItemRutina> desmontaje = CargarDesmontajeDesdeRutina(correlativoUltimaRutina);
+                rptDesmontaje.DataSource = desmontaje;
+                rptDesmontaje.DataBind();
+            }
 
             // --- 4. IMPRESIÓN AUTOMÁTICA ---
             //string script = @"window.onload = function() { var originalTitle = document.title; document.title = ''; window.print(); document.title = originalTitle; };";
@@ -1011,6 +1060,108 @@ namespace Rutinas
             // Nota: Se usa 'false' para indicar que la etiqueta <script> ya está incluida en la cadena.
         }
         #endregion
+        #region desmontaje
+        private int ObtenerRutinaConDesmontajePendiente(string codigoEmpleado)
+        {
+            string sql = @"
+                SELECT TOP 1 r.Correlativo
+                FROM Rutinas r
+                INNER JOIN Rutina_desmontaje rd ON r.Correlativo = rd.RutinaId
+                WHERE r.Codigo_empleado = @Codigo AND rd.Reportado = 0
+                ORDER BY r.Correlativo DESC";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
+                object result = cmd.ExecuteScalar();
+                return result != null && result != DBNull.Value ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        private List<ItemRutina> SeleccionarInstrumentosDesmontaje(int cantidad)
+        {
+            List<ItemRutina> lista = new List<ItemRutina>();
+            if (cantidad <= 0) return lista;
+            string sql = $@"
+                SELECT TOP {cantidad}
+                    I.TAG,
+                    I.Nombre AS NombreInstrumento,
+                    A.Nombre AS NombreArea
+                FROM DesmontajeInstrumento DI
+                INNER JOIN Instrumentos I ON DI.TAG = I.TAG
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                INNER JOIN DesmontajeAreaHabilitada DAH ON I.IDarea = DAH.AreaId
+                WHERE DI.Estado = 0
+                ORDER BY NEWID()";
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(new SqlCommand(sql, conn)).Fill(dt);
+            }
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new ItemRutina
+                {
+                    TAG               = row["TAG"].ToString().Trim(),
+                    NombreInstrumento = row["NombreInstrumento"].ToString().Trim(),
+                    NombreArea        = row["NombreArea"].ToString().Trim(),
+                    Actividad         = string.Empty
+                });
+            }
+            return lista;
+        }
+
+        private void GuardarDesmontajeEnRutina(int correlativo, List<ItemRutina> desmontaje)
+        {
+            if (correlativo <= 0 || desmontaje == null || desmontaje.Count == 0) return;
+            string sql = "INSERT INTO Rutina_desmontaje (RutinaId, TAG, Reportado, Desmontado) VALUES (@RutinaId, @TAG, 0, 0)";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                foreach (var item in desmontaje)
+                {
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@RutinaId", correlativo);
+                    cmd.Parameters.AddWithValue("@TAG",      item.TAG);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private List<ItemRutina> CargarDesmontajeDesdeRutina(int correlativo)
+        {
+            List<ItemRutina> lista = new List<ItemRutina>();
+            string sql = @"
+                SELECT I.TAG, I.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
+                FROM Rutina_desmontaje RD
+                INNER JOIN Instrumentos I ON RD.TAG = I.TAG
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                WHERE RD.RutinaId = @Correlativo";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Correlativo", correlativo);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new ItemRutina
+                        {
+                            TAG               = reader["TAG"].ToString(),
+                            NombreInstrumento = reader["NombreInstrumento"].ToString(),
+                            NombreArea        = reader["NombreArea"].ToString(),
+                            Actividad         = string.Empty
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+        #endregion
+
         #region carga obligatorios reimpresion
         private List<ItemRutina> CargarObligatoriosDesdeRutina(int correlativo)
         {

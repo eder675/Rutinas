@@ -21,5 +21,15 @@ namespace Rutinas.Models
             public string NombreInstrumento { get; set; }
             public string Actividad { get; set; }
         }
-    
+
+        // Representa un instrumento pendiente de reporte en RegistroDesmontaje
+        public class ItemDesmontajePendiente
+        {
+            public int    DesmontajeInstrumentoId { get; set; }
+            public int    RutinaId               { get; set; }
+            public string TAG                    { get; set; }
+            public string NombreInstrumento      { get; set; }
+            public string NombreArea             { get; set; }
+        }
+
 }

@@ -202,5 +202,29 @@ namespace Rutinas
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource3;
+
+        protected global::System.Web.UI.WebControls.LinkButton lnkDesmontaje;
+
+        protected global::System.Web.UI.WebControls.View vdesmontajeconfig;
+
+        protected global::System.Web.UI.WebControls.CheckBox chkMostrarInstrumentos;
+
+        protected global::System.Web.UI.WebControls.CheckBox chkMostrarObligatorios;
+
+        protected global::System.Web.UI.WebControls.CheckBox chkMostrarDesmontaje;
+
+        protected global::System.Web.UI.WebControls.TextBox txtCantManana;
+
+        protected global::System.Web.UI.WebControls.TextBox txtCantTarde;
+
+        protected global::System.Web.UI.WebControls.TextBox txtCantNoche;
+
+        protected global::System.Web.UI.WebControls.CheckBoxList cblAreas;
+
+        protected global::System.Web.UI.WebControls.Button btnGuardarConfig;
+
+        protected global::System.Web.UI.WebControls.Label lblConfigMsg;
+
+        protected global::System.Web.UI.WebControls.GridView gvPoolDesmontaje;
     }
 }

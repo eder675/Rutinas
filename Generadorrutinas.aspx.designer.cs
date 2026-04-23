@@ -139,5 +139,15 @@ namespace Rutinas
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptObligatorios;
+
+        protected global::System.Web.UI.WebControls.Repeater rptObligatorios0;
+
+        protected global::System.Web.UI.WebControls.Panel pnlInstrumentos;
+
+        protected global::System.Web.UI.WebControls.Panel pnlObligatorios;
+
+        protected global::System.Web.UI.WebControls.Panel pnlDesmontaje;
+
+        protected global::System.Web.UI.WebControls.Repeater rptDesmontaje;
     }
 }
