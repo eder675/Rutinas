@@ -291,6 +291,7 @@ namespace Rutinas
                        DEA.Keyword1, DEA.Keyword2
                 FROM Empleado E
                 LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
+                WHERE E.Cargo <> 'Administrador'
                 ORDER BY E.Nombre";
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
