@@ -165,7 +165,9 @@ namespace Rutinas
                         else if (turnoActual.Contains("22:00") || turnoActual.Contains("A 06:00")) t = 2;
                         int cantTurno = t == 0 ? config.CantManana : t == 1 ? config.CantTarde : config.CantNoche;
 
-                        List<ItemRutina> desmontaje = SeleccionarInstrumentosDesmontaje(cantTurno);
+                        int idGrupoDesmontaje = (nombreGrupoAsignado == "Extracción") ? 1 : 2;
+
+                        List<ItemRutina> desmontaje = SeleccionarInstrumentosDesmontaje(cantTurno, idGrupoDesmontaje, codigoEmpleado);
                         rptDesmontaje.DataSource = desmontaje;
                         rptDesmontaje.DataBind();
                         GuardarDesmontajeEnRutina(correlativoGenerado, desmontaje);
@@ -1079,27 +1081,107 @@ namespace Rutinas
             }
         }
 
-        private List<ItemRutina> SeleccionarInstrumentosDesmontaje(int cantidad)
+        private struct AsignacionDesmontaje
+        {
+            public int    AreaId;
+            public string Keyword;
+        }
+
+        private List<AsignacionDesmontaje> ObtenerAreasDesmontajeEmpleado(string codigoEmpleado)
+        {
+            var lista = new List<AsignacionDesmontaje>();
+            string sql = "SELECT Area1Id, Area2Id, Keyword1, Keyword2 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        if (dr["Area1Id"] != DBNull.Value)
+                            lista.Add(new AsignacionDesmontaje
+                            {
+                                AreaId  = Convert.ToInt32(dr["Area1Id"]),
+                                Keyword = dr["Keyword1"] != DBNull.Value ? dr["Keyword1"].ToString().Trim() : null
+                            });
+                        if (dr["Area2Id"] != DBNull.Value)
+                            lista.Add(new AsignacionDesmontaje
+                            {
+                                AreaId  = Convert.ToInt32(dr["Area2Id"]),
+                                Keyword = dr["Keyword2"] != DBNull.Value ? dr["Keyword2"].ToString().Trim() : null
+                            });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        private List<ItemRutina> SeleccionarInstrumentosDesmontaje(int cantidad, int idGrupoDefault, string codigoEmpleado)
         {
             List<ItemRutina> lista = new List<ItemRutina>();
             if (cantidad <= 0) return lista;
-            string sql = $@"
-                SELECT TOP {cantidad}
-                    I.TAG,
-                    I.Nombre AS NombreInstrumento,
-                    A.Nombre AS NombreArea
-                FROM DesmontajeInstrumento DI
-                INNER JOIN Instrumentos I ON DI.TAG = I.TAG
-                INNER JOIN Area A ON I.IDarea = A.IDarea
-                INNER JOIN DesmontajeAreaHabilitada DAH ON I.IDarea = DAH.AreaId
-                WHERE DI.Estado = 0
-                ORDER BY NEWID()";
+
+            List<AsignacionDesmontaje> asignaciones = ObtenerAreasDesmontajeEmpleado(codigoEmpleado);
+
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                new SqlDataAdapter(new SqlCommand(sql, conn)).Fill(dt);
+                SqlCommand cmd;
+
+                if (asignaciones.Count > 0)
+                {
+                    // Construir condición por área con keyword opcional — usa DI.Nombre y DI.AreaId
+                    var condiciones = new List<string>();
+                    cmd = new SqlCommand();
+                    cmd.Connection = conn;
+
+                    for (int i = 0; i < asignaciones.Count; i++)
+                    {
+                        string pArea = "@Area" + i;
+                        cmd.Parameters.AddWithValue(pArea, asignaciones[i].AreaId);
+
+                        if (string.IsNullOrEmpty(asignaciones[i].Keyword))
+                        {
+                            condiciones.Add($"DI.AreaId = {pArea}");
+                        }
+                        else
+                        {
+                            string pKw = "@Kw" + i;
+                            cmd.Parameters.AddWithValue(pKw, "%" + asignaciones[i].Keyword.ToUpper() + "%");
+                            condiciones.Add($"(DI.AreaId = {pArea} AND UPPER(DI.Nombre) LIKE {pKw})");
+                        }
+                    }
+
+                    cmd.CommandText = $@"
+                        SELECT TOP {cantidad}
+                            DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
+                        FROM DesmontajeInstrumento DI
+                        INNER JOIN Area A ON DI.AreaId = A.IDarea
+                        WHERE DI.Estado = 0
+                          AND ({string.Join(" OR ", condiciones)})
+                        ORDER BY NEWID()";
+                }
+                else
+                {
+                    // Sin asignación específica: rotación automática + áreas habilitadas
+                    cmd = new SqlCommand($@"
+                        SELECT TOP {cantidad}
+                            DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
+                        FROM DesmontajeInstrumento DI
+                        INNER JOIN Area A ON DI.AreaId = A.IDarea
+                        INNER JOIN DesmontajeAreaHabilitada DAH ON DI.AreaId = DAH.AreaId
+                        WHERE DI.Estado = 0
+                          AND A.IDgrupo = @IdGrupo
+                        ORDER BY NEWID()", conn);
+                    cmd.Parameters.AddWithValue("@IdGrupo", idGrupoDefault);
+                }
+
+                new SqlDataAdapter(cmd).Fill(dt);
             }
+
             foreach (DataRow row in dt.Rows)
             {
                 lista.Add(new ItemRutina
@@ -1134,10 +1216,10 @@ namespace Rutinas
         {
             List<ItemRutina> lista = new List<ItemRutina>();
             string sql = @"
-                SELECT I.TAG, I.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
+                SELECT DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
                 FROM Rutina_desmontaje RD
-                INNER JOIN Instrumentos I ON RD.TAG = I.TAG
-                INNER JOIN Area A ON I.IDarea = A.IDarea
+                INNER JOIN DesmontajeInstrumento DI ON RD.TAG = DI.TAG
+                INNER JOIN Area A ON DI.AreaId = A.IDarea
                 WHERE RD.RutinaId = @Correlativo";
             using (SqlConnection conn = new SqlConnection(ConnString))
             {

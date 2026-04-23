@@ -15,7 +15,8 @@ namespace Rutinas
 {
     public partial class LoginDeveloper : System.Web.UI.Page
     {
-        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string ConnString        = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string VinetasConnString = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -88,16 +89,20 @@ namespace Rutinas
 
             // Cargar pool de instrumentos
             BindPoolDesmontaje();
+
+            // Cargar asignaciones de áreas por empleado
+            CargarAsignacionesEmpleados();
         }
 
         private void BindPoolDesmontaje()
         {
+            // Pool actual: usa Nombre y AreaId almacenados directamente en DesmontajeInstrumento
             string sql = @"
-                SELECT DI.Id, DI.TAG, I.Nombre AS NombreInstrumento, A.Nombre AS NombreArea, DI.Estado
+                SELECT DI.Id, DI.TAG, DI.Nombre AS NombreInstrumento,
+                       ISNULL(A.Nombre, 'Sin área') AS NombreArea, DI.Estado
                 FROM DesmontajeInstrumento DI
-                INNER JOIN Instrumentos I ON DI.TAG = I.TAG
-                INNER JOIN Area A ON I.IDarea = A.IDarea
-                ORDER BY A.IDarea, I.Nombre";
+                LEFT JOIN Area A ON DI.AreaId = A.IDarea
+                ORDER BY DI.AreaId, DI.Nombre";
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
@@ -107,25 +112,44 @@ namespace Rutinas
             gvPoolDesmontaje.DataSource = dt;
             gvPoolDesmontaje.DataBind();
 
-            // Poblar dropdown del footer con instrumentos que aún no están en el pool
-            DropDownList ddl = (DropDownList)gvPoolDesmontaje.FooterRow?.FindControl("ddlNuevoInstrumento");
-            if (ddl != null)
+            if (gvPoolDesmontaje.FooterRow == null) return;
+
+            // Dropdown de instrumentos disponibles — carga desde Vinetas (equipos no en el pool)
+            DropDownList ddlInst = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoInstrumento");
+            if (ddlInst != null)
             {
-                string sqlDisponibles = @"
-                    SELECT TAG, Nombre FROM Instrumentos
+                string sqlVinetas = @"
+                    SELECT TAG, Descripcion FROM equipos
                     WHERE TAG NOT IN (SELECT TAG FROM DesmontajeInstrumento)
-                    ORDER BY Nombre";
-                DataTable dtDisp = new DataTable();
+                    ORDER BY Descripcion";
+                DataTable dtVinetas = new DataTable();
+                using (SqlConnection conn = new SqlConnection(VinetasConnString))
+                {
+                    conn.Open();
+                    new SqlDataAdapter(new SqlCommand(sqlVinetas, conn)).Fill(dtVinetas);
+                }
+                ddlInst.DataSource     = dtVinetas;
+                ddlInst.DataTextField  = "Descripcion";
+                ddlInst.DataValueField = "TAG";
+                ddlInst.DataBind();
+                ddlInst.Items.Insert(0, new ListItem("-- Seleccione equipo --", ""));
+            }
+
+            // Dropdown de área — carga desde REPORTES
+            DropDownList ddlArea = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoArea");
+            if (ddlArea != null)
+            {
+                DataTable dtAreas = new DataTable();
                 using (SqlConnection conn = new SqlConnection(ConnString))
                 {
                     conn.Open();
-                    new SqlDataAdapter(new SqlCommand(sqlDisponibles, conn)).Fill(dtDisp);
+                    new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
                 }
-                ddl.DataSource     = dtDisp;
-                ddl.DataTextField  = "Nombre";
-                ddl.DataValueField = "TAG";
-                ddl.DataBind();
-                ddl.Items.Insert(0, new ListItem("-- Seleccione instrumento --", ""));
+                ddlArea.DataSource     = dtAreas;
+                ddlArea.DataTextField  = "Nombre";
+                ddlArea.DataValueField = "IDarea";
+                ddlArea.DataBind();
+                ddlArea.Items.Insert(0, new ListItem("-- Seleccione área --", ""));
             }
         }
 
@@ -226,27 +250,157 @@ namespace Rutinas
             }
             else if (e.CommandName == "agregarPool")
             {
-                DropDownList ddl = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoInstrumento");
-                if (ddl == null || string.IsNullOrEmpty(ddl.SelectedValue)) return;
+                DropDownList ddlInst = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoInstrumento");
+                DropDownList ddlArea = (DropDownList)gvPoolDesmontaje.FooterRow.FindControl("ddlNuevoArea");
 
-                string tag = ddl.SelectedValue;
-                string sqlCheck = "SELECT COUNT(1) FROM DesmontajeInstrumento WHERE TAG = @TAG";
+                if (ddlInst == null || string.IsNullOrEmpty(ddlInst.SelectedValue) ||
+                    ddlArea == null || string.IsNullOrEmpty(ddlArea.SelectedValue)) return;
+
+                string tag    = ddlInst.SelectedValue;
+                string nombre = ddlInst.SelectedItem?.Text ?? tag;
+                int    areaId = Convert.ToInt32(ddlArea.SelectedValue);
+
                 using (SqlConnection conn = new SqlConnection(ConnString))
                 {
                     conn.Open();
-                    SqlCommand cmdChk = new SqlCommand(sqlCheck, conn);
+                    SqlCommand cmdChk = new SqlCommand(
+                        "SELECT COUNT(1) FROM DesmontajeInstrumento WHERE TAG = @TAG", conn);
                     cmdChk.Parameters.AddWithValue("@TAG", tag);
-                    int exists = Convert.ToInt32(cmdChk.ExecuteScalar());
-                    if (exists == 0)
+                    if (Convert.ToInt32(cmdChk.ExecuteScalar()) == 0)
                     {
-                        SqlCommand cmdIns = new SqlCommand(
-                            "INSERT INTO DesmontajeInstrumento (TAG, Estado) VALUES (@TAG, 0)", conn);
-                        cmdIns.Parameters.AddWithValue("@TAG", tag);
+                        SqlCommand cmdIns = new SqlCommand(@"
+                            INSERT INTO DesmontajeInstrumento (TAG, Nombre, AreaId, Estado)
+                            VALUES (@TAG, @Nombre, @AreaId, 0)", conn);
+                        cmdIns.Parameters.AddWithValue("@TAG",    tag);
+                        cmdIns.Parameters.AddWithValue("@Nombre", nombre);
+                        cmdIns.Parameters.AddWithValue("@AreaId", areaId);
                         cmdIns.ExecuteNonQuery();
                     }
                 }
                 BindPoolDesmontaje();
             }
+        }
+
+        #region asignaciones por empleado
+
+        private void CargarAsignacionesEmpleados()
+        {
+            string sql = @"
+                SELECT E.Codigo_empleado, E.Nombre,
+                       DEA.Area1Id, DEA.Area2Id,
+                       DEA.Keyword1, DEA.Keyword2
+                FROM Empleado E
+                LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
+                ORDER BY E.Nombre";
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(new SqlCommand(sql, conn)).Fill(dt);
+            }
+            rptEmpleadosArea.DataSource = dt;
+            rptEmpleadosArea.DataBind();
+        }
+
+        protected void rptEmpleadosArea_ItemDataBound(object sender, System.Web.UI.WebControls.RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType != System.Web.UI.WebControls.ListItemType.Item &&
+                e.Item.ItemType != System.Web.UI.WebControls.ListItemType.AlternatingItem)
+                return;
+
+            DataRowView row = (DataRowView)e.Item.DataItem;
+
+            // Cargar áreas disponibles
+            DataTable dtAreas = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
+            }
+
+            DropDownList ddl1 = (DropDownList)e.Item.FindControl("ddlArea1Emp");
+            DropDownList ddl2 = (DropDownList)e.Item.FindControl("ddlArea2Emp");
+
+            // Opción vacía = usar rotación automática
+            ddl1.Items.Add(new System.Web.UI.WebControls.ListItem("-- Automático --", ""));
+            ddl2.Items.Add(new System.Web.UI.WebControls.ListItem("-- Ninguna --", ""));
+
+            foreach (DataRow areaRow in dtAreas.Rows)
+            {
+                string id   = areaRow["IDarea"].ToString();
+                string name = areaRow["Nombre"].ToString();
+                ddl1.Items.Add(new System.Web.UI.WebControls.ListItem(name, id));
+                ddl2.Items.Add(new System.Web.UI.WebControls.ListItem(name, id));
+            }
+
+            // Pre-seleccionar la asignación actual
+            if (row["Area1Id"] != DBNull.Value)
+                ddl1.SelectedValue = row["Area1Id"].ToString();
+            if (row["Area2Id"] != DBNull.Value)
+                ddl2.SelectedValue = row["Area2Id"].ToString();
+
+            // Pre-cargar palabras clave
+            TextBox txt1 = (TextBox)e.Item.FindControl("txtKw1Emp");
+            TextBox txt2 = (TextBox)e.Item.FindControl("txtKw2Emp");
+            if (txt1 != null && row["Keyword1"] != DBNull.Value) txt1.Text = row["Keyword1"].ToString();
+            if (txt2 != null && row["Keyword2"] != DBNull.Value) txt2.Text = row["Keyword2"].ToString();
+        }
+
+        protected void btnGuardarAsignaciones_Click(object sender, EventArgs e)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                foreach (System.Web.UI.WebControls.RepeaterItem item in rptEmpleadosArea.Items)
+                {
+                    if (item.ItemType != System.Web.UI.WebControls.ListItemType.Item &&
+                        item.ItemType != System.Web.UI.WebControls.ListItemType.AlternatingItem)
+                        continue;
+
+                    HiddenField   hf   = (HiddenField)item.FindControl("hfCodigo");
+                    DropDownList  ddl1 = (DropDownList)item.FindControl("ddlArea1Emp");
+                    DropDownList  ddl2 = (DropDownList)item.FindControl("ddlArea2Emp");
+
+                    TextBox   txt1  = (TextBox)item.FindControl("txtKw1Emp");
+                    TextBox   txt2  = (TextBox)item.FindControl("txtKw2Emp");
+
+                    string codigo = hf.Value;
+                    object area1  = string.IsNullOrEmpty(ddl1.SelectedValue) ? (object)DBNull.Value : Convert.ToInt32(ddl1.SelectedValue);
+                    object area2  = string.IsNullOrEmpty(ddl2.SelectedValue) ? (object)DBNull.Value : Convert.ToInt32(ddl2.SelectedValue);
+                    object kw1    = string.IsNullOrWhiteSpace(txt1?.Text) ? (object)DBNull.Value : txt1.Text.Trim();
+                    object kw2    = string.IsNullOrWhiteSpace(txt2?.Text) ? (object)DBNull.Value : txt2.Text.Trim();
+
+                    // Si ambas áreas son nulas, eliminar la fila para mantener la tabla limpia
+                    if (area1 == DBNull.Value && area2 == DBNull.Value)
+                    {
+                        SqlCommand cmdDel = new SqlCommand(
+                            "DELETE FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
+                        cmdDel.Parameters.AddWithValue("@Codigo", codigo);
+                        cmdDel.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        string sqlMerge = @"
+                            IF EXISTS (SELECT 1 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo)
+                                UPDATE DesmontajeEmpleadoArea
+                                SET Area1Id = @A1, Area2Id = @A2, Keyword1 = @K1, Keyword2 = @K2
+                                WHERE Codigo_empleado = @Codigo
+                            ELSE
+                                INSERT INTO DesmontajeEmpleadoArea (Codigo_empleado, Area1Id, Area2Id, Keyword1, Keyword2)
+                                VALUES (@Codigo, @A1, @A2, @K1, @K2)";
+                        SqlCommand cmdMerge = new SqlCommand(sqlMerge, conn);
+                        cmdMerge.Parameters.AddWithValue("@Codigo", codigo);
+                        cmdMerge.Parameters.AddWithValue("@A1", area1);
+                        cmdMerge.Parameters.AddWithValue("@A2", area2);
+                        cmdMerge.Parameters.AddWithValue("@K1", kw1);
+                        cmdMerge.Parameters.AddWithValue("@K2", kw2);
+                        cmdMerge.ExecuteNonQuery();
+                    }
+                }
+            }
+            lblAsignMsg.Text      = "Asignaciones guardadas correctamente.";
+            lblAsignMsg.ForeColor = System.Drawing.Color.Green;
+            CargarAsignacionesEmpleados();
         }
 
         #endregion
@@ -453,4 +607,5 @@ namespace Rutinas
             }
         }
     }
+        #endregion
 }

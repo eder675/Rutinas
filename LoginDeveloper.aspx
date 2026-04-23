@@ -406,8 +406,58 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                 </fieldset>
 
                 <asp:Button ID="btnGuardarConfig" runat="server" Text="GUARDAR CONFIGURACIÓN"
-                    OnClick="btnGuardarConfig_Click" Style="margin-bottom:20px; padding:8px 20px;" />
+                    OnClick="btnGuardarConfig_Click" Style="margin-bottom:4px; padding:8px 20px;" />
                 <asp:Label ID="lblConfigMsg" runat="server" Text="" ForeColor="Green" />
+
+                <fieldset style="margin-top:20px; padding:12px;">
+                    <legend><b>Áreas de desmontaje por empleado</b></legend>
+                    <p style="margin:0 0 8px; font-size:0.9em; color:#555;">
+                        Si no asigna áreas a un empleado, se usará la rotación automática.<br />
+                        Puede asignar hasta 2 áreas por empleado.
+                    </p>
+                    <p style="margin:4px 0 6px; font-size:0.85em; color:#777;">
+                        La palabra clave filtra instrumentos cuyo nombre la contenga (ej: "JUGO", "VAPOR").
+                        Déjela vacía para incluir todos los instrumentos del área.
+                    </p>
+                    <table style="border-collapse:collapse; width:100%;">
+                        <thead>
+                            <tr style="background:#f2f2f2;">
+                                <th style="padding:6px 10px; border:1px solid #ccc; text-align:left;">Empleado</th>
+                                <th style="padding:6px 10px; border:1px solid #ccc;">Área 1 / Palabra clave</th>
+                                <th style="padding:6px 10px; border:1px solid #ccc;">Área 2 / Palabra clave</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <asp:Repeater ID="rptEmpleadosArea" runat="server"
+                                OnItemDataBound="rptEmpleadosArea_ItemDataBound">
+                                <ItemTemplate>
+                                    <tr>
+                                        <td style="padding:5px 10px; border:1px solid #ccc;">
+                                            <asp:HiddenField ID="hfCodigo" runat="server" Value='<%# Eval("Codigo_empleado") %>' />
+                                            <%# Eval("Nombre") %>
+                                        </td>
+                                        <td style="padding:5px 10px; border:1px solid #ccc; text-align:center;">
+                                            <asp:DropDownList ID="ddlArea1Emp" runat="server" Width="180px" /><br />
+                                            <asp:TextBox ID="txtKw1Emp" runat="server" Width="175px"
+                                                placeholder="palabra clave..." MaxLength="100"
+                                                style="margin-top:3px; font-size:0.85em;" />
+                                        </td>
+                                        <td style="padding:5px 10px; border:1px solid #ccc; text-align:center;">
+                                            <asp:DropDownList ID="ddlArea2Emp" runat="server" Width="180px" /><br />
+                                            <asp:TextBox ID="txtKw2Emp" runat="server" Width="175px"
+                                                placeholder="palabra clave..." MaxLength="100"
+                                                style="margin-top:3px; font-size:0.85em;" />
+                                        </td>
+                                    </tr>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </tbody>
+                    </table>
+                    <br />
+                    <asp:Button ID="btnGuardarAsignaciones" runat="server" Text="GUARDAR ASIGNACIONES"
+                        OnClick="btnGuardarAsignaciones_Click" Style="padding:8px 20px;" />
+                    <asp:Label ID="lblAsignMsg" runat="server" Text="" ForeColor="Green" />
+                </fieldset>
 
                 <fieldset style="padding:12px;">
                     <legend><b>Pool de instrumentos a desmontar</b></legend>
@@ -427,7 +477,10 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                                         Convert.ToInt32(Eval("Estado")) == 1 ? "Desmontado" : "Excluido" %>
                                 </ItemTemplate>
                                 <FooterTemplate>
-                                    <asp:DropDownList ID="ddlNuevoInstrumento" runat="server" Width="260px" />
+                                    Equipo (Vinetas):<br />
+                                    <asp:DropDownList ID="ddlNuevoInstrumento" runat="server" Width="260px" /><br />
+                                    Área:<br />
+                                    <asp:DropDownList ID="ddlNuevoArea" runat="server" Width="260px" />
                                 </FooterTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Acciones">

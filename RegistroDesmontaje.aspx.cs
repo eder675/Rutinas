@@ -86,14 +86,13 @@ namespace Rutinas
                 SELECT DI.Id AS DesmontajeInstrumentoId,
                        RD.RutinaId,
                        RD.TAG,
-                       I.Nombre  AS NombreInstrumento,
+                       DI.Nombre AS NombreInstrumento,
                        A.Nombre  AS NombreArea
                 FROM Rutina_desmontaje RD
                 INNER JOIN DesmontajeInstrumento DI ON RD.TAG = DI.TAG
-                INNER JOIN Instrumentos I ON RD.TAG = I.TAG
-                INNER JOIN Area A ON I.IDarea = A.IDarea
+                INNER JOIN Area A ON DI.AreaId = A.IDarea
                 WHERE RD.RutinaId = @RutinaId AND RD.Reportado = 0
-                ORDER BY A.IDarea, I.Nombre";
+                ORDER BY DI.AreaId, DI.Nombre";
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {

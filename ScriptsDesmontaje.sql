@@ -3,6 +3,63 @@
 -- Ejecutar una sola vez en la BD ConexionRutinasMTI
 -- ============================================================
 
+-- 5. Asignación de áreas de desmontaje por empleado (máximo 2 áreas)
+--    Si un empleado no tiene fila aquí, usa la rotación automática.
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DesmontajeEmpleadoArea')
+BEGIN
+    CREATE TABLE DesmontajeEmpleadoArea (
+        Id               INT IDENTITY(1,1) PRIMARY KEY,
+        Codigo_empleado  VARCHAR(25)  NOT NULL,
+        Area1Id          INT          NULL,
+        Area2Id          INT          NULL,
+        CONSTRAINT FK_DesmontajeEmpleadoArea_Empleado FOREIGN KEY (Codigo_empleado) REFERENCES Empleado(Codigo_empleado),
+        CONSTRAINT FK_DesmontajeEmpleadoArea_Area1    FOREIGN KEY (Area1Id) REFERENCES Area(IDarea),
+        CONSTRAINT FK_DesmontajeEmpleadoArea_Area2    FOREIGN KEY (Area2Id) REFERENCES Area(IDarea),
+        CONSTRAINT UQ_DesmontajeEmpleadoArea          UNIQUE (Codigo_empleado)
+    );
+END
+
+-- Agregar columnas de palabra clave si la tabla ya existía sin ellas
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('DesmontajeEmpleadoArea') AND name = 'Keyword1')
+    ALTER TABLE DesmontajeEmpleadoArea ADD Keyword1 VARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('DesmontajeEmpleadoArea') AND name = 'Keyword2')
+    ALTER TABLE DesmontajeEmpleadoArea ADD Keyword2 VARCHAR(100) NULL;
+
+-- ============================================================
+-- INDEPENDIZAR DesmontajeInstrumento de REPORTES.Instrumentos
+-- El pool ahora usa instrumentos de Vinetas (cualquier equipo
+-- de planta, no solo los del recorrido de rutinas).
+-- ============================================================
+
+-- Quitar FK de TAG hacia Instrumentos (ya no es necesaria)
+IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_DesmontajeInstrumento_Instrumento')
+    ALTER TABLE DesmontajeInstrumento DROP CONSTRAINT FK_DesmontajeInstrumento_Instrumento;
+
+-- Quitar FK de TAG en Rutina_desmontaje hacia Instrumentos
+IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_RutinaDesmontaje_Instrumento')
+    ALTER TABLE Rutina_desmontaje DROP CONSTRAINT FK_RutinaDesmontaje_Instrumento;
+
+-- Agregar Nombre y AreaId directamente en el pool
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('DesmontajeInstrumento') AND name = 'Nombre')
+    ALTER TABLE DesmontajeInstrumento ADD Nombre VARCHAR(200) NOT NULL DEFAULT '';
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('DesmontajeInstrumento') AND name = 'AreaId')
+BEGIN
+    ALTER TABLE DesmontajeInstrumento ADD AreaId INT NULL;
+    ALTER TABLE DesmontajeInstrumento
+        ADD CONSTRAINT FK_DesmontajeInstrumento_Area FOREIGN KEY (AreaId) REFERENCES Area(IDarea);
+END
+
+-- Migrar entradas existentes del pool (si venían de REPORTES.Instrumentos)
+UPDATE DI
+SET    DI.Nombre = I.Nombre,
+       DI.AreaId = I.IDarea
+FROM   DesmontajeInstrumento DI
+INNER JOIN Instrumentos I ON DI.TAG = I.TAG
+WHERE  (DI.Nombre = '' OR DI.Nombre IS NULL)
+  AND  DI.AreaId IS NULL;
+
 -- 1. Configuración global de visibilidad de tablas y cantidades
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DesmontajeConfig')
 BEGIN
