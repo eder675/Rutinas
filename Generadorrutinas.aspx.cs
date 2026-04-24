@@ -220,8 +220,8 @@ namespace Rutinas
             // --- LÓGICA DE DOMINGO (12h / 4h) ---
             if (ahora.DayOfWeek == DayOfWeek.Sunday)
             {
-                // Jornada de Día (6am a 6pm): Entrada desde 5:41 AM hasta antes de las 5:41 PM
-                if (hora >= new TimeSpan(5, 41, 0) && hora <= new TimeSpan(17, 40, 59))
+                // Jornada de Día (6am a 6pm): Entrada desde 5:30 AM hasta antes de las 5:40 PM
+                if (hora >= new TimeSpan(5, 30, 0) && hora <= new TimeSpan(17, 40, 59))
                 {
                     return "06:00 A 18:00";
                 }
@@ -237,11 +237,11 @@ namespace Rutinas
             }
 
             // --- LÓGICA NORMAL Y RELEVO ---
-            // Turno Mañana: 05:41 AM a 01:40 PM
-            if (hora >= new TimeSpan(5, 41, 0) && hora <= new TimeSpan(13, 40, 59)) return "06:00 A 14:00";
+            // Turno Mañana: 05:30 AM a 01:40 PM
+            if (hora >= new TimeSpan(5, 30, 0) && hora <= new TimeSpan(13, 40, 59)) return "06:00 A 14:00";
 
-            // Turno Tarde: 01:41 PM a 09:40 PM
-            if (hora >= new TimeSpan(13, 41, 0) && hora <= new TimeSpan(21, 40, 59)) return "14:00 A 22:00";
+            // Turno Tarde: 01:30 PM a 09:40 PM
+            if (hora >= new TimeSpan(13, 30, 0) && hora <= new TimeSpan(21, 40, 59)) return "14:00 A 22:00";
 
             // Turno Noche (Relevo y Nocturnos): 09:41 PM a 05:40 AM
             return "22:00 - 06:00";
