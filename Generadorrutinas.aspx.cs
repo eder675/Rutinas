@@ -1082,27 +1082,75 @@ namespace Rutinas
             }
         }
 
-        private List<string> ObtenerKeywordsDesmontaje(string codigoEmpleado)
+        private struct FiltrosDesmontaje
         {
-            var keywords = new List<string>();
+            public string Incluir;
+            public string Excluir;
+        }
+
+        private FiltrosDesmontaje ObtenerFiltrosDesmontaje(string codigoEmpleado)
+        {
+            var filtros = new FiltrosDesmontaje();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(
-                    "SELECT Keyword1, Keyword2 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
+                    "SELECT Keyword1, ExcludeKeyword1 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
                 cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     if (dr.Read())
                     {
-                        if (dr["Keyword1"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["Keyword1"].ToString()))
-                            keywords.Add(dr["Keyword1"].ToString().Trim());
-                        if (dr["Keyword2"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["Keyword2"].ToString()))
-                            keywords.Add(dr["Keyword2"].ToString().Trim());
+                        filtros.Incluir = dr["Keyword1"]       != DBNull.Value ? dr["Keyword1"].ToString().Trim()        : null;
+                        filtros.Excluir = dr["ExcludeKeyword1"]!= DBNull.Value ? dr["ExcludeKeyword1"].ToString().Trim() : null;
                     }
                 }
             }
-            return keywords;
+            return filtros;
+        }
+
+        // TAGs excluidos permanentemente (cualquier empleado):
+        // - Desmontado = 1: el equipo ya fue retirado físicamente.
+        // - Razón "No se puede desmontar hasta mantenimiento": requiere intervención antes de volver a programarse.
+        private HashSet<string> ObtenerTagsExcluidosPermanentes()
+        {
+            var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(@"
+                    SELECT DISTINCT TAG
+                    FROM Rutina_desmontaje
+                    WHERE Desmontado = 1
+                       OR RazonNoDesmontaje LIKE 'No se puede desmontar hasta mantenimiento%'", conn);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
+            }
+            return tags;
+        }
+
+        // TAGs excluidos temporalmente (24 h, por empleado):
+        // No desmontados por otra razón — pueden volver a aparecer al día siguiente.
+        private HashSet<string> ObtenerTagsExcluidosTemporales(string codigoEmpleado)
+        {
+            var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(@"
+                    SELECT DISTINCT rd.TAG
+                    FROM Rutina_desmontaje rd
+                    INNER JOIN Rutinas r ON rd.RutinaId = r.Correlativo
+                    WHERE r.Codigo_empleado = @Codigo
+                      AND rd.Desmontado    = 0
+                      AND (rd.RazonNoDesmontaje IS NULL
+                           OR rd.RazonNoDesmontaje NOT LIKE 'No se puede desmontar hasta mantenimiento%')
+                      AND r.Fecha >= DATEADD(HOUR, -24, GETDATE())", conn);
+                cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
+            }
+            return tags;
         }
 
         private List<ItemRutina> SeleccionarInstrumentosDesmontaje(int cantidad, int idGrupoDefault, string codigoEmpleado)
@@ -1110,7 +1158,11 @@ namespace Rutinas
             List<ItemRutina> lista = new List<ItemRutina>();
             if (cantidad <= 0) return lista;
 
-            List<string> keywords = ObtenerKeywordsDesmontaje(codigoEmpleado);
+            FiltrosDesmontaje filtros = ObtenerFiltrosDesmontaje(codigoEmpleado);
+
+            // Unión de exclusiones permanentes + temporales
+            var tagsExcluir = ObtenerTagsExcluidosPermanentes();
+            tagsExcluir.UnionWith(ObtenerTagsExcluidosTemporales(codigoEmpleado));
 
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(VinetasConnString))
@@ -1119,23 +1171,34 @@ namespace Rutinas
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
 
-                if (keywords.Count > 0)
+                var condWhere = new List<string>();
+
+                if (!string.IsNullOrWhiteSpace(filtros.Incluir))
                 {
-                    var condiciones = new List<string>();
-                    for (int i = 0; i < keywords.Count; i++)
-                    {
-                        string pKw = "@Kw" + i;
-                        cmd.Parameters.AddWithValue(pKw, "%" + keywords[i].ToUpper() + "%");
-                        condiciones.Add($"UPPER(Descripcion) LIKE {pKw}");
-                    }
-                    cmd.CommandText = $"SELECT TOP {cantidad} TAG, Descripcion FROM equipos WHERE {string.Join(" OR ", condiciones)} ORDER BY NEWID()";
-                }
-                else
-                {
-                    // Sin keyword asignada: selección aleatoria del catálogo completo
-                    cmd.CommandText = $"SELECT TOP {cantidad} TAG, Descripcion FROM equipos ORDER BY NEWID()";
+                    cmd.Parameters.AddWithValue("@KwIncluir", "%" + filtros.Incluir.ToUpper() + "%");
+                    condWhere.Add("UPPER(Descripcion) LIKE @KwIncluir");
                 }
 
+                if (!string.IsNullOrWhiteSpace(filtros.Excluir))
+                {
+                    cmd.Parameters.AddWithValue("@KwExcluir", "%" + filtros.Excluir.ToUpper() + "%");
+                    condWhere.Add("UPPER(Descripcion) NOT LIKE @KwExcluir");
+                }
+
+                if (tagsExcluir.Count > 0)
+                {
+                    var tagsList   = tagsExcluir.ToList();
+                    var paramNames = tagsList.Select((t, i) => "@ExTag" + i).ToList();
+                    for (int i = 0; i < tagsList.Count; i++)
+                        cmd.Parameters.AddWithValue("@ExTag" + i, tagsList[i]);
+                    condWhere.Add($"TAG NOT IN ({string.Join(", ", paramNames)})");
+                }
+
+                string whereClause = condWhere.Count > 0
+                    ? "WHERE " + string.Join(" AND ", condWhere)
+                    : string.Empty;
+
+                cmd.CommandText = $"SELECT TOP {cantidad} TAG, Descripcion FROM equipos {whereClause} ORDER BY NEWID()";
                 new SqlDataAdapter(cmd).Fill(dt);
             }
 

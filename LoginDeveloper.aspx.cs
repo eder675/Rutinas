@@ -292,7 +292,7 @@ namespace Rutinas
                 conn.Open();
                 new SqlDataAdapter(@"
                     SELECT E.Codigo_empleado, E.Nombre,
-                           DEA.Area1Id, DEA.Area2Id, DEA.Keyword1, DEA.Keyword2
+                           DEA.Area1Id, DEA.Keyword1, DEA.ExcludeKeyword1
                     FROM Empleado E
                     LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
                     WHERE E.Cargo <> 'Administrador'
@@ -307,36 +307,29 @@ namespace Rutinas
                 new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
             }
 
-            // __doPostBack con UniqueID es el mecanismo nativo de ASP.NET para disparar
-            // el evento servidor desde JS; es más fiable que getElementById(...).click()
-            // porque no depende de que el ClientID coincida exactamente con el id renderizado.
             string btnUniqueId = btnGuardarAsignaciones.UniqueID;
             string onEnter = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
 
             var sb = new System.Text.StringBuilder();
             foreach (DataRow row in dtEmps.Rows)
             {
-                string cod    = System.Web.HttpUtility.HtmlEncode(row["Codigo_empleado"].ToString());
-                string nombre = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
-                string a1Val  = row["Area1Id"]  != DBNull.Value ? row["Area1Id"].ToString()  : "";
-                string a2Val  = row["Area2Id"]  != DBNull.Value ? row["Area2Id"].ToString()  : "";
-                // HtmlAttributeEncode codifica también la comilla simple, evitando HTML malformado
-                string kw1Val = row["Keyword1"] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["Keyword1"].ToString()) : "";
-                string kw2Val = row["Keyword2"] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["Keyword2"].ToString()) : "";
+                string cod         = System.Web.HttpUtility.HtmlEncode(row["Codigo_empleado"].ToString());
+                string nombre      = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
+                string a1Val       = row["Area1Id"]        != DBNull.Value ? row["Area1Id"].ToString() : "";
+                string kw1Val      = row["Keyword1"]       != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["Keyword1"].ToString()) : "";
+                string kwExcluirVal= row["ExcludeKeyword1"]!= DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(row["ExcludeKeyword1"].ToString()) : "";
+
+                string inputStyle = "font-size:0.85em;width:150px;margin-top:2px;";
 
                 sb.Append("<tr>");
                 sb.Append($"<td style='padding:5px 10px;border:1px solid #ccc;'>{nombre}</td>");
 
-                // Columna Área 1 + keyword 1
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
                 sb.Append(BuildSelect($"area1_{cod}", dtAreas, a1Val, "", "-- Automático --"));
-                sb.Append($"<br/><input type=\"text\" name=\"kw1_{cod}\" value=\"{kw1Val}\" placeholder=\"palabra clave...\" maxlength=\"100\" style=\"margin-top:3px;font-size:0.85em;width:175px;\" onkeydown=\"{onEnter}\" />");
-                sb.Append("</td>");
-
-                // Columna Área 2 + keyword 2
-                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
-                sb.Append(BuildSelect($"area2_{cod}", dtAreas, a2Val, "", "-- Ninguna --"));
-                sb.Append($"<br/><input type=\"text\" name=\"kw2_{cod}\" value=\"{kw2Val}\" placeholder=\"palabra clave...\" maxlength=\"100\" style=\"margin-top:3px;font-size:0.85em;width:175px;\" onkeydown=\"{onEnter}\" />");
+                sb.Append("<br/>");
+                sb.Append($"<small style='color:#555;'>Incluir:</small> <input type=\"text\" name=\"kw1_{cod}\" value=\"{kw1Val}\" placeholder=\"ej: MELADURA\" maxlength=\"100\" style=\"{inputStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append("<br/>");
+                sb.Append($"<small style='color:#c00;'>Excluir:</small>&nbsp;<input type=\"text\" name=\"kwExcluir1_{cod}\" value=\"{kwExcluirVal}\" placeholder=\"ej: TACHOS\" maxlength=\"100\" style=\"{inputStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append("</td>");
 
                 sb.Append("</tr>");
@@ -380,20 +373,17 @@ namespace Rutinas
                 conn.Open();
                 foreach (DataRow empRow in dtEmps.Rows)
                 {
-                    string codigo   = empRow["Codigo_empleado"].ToString();
-                    string area1Raw = Request.Form["area1_" + codigo];
-                    string area2Raw = Request.Form["area2_" + codigo];
-                    string kw1Raw   = Request.Form["kw1_"   + codigo];
-                    string kw2Raw   = Request.Form["kw2_"   + codigo];
+                    string codigo      = empRow["Codigo_empleado"].ToString();
+                    string area1Raw    = Request.Form["area1_"      + codigo];
+                    string kw1Raw      = Request.Form["kw1_"        + codigo];
+                    string kwExcluir1Raw = Request.Form["kwExcluir1_" + codigo];
 
-                    object area1 = string.IsNullOrEmpty(area1Raw) ? (object)DBNull.Value : Convert.ToInt32(area1Raw);
-                    object area2 = string.IsNullOrEmpty(area2Raw) ? (object)DBNull.Value : Convert.ToInt32(area2Raw);
-                    object kw1   = string.IsNullOrWhiteSpace(kw1Raw) ? (object)DBNull.Value : kw1Raw.Trim();
-                    object kw2   = string.IsNullOrWhiteSpace(kw2Raw) ? (object)DBNull.Value : kw2Raw.Trim();
+                    object area1     = string.IsNullOrEmpty(area1Raw)     ? (object)DBNull.Value : Convert.ToInt32(area1Raw);
+                    object kw1       = string.IsNullOrWhiteSpace(kw1Raw)  ? (object)DBNull.Value : kw1Raw.Trim();
+                    object kwExcluir1= string.IsNullOrWhiteSpace(kwExcluir1Raw) ? (object)DBNull.Value : kwExcluir1Raw.Trim();
 
                     // Solo eliminar si no hay nada: ni área ni keyword
-                    if (area1 == DBNull.Value && area2 == DBNull.Value &&
-                        kw1 == DBNull.Value && kw2 == DBNull.Value)
+                    if (area1 == DBNull.Value && kw1 == DBNull.Value && kwExcluir1 == DBNull.Value)
                     {
                         SqlCommand cmdDel = new SqlCommand(
                             "DELETE FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
@@ -405,17 +395,16 @@ namespace Rutinas
                         string sqlMerge = @"
                             IF EXISTS (SELECT 1 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo)
                                 UPDATE DesmontajeEmpleadoArea
-                                SET Area1Id = @A1, Area2Id = @A2, Keyword1 = @K1, Keyword2 = @K2
+                                SET Area1Id = @A1, Keyword1 = @K1, ExcludeKeyword1 = @KwEx
                                 WHERE Codigo_empleado = @Codigo
                             ELSE
-                                INSERT INTO DesmontajeEmpleadoArea (Codigo_empleado, Area1Id, Area2Id, Keyword1, Keyword2)
-                                VALUES (@Codigo, @A1, @A2, @K1, @K2)";
+                                INSERT INTO DesmontajeEmpleadoArea (Codigo_empleado, Area1Id, Keyword1, ExcludeKeyword1)
+                                VALUES (@Codigo, @A1, @K1, @KwEx)";
                         SqlCommand cmdMerge = new SqlCommand(sqlMerge, conn);
                         cmdMerge.Parameters.AddWithValue("@Codigo", codigo);
-                        cmdMerge.Parameters.AddWithValue("@A1", area1);
-                        cmdMerge.Parameters.AddWithValue("@A2", area2);
-                        cmdMerge.Parameters.AddWithValue("@K1", kw1);
-                        cmdMerge.Parameters.AddWithValue("@K2", kw2);
+                        cmdMerge.Parameters.AddWithValue("@A1",   area1);
+                        cmdMerge.Parameters.AddWithValue("@K1",   kw1);
+                        cmdMerge.Parameters.AddWithValue("@KwEx", kwExcluir1);
                         cmdMerge.ExecuteNonQuery();
                     }
                 }

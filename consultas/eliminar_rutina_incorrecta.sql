@@ -40,19 +40,33 @@ FROM Rutina_instrumento RI
 INNER JOIN Instrumentos I ON RI.TAG = I.TAG
 WHERE RI.Correlativo = 148;              -- <-- reemplazar con el Correlativo
 
+--  3. Verificar equipos de desmontaje asociados al correlativo:
+--
+SELECT
+    RD.RutinaId,
+    RD.TAG,
+    RD.Reportado,
+    RD.Desmontado
+FROM Rutina_desmontaje RD
+WHERE RD.RutinaId = 148;                -- <-- reemplazar con el Correlativo
+
 -- ============================================================
---  ELIMINACIÓN (ejecutar en este orden — respetar la FK)
+--  ELIMINACIÓN (ejecutar en este orden — respetar las FK)
 -- ============================================================
 
 BEGIN TRANSACTION;
 
-    -- Paso 1: eliminar el detalle de instrumentos (tabla hija)
-    DELETE FROM Rutina_instrumento
-    WHERE Correlativo = 148;             -- <-- reemplazar con el Correlativo
+    -- Paso 1: eliminar equipos de desmontaje (tabla hija nueva)
+    DELETE FROM Rutina_desmontaje
+    WHERE RutinaId = 148;               -- <-- reemplazar con el Correlativo
 
-    -- Paso 2: eliminar la cabecera de la rutina (tabla padre)
+    -- Paso 2: eliminar el detalle de instrumentos (tabla hija)
+    DELETE FROM Rutina_instrumento
+    WHERE Correlativo = 148;            -- <-- reemplazar con el Correlativo
+
+    -- Paso 3: eliminar la cabecera de la rutina (tabla padre)
     DELETE FROM Rutinas
-    WHERE Correlativo = 148;             -- <-- reemplazar con el Correlativo
+    WHERE Correlativo = 148;            -- <-- reemplazar con el Correlativo
 
 COMMIT TRANSACTION;
 -- Si algo falla, reemplazar COMMIT por ROLLBACK TRANSACTION;
@@ -62,9 +76,10 @@ COMMIT TRANSACTION;
 -- ============================================================
 
 -- Confirmar que ya no existen registros:
-SELECT * FROM Rutinas           WHERE Correlativo = 148;
-SELECT * FROM Rutina_instrumento WHERE Correlativo = 148;
--- Ambas consultas deben devolver 0 filas.
+SELECT * FROM Rutinas              WHERE Correlativo = 148;
+SELECT * FROM Rutina_instrumento   WHERE Correlativo = 148;
+SELECT * FROM Rutina_desmontaje    WHERE RutinaId    = 148;
+-- Las tres consultas deben devolver 0 filas.
 
 -- ============================================================
 --  EJEMPLO REAL — 15-abr-2026, Exiles Ceren (1055), Corr. 130

@@ -23,8 +23,10 @@
                 </div>
 
                 <p class="rdm-instrucciones">
-                    Marque los equipos que desmontó durante el turno. Los que no marque volverán a aparecer en la próxima rutina.
-                    Si no pudo desmontar un equipo, selecciónelo e indique el motivo.
+                    Marque los equipos que desmontó durante el turno.<br />
+                    — Los <strong>desmontados</strong> no volverán a aparecer.<br />
+                    — Los <strong>no desmontados</strong> podrán aparecer nuevamente pasadas 24 horas.<br />
+                    — Si indica <em>"No se puede desmontar hasta mantenimiento"</em>, tampoco volverá a aparecer.
                 </p>
 
                 <%-- Repeater de instrumentos pendientes --%>
@@ -54,6 +56,7 @@
                                         <asp:ListItem Value="Falta de herramienta">Falta de herramienta</asp:ListItem>
                                         <asp:ListItem Value="Equipo en operacion">Equipo en operación</asp:ListItem>
                                         <asp:ListItem Value="Pendiente reprogramar">Pendiente reprogramar</asp:ListItem>
+                                        <asp:ListItem Value="No se puede desmontar hasta mantenimiento">No se puede desmontar hasta mantenimiento</asp:ListItem>
                                         <asp:ListItem Value="Otro">Otro</asp:ListItem>
                                     </asp:DropDownList>
                                 </div>
