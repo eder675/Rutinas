@@ -423,7 +423,8 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         <thead>
                             <tr style="background:#f2f2f2;">
                                 <th style="padding:6px 10px; border:1px solid #ccc; text-align:left;">Empleado</th>
-                                <th style="padding:6px 10px; border:1px solid #ccc;">Área / Incluir / Excluir</th>
+                                <th style="padding:6px 10px; border:1px solid #ccc; color:#1a6e1a;">Incluir (coincide con cualquiera)</th>
+                                <th style="padding:6px 10px; border:1px solid #ccc; color:#c00;">Excluir (si coincide con cualquiera)</th>
                             </tr>
                         </thead>
                         <asp:Literal ID="litEmpleadosArea" runat="server" />

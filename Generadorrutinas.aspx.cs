@@ -1084,25 +1084,37 @@ namespace Rutinas
 
         private struct FiltrosDesmontaje
         {
-            public string Incluir;
-            public string Excluir;
+            public List<string> Incluir;  // OR: aparece si coincide con cualquiera
+            public List<string> Excluir;  // AND NOT: se excluye si coincide con cualquiera
         }
 
         private FiltrosDesmontaje ObtenerFiltrosDesmontaje(string codigoEmpleado)
         {
-            var filtros = new FiltrosDesmontaje();
+            var filtros = new FiltrosDesmontaje
+            {
+                Incluir = new List<string>(),
+                Excluir = new List<string>()
+            };
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand(
-                    "SELECT Keyword1, ExcludeKeyword1 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
+                SqlCommand cmd = new SqlCommand(@"
+                    SELECT Keyword1, Keyword2, Keyword3,
+                           ExcludeKeyword1, ExcludeKeyword2, ExcludeKeyword3
+                    FROM DesmontajeEmpleadoArea
+                    WHERE Codigo_empleado = @Codigo", conn);
                 cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     if (dr.Read())
                     {
-                        filtros.Incluir = dr["Keyword1"]       != DBNull.Value ? dr["Keyword1"].ToString().Trim()        : null;
-                        filtros.Excluir = dr["ExcludeKeyword1"]!= DBNull.Value ? dr["ExcludeKeyword1"].ToString().Trim() : null;
+                        foreach (string col in new[] { "Keyword1", "Keyword2", "Keyword3" })
+                            if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
+                                filtros.Incluir.Add(dr[col].ToString().Trim());
+
+                        foreach (string col in new[] { "ExcludeKeyword1", "ExcludeKeyword2", "ExcludeKeyword3" })
+                            if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
+                                filtros.Excluir.Add(dr[col].ToString().Trim());
                     }
                 }
             }
@@ -1173,16 +1185,25 @@ namespace Rutinas
 
                 var condWhere = new List<string>();
 
-                if (!string.IsNullOrWhiteSpace(filtros.Incluir))
+                // Incluir: OR — aparece si coincide con al menos uno
+                if (filtros.Incluir.Count > 0)
                 {
-                    cmd.Parameters.AddWithValue("@KwIncluir", "%" + filtros.Incluir.ToUpper() + "%");
-                    condWhere.Add("UPPER(Descripcion) LIKE @KwIncluir");
+                    var partes = new List<string>();
+                    for (int i = 0; i < filtros.Incluir.Count; i++)
+                    {
+                        string p = "@KwI" + i;
+                        cmd.Parameters.AddWithValue(p, "%" + filtros.Incluir[i].ToUpper() + "%");
+                        partes.Add($"UPPER(Descripcion) LIKE {p}");
+                    }
+                    condWhere.Add($"({string.Join(" OR ", partes)})");
                 }
 
-                if (!string.IsNullOrWhiteSpace(filtros.Excluir))
+                // Excluir: AND NOT — se descarta si coincide con cualquiera
+                for (int i = 0; i < filtros.Excluir.Count; i++)
                 {
-                    cmd.Parameters.AddWithValue("@KwExcluir", "%" + filtros.Excluir.ToUpper() + "%");
-                    condWhere.Add("UPPER(Descripcion) NOT LIKE @KwExcluir");
+                    string p = "@KwE" + i;
+                    cmd.Parameters.AddWithValue(p, "%" + filtros.Excluir[i].ToUpper() + "%");
+                    condWhere.Add($"UPPER(Descripcion) NOT LIKE {p}");
                 }
 
                 if (tagsExcluir.Count > 0)
