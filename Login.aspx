@@ -48,7 +48,7 @@
                 <asp:RadioButton ID="rbtInstrumentista" runat="server" AutoPostBack="True" Checked="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtInstrumentista_CheckedChanged" Text="Instrumentista" />
             </p>
             <p>
-                <asp:TextBox ID="txtcodigo" runat="server" input type ="number" placeholder="Codigo de empleado"></asp:TextBox>
+                <asp:TextBox ID="txtcodigo" runat="server" TextMode="Password" placeholder="Codigo de empleado"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvCodigo" runat="server" ControlToValidate="txtcodigo" ErrorMessage="Complete este campo " ForeColor="Red"></asp:RequiredFieldValidator>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <asp:RadioButton ID="rbtAdministrador" runat="server" AutoPostBack="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtAdministrador_CheckedChanged" Text="Administrador " />
