@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Web.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -11,7 +12,8 @@ namespace Rutinas
 {
     public partial class RegistroDesmontaje : System.Web.UI.Page
     {
-        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string ConnString        = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string VinetasConnString = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -81,38 +83,42 @@ namespace Rutinas
 
         private List<ItemDesmontajePendiente> CargarPendientes(int rutinaId)
         {
-            var lista = new List<ItemDesmontajePendiente>();
-            string sql = @"
-                SELECT DI.Id AS DesmontajeInstrumentoId,
-                       RD.RutinaId,
-                       RD.TAG,
-                       DI.Nombre AS NombreInstrumento,
-                       A.Nombre  AS NombreArea
-                FROM Rutina_desmontaje RD
-                INNER JOIN DesmontajeInstrumento DI ON RD.TAG = DI.TAG
-                INNER JOIN Area A ON DI.AreaId = A.IDarea
-                WHERE RD.RutinaId = @RutinaId AND RD.Reportado = 0
-                ORDER BY DI.AreaId, DI.Nombre";
-            DataTable dt = new DataTable();
+            // 1. TAGs pendientes de reportar en esta rutina
+            var tags = new List<string>();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT TAG FROM Rutina_desmontaje WHERE RutinaId = @RutinaId AND Reportado = 0", conn);
                 cmd.Parameters.AddWithValue("@RutinaId", rutinaId);
-                new SqlDataAdapter(cmd).Fill(dt);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
             }
-            foreach (DataRow row in dt.Rows)
+            if (tags.Count == 0) return new List<ItemDesmontajePendiente>();
+
+            // 2. Descripciones desde Vinetas
+            var descripcionesPorTag = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(VinetasConnString))
             {
-                lista.Add(new ItemDesmontajePendiente
-                {
-                    DesmontajeInstrumentoId = Convert.ToInt32(row["DesmontajeInstrumentoId"]),
-                    RutinaId               = Convert.ToInt32(row["RutinaId"]),
-                    TAG                    = row["TAG"].ToString(),
-                    NombreInstrumento      = row["NombreInstrumento"].ToString(),
-                    NombreArea             = row["NombreArea"].ToString()
-                });
+                conn.Open();
+                var parametros = tags.Select((t, i) => "@T" + i).ToList();
+                SqlCommand cmd = new SqlCommand(
+                    $"SELECT TAG, Descripcion FROM equipos WHERE TAG IN ({string.Join(",", parametros)})", conn);
+                for (int i = 0; i < tags.Count; i++)
+                    cmd.Parameters.AddWithValue("@T" + i, tags[i]);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read())
+                        descripcionesPorTag[dr["TAG"].ToString()] = dr["Descripcion"].ToString();
             }
-            return lista;
+
+            return tags.Select(tag => new ItemDesmontajePendiente
+            {
+                DesmontajeInstrumentoId = 0,
+                RutinaId               = rutinaId,
+                TAG                    = tag,
+                NombreInstrumento      = descripcionesPorTag.TryGetValue(tag, out string desc) ? desc : tag,
+                NombreArea             = string.Empty
+            }).ToList();
         }
 
         protected void rptPendientes_ItemDataBound(object sender, RepeaterItemEventArgs e)

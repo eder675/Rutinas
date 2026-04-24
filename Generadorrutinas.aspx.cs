@@ -17,7 +17,8 @@ namespace Rutinas
     {
         private readonly DateTime FECHA_INICIO_ZAFRA = new DateTime(2025, 11, 25);
         
-        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string ConnString       = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string VinetasConnString = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
 
         // ─── CONFIGURACIÓN DE GENERACIÓN ─────────────────────────────────────────
         // Cantidad de instrumentos por prioridad, por área asignada al turno.
@@ -1081,41 +1082,27 @@ namespace Rutinas
             }
         }
 
-        private struct AsignacionDesmontaje
+        private List<string> ObtenerKeywordsDesmontaje(string codigoEmpleado)
         {
-            public int    AreaId;
-            public string Keyword;
-        }
-
-        private List<AsignacionDesmontaje> ObtenerAreasDesmontajeEmpleado(string codigoEmpleado)
-        {
-            var lista = new List<AsignacionDesmontaje>();
-            string sql = "SELECT Area1Id, Area2Id, Keyword1, Keyword2 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo";
+            var keywords = new List<string>();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT Keyword1, Keyword2 FROM DesmontajeEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
                 cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     if (dr.Read())
                     {
-                        if (dr["Area1Id"] != DBNull.Value)
-                            lista.Add(new AsignacionDesmontaje
-                            {
-                                AreaId  = Convert.ToInt32(dr["Area1Id"]),
-                                Keyword = dr["Keyword1"] != DBNull.Value ? dr["Keyword1"].ToString().Trim() : null
-                            });
-                        if (dr["Area2Id"] != DBNull.Value)
-                            lista.Add(new AsignacionDesmontaje
-                            {
-                                AreaId  = Convert.ToInt32(dr["Area2Id"]),
-                                Keyword = dr["Keyword2"] != DBNull.Value ? dr["Keyword2"].ToString().Trim() : null
-                            });
+                        if (dr["Keyword1"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["Keyword1"].ToString()))
+                            keywords.Add(dr["Keyword1"].ToString().Trim());
+                        if (dr["Keyword2"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["Keyword2"].ToString()))
+                            keywords.Add(dr["Keyword2"].ToString().Trim());
                     }
                 }
             }
-            return lista;
+            return keywords;
         }
 
         private List<ItemRutina> SeleccionarInstrumentosDesmontaje(int cantidad, int idGrupoDefault, string codigoEmpleado)
@@ -1123,60 +1110,30 @@ namespace Rutinas
             List<ItemRutina> lista = new List<ItemRutina>();
             if (cantidad <= 0) return lista;
 
-            List<AsignacionDesmontaje> asignaciones = ObtenerAreasDesmontajeEmpleado(codigoEmpleado);
+            List<string> keywords = ObtenerKeywordsDesmontaje(codigoEmpleado);
 
             DataTable dt = new DataTable();
-            using (SqlConnection conn = new SqlConnection(ConnString))
+            using (SqlConnection conn = new SqlConnection(VinetasConnString))
             {
                 conn.Open();
-                SqlCommand cmd;
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
 
-                if (asignaciones.Count > 0)
+                if (keywords.Count > 0)
                 {
-                    // Construir condición por área con keyword opcional — usa DI.Nombre y DI.AreaId
                     var condiciones = new List<string>();
-                    cmd = new SqlCommand();
-                    cmd.Connection = conn;
-
-                    for (int i = 0; i < asignaciones.Count; i++)
+                    for (int i = 0; i < keywords.Count; i++)
                     {
-                        string pArea = "@Area" + i;
-                        cmd.Parameters.AddWithValue(pArea, asignaciones[i].AreaId);
-
-                        if (string.IsNullOrEmpty(asignaciones[i].Keyword))
-                        {
-                            condiciones.Add($"DI.AreaId = {pArea}");
-                        }
-                        else
-                        {
-                            string pKw = "@Kw" + i;
-                            cmd.Parameters.AddWithValue(pKw, "%" + asignaciones[i].Keyword.ToUpper() + "%");
-                            condiciones.Add($"(DI.AreaId = {pArea} AND UPPER(DI.Nombre) LIKE {pKw})");
-                        }
+                        string pKw = "@Kw" + i;
+                        cmd.Parameters.AddWithValue(pKw, "%" + keywords[i].ToUpper() + "%");
+                        condiciones.Add($"UPPER(Descripcion) LIKE {pKw}");
                     }
-
-                    cmd.CommandText = $@"
-                        SELECT TOP {cantidad}
-                            DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
-                        FROM DesmontajeInstrumento DI
-                        INNER JOIN Area A ON DI.AreaId = A.IDarea
-                        WHERE DI.Estado = 0
-                          AND ({string.Join(" OR ", condiciones)})
-                        ORDER BY NEWID()";
+                    cmd.CommandText = $"SELECT TOP {cantidad} TAG, Descripcion FROM equipos WHERE {string.Join(" OR ", condiciones)} ORDER BY NEWID()";
                 }
                 else
                 {
-                    // Sin asignación específica: rotación automática + áreas habilitadas
-                    cmd = new SqlCommand($@"
-                        SELECT TOP {cantidad}
-                            DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
-                        FROM DesmontajeInstrumento DI
-                        INNER JOIN Area A ON DI.AreaId = A.IDarea
-                        INNER JOIN DesmontajeAreaHabilitada DAH ON DI.AreaId = DAH.AreaId
-                        WHERE DI.Estado = 0
-                          AND A.IDgrupo = @IdGrupo
-                        ORDER BY NEWID()", conn);
-                    cmd.Parameters.AddWithValue("@IdGrupo", idGrupoDefault);
+                    // Sin keyword asignada: selección aleatoria del catálogo completo
+                    cmd.CommandText = $"SELECT TOP {cantidad} TAG, Descripcion FROM equipos ORDER BY NEWID()";
                 }
 
                 new SqlDataAdapter(cmd).Fill(dt);
@@ -1187,8 +1144,8 @@ namespace Rutinas
                 lista.Add(new ItemRutina
                 {
                     TAG               = row["TAG"].ToString().Trim(),
-                    NombreInstrumento = row["NombreInstrumento"].ToString().Trim(),
-                    NombreArea        = row["NombreArea"].ToString().Trim(),
+                    NombreInstrumento = row["Descripcion"].ToString().Trim(),
+                    NombreArea        = string.Empty,
                     Actividad         = string.Empty
                 });
             }
@@ -1214,33 +1171,41 @@ namespace Rutinas
 
         private List<ItemRutina> CargarDesmontajeDesdeRutina(int correlativo)
         {
-            List<ItemRutina> lista = new List<ItemRutina>();
-            string sql = @"
-                SELECT DI.TAG, DI.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
-                FROM Rutina_desmontaje RD
-                INNER JOIN DesmontajeInstrumento DI ON RD.TAG = DI.TAG
-                INNER JOIN Area A ON DI.AreaId = A.IDarea
-                WHERE RD.RutinaId = @Correlativo";
+            // 1. Obtener los TAGs guardados en la rutina
+            var tags = new List<string>();
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT TAG FROM Rutina_desmontaje WHERE RutinaId = @Correlativo", conn);
                 cmd.Parameters.AddWithValue("@Correlativo", correlativo);
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        lista.Add(new ItemRutina
-                        {
-                            TAG               = reader["TAG"].ToString(),
-                            NombreInstrumento = reader["NombreInstrumento"].ToString(),
-                            NombreArea        = reader["NombreArea"].ToString(),
-                            Actividad         = string.Empty
-                        });
-                    }
-                }
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
             }
-            return lista;
+            if (tags.Count == 0) return new List<ItemRutina>();
+
+            // 2. Obtener descripciones desde Vinetas
+            var descripcionesPorTag = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(VinetasConnString))
+            {
+                conn.Open();
+                var parametros = tags.Select((t, i) => "@T" + i).ToList();
+                SqlCommand cmd = new SqlCommand(
+                    $"SELECT TAG, Descripcion FROM equipos WHERE TAG IN ({string.Join(",", parametros)})", conn);
+                for (int i = 0; i < tags.Count; i++)
+                    cmd.Parameters.AddWithValue("@T" + i, tags[i]);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read())
+                        descripcionesPorTag[dr["TAG"].ToString()] = dr["Descripcion"].ToString();
+            }
+
+            return tags.Select(tag => new ItemRutina
+            {
+                TAG               = tag,
+                NombreInstrumento = descripcionesPorTag.TryGetValue(tag, out string desc) ? desc : tag,
+                NombreArea        = string.Empty,
+                Actividad         = string.Empty
+            }).ToList();
         }
         #endregion
 
