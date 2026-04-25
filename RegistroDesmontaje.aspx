@@ -1,10 +1,10 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegistroDesmontaje.aspx.cs" Inherits="Rutinas.RegistroDesmontaje" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegistroDesmontaje.aspx.cs" Inherits="Rutinas.RegistroDesmontaje" %>
 
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Registro de Desmontaje</title>
     <link rel="stylesheet" href="styles-shared.css" />
     <link rel="stylesheet" href="stylesregistrodesmontaje.css" />
