@@ -1099,8 +1099,9 @@ namespace Rutinas
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(@"
-                    SELECT Keyword1, Keyword2, Keyword3,
-                           ExcludeKeyword1, ExcludeKeyword2, ExcludeKeyword3
+                    SELECT Keyword1, Keyword2, Keyword3, Keyword4, Keyword5, Keyword6,
+                           ExcludeKeyword1, ExcludeKeyword2, ExcludeKeyword3,
+                           ExcludeKeyword4, ExcludeKeyword5, ExcludeKeyword6
                     FROM DesmontajeEmpleadoArea
                     WHERE Codigo_empleado = @Codigo", conn);
                 cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
@@ -1108,11 +1109,11 @@ namespace Rutinas
                 {
                     if (dr.Read())
                     {
-                        foreach (string col in new[] { "Keyword1", "Keyword2", "Keyword3" })
+                        foreach (string col in new[] { "Keyword1", "Keyword2", "Keyword3", "Keyword4", "Keyword5", "Keyword6" })
                             if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
                                 filtros.Incluir.Add(dr[col].ToString().Trim());
 
-                        foreach (string col in new[] { "ExcludeKeyword1", "ExcludeKeyword2", "ExcludeKeyword3" })
+                        foreach (string col in new[] { "ExcludeKeyword1", "ExcludeKeyword2", "ExcludeKeyword3", "ExcludeKeyword4", "ExcludeKeyword5", "ExcludeKeyword6" })
                             if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
                                 filtros.Excluir.Add(dr[col].ToString().Trim());
                     }
@@ -1264,7 +1265,7 @@ namespace Rutinas
                     "SELECT TAG FROM Rutina_desmontaje WHERE RutinaId = @Correlativo", conn);
                 cmd.Parameters.AddWithValue("@Correlativo", correlativo);
                 using (SqlDataReader dr = cmd.ExecuteReader())
-                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString().Trim());
             }
             if (tags.Count == 0) return new List<ItemRutina>();
 
@@ -1280,7 +1281,7 @@ namespace Rutinas
                     cmd.Parameters.AddWithValue("@T" + i, tags[i]);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                     while (dr.Read())
-                        descripcionesPorTag[dr["TAG"].ToString()] = dr["Descripcion"].ToString();
+                        descripcionesPorTag[dr["TAG"].ToString().Trim()] = dr["Descripcion"].ToString().Trim();
             }
 
             return tags.Select(tag => new ItemRutina
