@@ -767,7 +767,7 @@ namespace Rutinas
                       AND I.Nombre = 'Transmisor De Ph Jugo Alcalizado E+H'";
                 lista.AddRange(EjecutarConsultaObligatorios(sqlPhFijo));
 
-                // pH aleatorio (excluyendo el fijo y los usados en el turno anterior)
+                // pH aleatorio (excluyendo el fijo y los usados en los últimos 3 turnos / 24h)
                 string sqlPhAleatorio = $@"
                     SELECT TOP {CANT_OBL_PH_ALEATORIO_G1[t]}
                         I.TAG,
@@ -781,7 +781,7 @@ namespace Rutinas
                           SELECT RI.TAG
                           FROM Rutina_instrumento RI
                           INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
-                          WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                          WHERE R.Fecha >= DATEADD(hour, -24, GETDATE())
                             AND RI.EsObligatorio = 1
                       )
                     ORDER BY NEWID()";
@@ -831,7 +831,7 @@ namespace Rutinas
             }
             else // Alcalizado
             {
-                // Equipos Brix aleatorios, excluyendo los usados en el turno anterior
+                // Equipos Brix aleatorios, excluyendo los usados en los últimos 3 turnos / 24h
                 string sqlBrix = $@"
                     SELECT TOP {CANT_OBL_BRIX_G2[t]}
                         I.TAG,
@@ -844,7 +844,7 @@ namespace Rutinas
                           SELECT RI.TAG
                           FROM Rutina_instrumento RI
                           INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
-                          WHERE R.Fecha >= DATEADD(hour, -10, GETDATE())
+                          WHERE R.Fecha >= DATEADD(hour, -24, GETDATE())
                             AND RI.EsObligatorio = 1
                       )
                     ORDER BY NEWID()";
