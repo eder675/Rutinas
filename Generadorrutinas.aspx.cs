@@ -201,12 +201,32 @@ namespace Rutinas
         }
 
         #region DiaZafra
+        private int ObtenerDiaZafraDesdeNodeRed()
+        {
+            try
+            {
+                var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create("http://10.1.0.29:1880/dz");
+                request.Method  = "GET";
+                request.Timeout = 3000;
+                using (var response = (System.Net.HttpWebResponse)request.GetResponse())
+                using (var reader  = new System.IO.StreamReader(response.GetResponseStream()))
+                {
+                    string respuesta = reader.ReadToEnd().Trim();
+                    if (int.TryParse(respuesta, out int diaZafra))
+                        return diaZafra;
+                }
+            }
+            catch { }
+
+            // Si Node-RED no responde, retorna 0 para detectar el fallo visualmente.
+            // Descomentar la línea de abajo (y comentar el return 0) para activar el cálculo local como respaldo:
+            // return (DateTime.Now - new DateTime(2025, 11, 24)).Days + 1;
+            return 0;
+        }
+
         private void MostrarDiaZafra()
         {
-             //calculo dia zafra
-             DateTime fechaInicioZafraReal = new DateTime(2025, 11, 24);
-             int diaZafra = (DateTime.Now - fechaInicioZafraReal).Days + 1;
-             lblzafra.Text =""+diaZafra;//concateno sin convertir de entero a texto usando las comas
+            lblzafra.Text = ObtenerDiaZafraDesdeNodeRed().ToString();
         }
         #endregion
 
