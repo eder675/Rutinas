@@ -1120,8 +1120,11 @@ namespace Rutinas
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(@"
                     SELECT Keyword1, Keyword2, Keyword3, Keyword4, Keyword5, Keyword6,
+                           Keyword7, Keyword8, Keyword9, Keyword10, Keyword11,
                            ExcludeKeyword1, ExcludeKeyword2, ExcludeKeyword3,
-                           ExcludeKeyword4, ExcludeKeyword5, ExcludeKeyword6
+                           ExcludeKeyword4, ExcludeKeyword5, ExcludeKeyword6,
+                           ExcludeKeyword7, ExcludeKeyword8, ExcludeKeyword9,
+                           ExcludeKeyword10, ExcludeKeyword11
                     FROM DesmontajeEmpleadoArea
                     WHERE Codigo_empleado = @Codigo", conn);
                 cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
@@ -1129,11 +1132,15 @@ namespace Rutinas
                 {
                     if (dr.Read())
                     {
-                        foreach (string col in new[] { "Keyword1", "Keyword2", "Keyword3", "Keyword4", "Keyword5", "Keyword6" })
+                        foreach (string col in new[] { "Keyword1", "Keyword2", "Keyword3", "Keyword4", "Keyword5", "Keyword6",
+                                                       "Keyword7", "Keyword8", "Keyword9", "Keyword10", "Keyword11" })
                             if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
                                 filtros.Incluir.Add(dr[col].ToString().Trim());
 
-                        foreach (string col in new[] { "ExcludeKeyword1", "ExcludeKeyword2", "ExcludeKeyword3", "ExcludeKeyword4", "ExcludeKeyword5", "ExcludeKeyword6" })
+                        foreach (string col in new[] { "ExcludeKeyword1", "ExcludeKeyword2", "ExcludeKeyword3",
+                                                       "ExcludeKeyword4", "ExcludeKeyword5", "ExcludeKeyword6",
+                                                       "ExcludeKeyword7", "ExcludeKeyword8", "ExcludeKeyword9",
+                                                       "ExcludeKeyword10", "ExcludeKeyword11" })
                             if (dr[col] != DBNull.Value && !string.IsNullOrWhiteSpace(dr[col].ToString()))
                                 filtros.Excluir.Add(dr[col].ToString().Trim());
                     }

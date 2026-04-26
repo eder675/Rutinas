@@ -292,8 +292,11 @@ namespace Rutinas
                 new SqlDataAdapter(@"
                     SELECT E.Codigo_empleado, E.Nombre,
                            DEA.Keyword1, DEA.Keyword2, DEA.Keyword3, DEA.Keyword4, DEA.Keyword5, DEA.Keyword6,
+                           DEA.Keyword7, DEA.Keyword8, DEA.Keyword9, DEA.Keyword10, DEA.Keyword11,
                            DEA.ExcludeKeyword1, DEA.ExcludeKeyword2, DEA.ExcludeKeyword3,
-                           DEA.ExcludeKeyword4, DEA.ExcludeKeyword5, DEA.ExcludeKeyword6
+                           DEA.ExcludeKeyword4, DEA.ExcludeKeyword5, DEA.ExcludeKeyword6,
+                           DEA.ExcludeKeyword7, DEA.ExcludeKeyword8, DEA.ExcludeKeyword9,
+                           DEA.ExcludeKeyword10, DEA.ExcludeKeyword11
                     FROM Empleado E
                     LEFT JOIN DesmontajeEmpleadoArea DEA ON E.Codigo_empleado = DEA.Codigo_empleado
                     WHERE E.Cargo <> 'Administrador'
@@ -316,7 +319,7 @@ namespace Rutinas
                 sb.Append("<tr>");
                 sb.Append($"<td style='padding:5px 10px;border:1px solid #ccc;'>{nombre}</td>");
 
-                // Columna INCLUIR (6 textboxes)
+                // Columna INCLUIR (11 textboxes)
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
                 sb.Append($"<input type=\"text\" name=\"kw1_{cod}\" value=\"{Kw(row,"Keyword1")}\" placeholder=\"Incluir 1\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kw2_{cod}\" value=\"{Kw(row,"Keyword2")}\" placeholder=\"Incluir 2\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
@@ -324,9 +327,14 @@ namespace Rutinas
                 sb.Append($"<input type=\"text\" name=\"kw4_{cod}\" value=\"{Kw(row,"Keyword4")}\" placeholder=\"Incluir 4\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kw5_{cod}\" value=\"{Kw(row,"Keyword5")}\" placeholder=\"Incluir 5\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kw6_{cod}\" value=\"{Kw(row,"Keyword6")}\" placeholder=\"Incluir 6\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw7_{cod}\" value=\"{Kw(row,"Keyword7")}\" placeholder=\"Incluir 7\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw8_{cod}\" value=\"{Kw(row,"Keyword8")}\" placeholder=\"Incluir 8\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw9_{cod}\" value=\"{Kw(row,"Keyword9")}\" placeholder=\"Incluir 9\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw10_{cod}\" value=\"{Kw(row,"Keyword10")}\" placeholder=\"Incluir 10\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw11_{cod}\" value=\"{Kw(row,"Keyword11")}\" placeholder=\"Incluir 11\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append("</td>");
 
-                // Columna EXCLUIR (6 textboxes)
+                // Columna EXCLUIR (11 textboxes)
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
                 sb.Append($"<input type=\"text\" name=\"kwExcluir1_{cod}\" value=\"{Kw(row,"ExcludeKeyword1")}\" placeholder=\"Excluir 1\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kwExcluir2_{cod}\" value=\"{Kw(row,"ExcludeKeyword2")}\" placeholder=\"Excluir 2\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
@@ -334,6 +342,11 @@ namespace Rutinas
                 sb.Append($"<input type=\"text\" name=\"kwExcluir4_{cod}\" value=\"{Kw(row,"ExcludeKeyword4")}\" placeholder=\"Excluir 4\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kwExcluir5_{cod}\" value=\"{Kw(row,"ExcludeKeyword5")}\" placeholder=\"Excluir 5\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
                 sb.Append($"<input type=\"text\" name=\"kwExcluir6_{cod}\" value=\"{Kw(row,"ExcludeKeyword6")}\" placeholder=\"Excluir 6\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir7_{cod}\" value=\"{Kw(row,"ExcludeKeyword7")}\" placeholder=\"Excluir 7\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir8_{cod}\" value=\"{Kw(row,"ExcludeKeyword8")}\" placeholder=\"Excluir 8\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir9_{cod}\" value=\"{Kw(row,"ExcludeKeyword9")}\" placeholder=\"Excluir 9\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir10_{cod}\" value=\"{Kw(row,"ExcludeKeyword10")}\" placeholder=\"Excluir 10\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir11_{cod}\" value=\"{Kw(row,"ExcludeKeyword11")}\" placeholder=\"Excluir 11\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
                 sb.Append("</td>");
 
                 sb.Append("</tr>");
@@ -384,23 +397,37 @@ namespace Rutinas
                         return string.IsNullOrWhiteSpace(v) ? (object)DBNull.Value : v.Trim();
                     }
 
-                    object kw1   = Leer("kw1");
-                    object kw2   = Leer("kw2");
-                    object kw3   = Leer("kw3");
-                    object kw4   = Leer("kw4");
-                    object kw5   = Leer("kw5");
-                    object kw6   = Leer("kw6");
-                    object kwEx1 = Leer("kwExcluir1");
-                    object kwEx2 = Leer("kwExcluir2");
-                    object kwEx3 = Leer("kwExcluir3");
-                    object kwEx4 = Leer("kwExcluir4");
-                    object kwEx5 = Leer("kwExcluir5");
-                    object kwEx6 = Leer("kwExcluir6");
+                    object kw1    = Leer("kw1");
+                    object kw2    = Leer("kw2");
+                    object kw3    = Leer("kw3");
+                    object kw4    = Leer("kw4");
+                    object kw5    = Leer("kw5");
+                    object kw6    = Leer("kw6");
+                    object kw7    = Leer("kw7");
+                    object kw8    = Leer("kw8");
+                    object kw9    = Leer("kw9");
+                    object kw10   = Leer("kw10");
+                    object kw11   = Leer("kw11");
+                    object kwEx1  = Leer("kwExcluir1");
+                    object kwEx2  = Leer("kwExcluir2");
+                    object kwEx3  = Leer("kwExcluir3");
+                    object kwEx4  = Leer("kwExcluir4");
+                    object kwEx5  = Leer("kwExcluir5");
+                    object kwEx6  = Leer("kwExcluir6");
+                    object kwEx7  = Leer("kwExcluir7");
+                    object kwEx8  = Leer("kwExcluir8");
+                    object kwEx9  = Leer("kwExcluir9");
+                    object kwEx10 = Leer("kwExcluir10");
+                    object kwEx11 = Leer("kwExcluir11");
 
                     bool todosVacios = kw1 == DBNull.Value && kw2 == DBNull.Value && kw3 == DBNull.Value
                                     && kw4 == DBNull.Value && kw5 == DBNull.Value && kw6 == DBNull.Value
+                                    && kw7 == DBNull.Value && kw8 == DBNull.Value && kw9 == DBNull.Value
+                                    && kw10 == DBNull.Value && kw11 == DBNull.Value
                                     && kwEx1 == DBNull.Value && kwEx2 == DBNull.Value && kwEx3 == DBNull.Value
-                                    && kwEx4 == DBNull.Value && kwEx5 == DBNull.Value && kwEx6 == DBNull.Value;
+                                    && kwEx4 == DBNull.Value && kwEx5 == DBNull.Value && kwEx6 == DBNull.Value
+                                    && kwEx7 == DBNull.Value && kwEx8 == DBNull.Value && kwEx9 == DBNull.Value
+                                    && kwEx10 == DBNull.Value && kwEx11 == DBNull.Value;
 
                     if (todosVacios)
                     {
@@ -416,30 +443,47 @@ namespace Rutinas
                                 UPDATE DesmontajeEmpleadoArea
                                 SET Keyword1 = @K1, Keyword2 = @K2, Keyword3 = @K3,
                                     Keyword4 = @K4, Keyword5 = @K5, Keyword6 = @K6,
+                                    Keyword7 = @K7, Keyword8 = @K8, Keyword9 = @K9,
+                                    Keyword10 = @K10, Keyword11 = @K11,
                                     ExcludeKeyword1 = @Ex1, ExcludeKeyword2 = @Ex2, ExcludeKeyword3 = @Ex3,
-                                    ExcludeKeyword4 = @Ex4, ExcludeKeyword5 = @Ex5, ExcludeKeyword6 = @Ex6
+                                    ExcludeKeyword4 = @Ex4, ExcludeKeyword5 = @Ex5, ExcludeKeyword6 = @Ex6,
+                                    ExcludeKeyword7 = @Ex7, ExcludeKeyword8 = @Ex8, ExcludeKeyword9 = @Ex9,
+                                    ExcludeKeyword10 = @Ex10, ExcludeKeyword11 = @Ex11
                                 WHERE Codigo_empleado = @Codigo
                             ELSE
                                 INSERT INTO DesmontajeEmpleadoArea
                                     (Codigo_empleado, Keyword1, Keyword2, Keyword3, Keyword4, Keyword5, Keyword6,
+                                     Keyword7, Keyword8, Keyword9, Keyword10, Keyword11,
                                      ExcludeKeyword1, ExcludeKeyword2, ExcludeKeyword3,
-                                     ExcludeKeyword4, ExcludeKeyword5, ExcludeKeyword6)
-                                VALUES (@Codigo, @K1, @K2, @K3, @K4, @K5, @K6,
-                                        @Ex1, @Ex2, @Ex3, @Ex4, @Ex5, @Ex6)";
+                                     ExcludeKeyword4, ExcludeKeyword5, ExcludeKeyword6,
+                                     ExcludeKeyword7, ExcludeKeyword8, ExcludeKeyword9,
+                                     ExcludeKeyword10, ExcludeKeyword11)
+                                VALUES (@Codigo, @K1, @K2, @K3, @K4, @K5, @K6, @K7, @K8, @K9, @K10, @K11,
+                                        @Ex1, @Ex2, @Ex3, @Ex4, @Ex5, @Ex6, @Ex7, @Ex8, @Ex9, @Ex10, @Ex11)";
                         SqlCommand cmdMerge = new SqlCommand(sqlMerge, conn);
                         cmdMerge.Parameters.AddWithValue("@Codigo", codigo);
-                        cmdMerge.Parameters.AddWithValue("@K1",  kw1);
-                        cmdMerge.Parameters.AddWithValue("@K2",  kw2);
-                        cmdMerge.Parameters.AddWithValue("@K3",  kw3);
-                        cmdMerge.Parameters.AddWithValue("@K4",  kw4);
-                        cmdMerge.Parameters.AddWithValue("@K5",  kw5);
-                        cmdMerge.Parameters.AddWithValue("@K6",  kw6);
-                        cmdMerge.Parameters.AddWithValue("@Ex1", kwEx1);
-                        cmdMerge.Parameters.AddWithValue("@Ex2", kwEx2);
-                        cmdMerge.Parameters.AddWithValue("@Ex3", kwEx3);
-                        cmdMerge.Parameters.AddWithValue("@Ex4", kwEx4);
-                        cmdMerge.Parameters.AddWithValue("@Ex5", kwEx5);
-                        cmdMerge.Parameters.AddWithValue("@Ex6", kwEx6);
+                        cmdMerge.Parameters.AddWithValue("@K1",   kw1);
+                        cmdMerge.Parameters.AddWithValue("@K2",   kw2);
+                        cmdMerge.Parameters.AddWithValue("@K3",   kw3);
+                        cmdMerge.Parameters.AddWithValue("@K4",   kw4);
+                        cmdMerge.Parameters.AddWithValue("@K5",   kw5);
+                        cmdMerge.Parameters.AddWithValue("@K6",   kw6);
+                        cmdMerge.Parameters.AddWithValue("@K7",   kw7);
+                        cmdMerge.Parameters.AddWithValue("@K8",   kw8);
+                        cmdMerge.Parameters.AddWithValue("@K9",   kw9);
+                        cmdMerge.Parameters.AddWithValue("@K10",  kw10);
+                        cmdMerge.Parameters.AddWithValue("@K11",  kw11);
+                        cmdMerge.Parameters.AddWithValue("@Ex1",  kwEx1);
+                        cmdMerge.Parameters.AddWithValue("@Ex2",  kwEx2);
+                        cmdMerge.Parameters.AddWithValue("@Ex3",  kwEx3);
+                        cmdMerge.Parameters.AddWithValue("@Ex4",  kwEx4);
+                        cmdMerge.Parameters.AddWithValue("@Ex5",  kwEx5);
+                        cmdMerge.Parameters.AddWithValue("@Ex6",  kwEx6);
+                        cmdMerge.Parameters.AddWithValue("@Ex7",  kwEx7);
+                        cmdMerge.Parameters.AddWithValue("@Ex8",  kwEx8);
+                        cmdMerge.Parameters.AddWithValue("@Ex9",  kwEx9);
+                        cmdMerge.Parameters.AddWithValue("@Ex10", kwEx10);
+                        cmdMerge.Parameters.AddWithValue("@Ex11", kwEx11);
                         cmdMerge.ExecuteNonQuery();
                     }
                 }
