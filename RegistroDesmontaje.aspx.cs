@@ -92,7 +92,7 @@ namespace Rutinas
                     "SELECT TAG FROM Rutina_desmontaje WHERE RutinaId = @RutinaId AND Reportado = 0", conn);
                 cmd.Parameters.AddWithValue("@RutinaId", rutinaId);
                 using (SqlDataReader dr = cmd.ExecuteReader())
-                    while (dr.Read()) tags.Add(dr["TAG"].ToString());
+                    while (dr.Read()) tags.Add(dr["TAG"].ToString().Trim());
             }
             if (tags.Count == 0) return new List<ItemDesmontajePendiente>();
 
@@ -108,7 +108,7 @@ namespace Rutinas
                     cmd.Parameters.AddWithValue("@T" + i, tags[i]);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                     while (dr.Read())
-                        descripcionesPorTag[dr["TAG"].ToString()] = dr["Descripcion"].ToString();
+                        descripcionesPorTag[dr["TAG"].ToString().Trim()] = dr["Descripcion"].ToString().Trim();
             }
 
             return tags.Select(tag => new ItemDesmontajePendiente
@@ -145,13 +145,14 @@ namespace Rutinas
 
                     HiddenField   hfTag   = (HiddenField)item.FindControl("hfTag");
                     HiddenField   hfId    = (HiddenField)item.FindControl("hfDesmontajeId");
-                    CheckBox      chk     = (CheckBox)item.FindControl("chkDesmontado");
+                    RadioButton   rdoSi   = (RadioButton)item.FindControl("rdoDesmontado");
+                    RadioButton   rdoNo   = (RadioButton)item.FindControl("rdoNoDesmontado");
                     DropDownList  ddl     = (DropDownList)item.FindControl("ddlRazon");
                     TextBox       txt     = (TextBox)item.FindControl("txtDetalle");
 
                     string tag                  = hfTag.Value;
                     int    desmontajeInstId      = Convert.ToInt32(hfId.Value);
-                    bool   desmontado           = chk.Checked;
+                    bool   desmontado           = rdoSi != null && rdoSi.Checked;
                     string razonSeleccionada    = ddl.SelectedValue;
                     string detalleAdicional     = txt.Text.Trim();
 

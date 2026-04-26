@@ -39,10 +39,16 @@
                             <div class="rdm-item-header">
                                 <span class="rdm-area-badge"><%# Eval("NombreArea") %></span>
                                 <span class="rdm-nombre"><%# Eval("NombreInstrumento") %></span>
-                                <label class="rdm-chk-label" id='<%# "lbl_" + Container.ItemIndex %>'>
-                                    <asp:CheckBox ID="chkDesmontado" runat="server" />
-                                    Desmontado
-                                </label>
+                                <div class="rdm-radio-group">
+                                    <label class="rdm-radio-label rdm-radio-si">
+                                        <asp:RadioButton ID="rdoDesmontado"   runat="server" GroupName="grpDesmontaje" />
+                                        Desmontado
+                                    </label>
+                                    <label class="rdm-radio-label rdm-radio-no">
+                                        <asp:RadioButton ID="rdoNoDesmontado" runat="server" GroupName="grpDesmontaje" />
+                                        No desmontado
+                                    </label>
+                                </div>
                             </div>
 
                             <%-- Panel de razón: visible solo si NO se marcó como desmontado --%>
@@ -78,30 +84,31 @@
     </form>
 
     <script type="text/javascript">
-        // Por cada checkbox de desmontaje: al marcar/desmarcar muestra/oculta el panel de razón
         window.addEventListener('load', function () {
             var items = document.querySelectorAll('.rdm-item');
-            items.forEach(function (item, idx) {
-                var chk    = item.querySelector('input[type="checkbox"]');
+            items.forEach(function (item) {
+                var rdoSi  = item.querySelector('input[id$="rdoDesmontado"]');
+                var rdoNo  = item.querySelector('input[id$="rdoNoDesmontado"]');
                 var panel  = item.querySelector('.rdm-razon-panel');
-                var lbl    = item.querySelector('.rdm-chk-label');
-                if (!chk || !panel) return;
+                var lblSi  = item.querySelector('.rdm-radio-si');
+                var lblNo  = item.querySelector('.rdm-radio-no');
+                if (!panel) return;
 
                 function actualizar() {
-                    if (chk.checked) {
-                        panel.classList.remove('visible');
-                        lbl.classList.add('marcado');
-                    } else {
+                    if (rdoNo && rdoNo.checked) {
                         panel.classList.add('visible');
-                        lbl.classList.remove('marcado');
+                        if (lblSi) lblSi.classList.remove('marcado');
+                        if (lblNo) lblNo.classList.add('marcado');
+                    } else {
+                        panel.classList.remove('visible');
+                        if (lblNo) lblNo.classList.remove('marcado');
+                        if (lblSi) lblSi.classList.toggle('marcado', rdoSi ? rdoSi.checked : false);
                     }
                 }
 
-                chk.addEventListener('change', actualizar);
-                // Inicializar: si el checkbox viene pre-marcado (postback)
+                if (rdoSi) rdoSi.addEventListener('change', actualizar);
+                if (rdoNo) rdoNo.addEventListener('change', actualizar);
                 actualizar();
-                // Pero al cargar la primera vez, ocultamos el panel (vacío por defecto)
-                if (!chk.checked) panel.classList.remove('visible');
             });
         });
     </script>
