@@ -331,6 +331,13 @@ namespace Rutinas
             // A su vez, esto hace que el domingo mañana (sin ajuste) y el lunes tarde
             // sean días consecutivos con paridades opuestas → también sin repetición.
             bool esTurnoNoche = horaActual >= new TimeSpan(21, 41, 0) || horaActual < new TimeSpan(5, 41, 0);
+
+            // Corrección domingo: la jornada nocturna arranca a las 17:41.
+            // A partir de ese momento el área debe usar la paridad del lunes (día siguiente)
+            // para evitar repetir el área que ya cubrió el turno de día del mismo domingo.
+            if (ahora.DayOfWeek == DayOfWeek.Sunday && horaActual >= new TimeSpan(17, 41, 0))
+                esTurnoNoche = true;
+
             if (esTurnoNoche)
                 diaJuliano += 1;
 
