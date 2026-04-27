@@ -142,6 +142,20 @@ namespace Rutinas
 
         protected global::System.Web.UI.WebControls.Repeater rptObligatorios0;
 
+        protected global::System.Web.UI.WebControls.Panel pnlOpcionAuxiliar;
+
+        protected global::System.Web.UI.WebControls.RadioButton rdoRelevar;
+
+        protected global::System.Web.UI.WebControls.DropDownList ddlInstrumentistas;
+
+        protected global::System.Web.UI.WebControls.RadioButton rdoTachos;
+
+        protected global::System.Web.UI.WebControls.TextBox txtCantTachos;
+
+        protected global::System.Web.UI.WebControls.Button btnGenerarAuxiliar;
+
+        protected global::System.Web.UI.WebControls.Label lblAuxMsg;
+
         protected global::System.Web.UI.WebControls.Panel pnlInstrumentos;
 
         protected global::System.Web.UI.WebControls.Panel pnlObligatorios;

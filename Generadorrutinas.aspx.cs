@@ -105,6 +105,28 @@ namespace Rutinas
                     string codigoEmpleado = Session["CodigoEmpleado"].ToString();
                     string nombreEmpleado = Session["NombreEmpleado"].ToString();
 
+                    lblname.Text  = nombreEmpleado;
+                    lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                    lblturno.Text = DeterminarTurnoActual();
+                    MostrarDiaZafra();
+
+                    // Detectar Auxiliar (PuestoFijo = 3): mostrar panel de elección
+                    var datosEmpleado = ConsultarDatosEmpleado(codigoEmpleado);
+                    if (datosEmpleado.PuestoFijo == 3)
+                    {
+                        pnlOpcionAuxiliar.Visible = true;
+                        pnlInstrumentos.Visible   = false;
+                        pnlObligatorios.Visible   = false;
+                        pnlDesmontaje.Visible     = false;
+                        CargarInstrumentistas();
+                        // onclick directo: más fiable que addEventListener con querySelector
+                        rdoRelevar.Attributes["onclick"] = "document.getElementById('divRelevar').style.display='block';document.getElementById('divTachos').style.display='none';";
+                        rdoTachos.Attributes["onclick"]  = "document.getElementById('divTachos').style.display='block';document.getElementById('divRelevar').style.display='none';";
+                        return;
+                    }
+
+                    string turnoActual = DeterminarTurnoActual();
+
                     // Cargar configuración de visibilidad de tablas
                     ConfigDesmontaje config = ObtenerConfigDesmontaje();
 
@@ -124,14 +146,7 @@ namespace Rutinas
                     pnlObligatorios.Visible = config.MostrarObligatorios;
                     pnlDesmontaje.Visible   = config.MostrarDesmontaje;
 
-                    string turnoActual = DeterminarTurnoActual();
-
-                    lblname.Text  = nombreEmpleado;
-                    lblfecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-                    lblturno.Text = turnoActual;
-                    MostrarDiaZafra();
-
-                    // Algoritmo principal (siempre corre para obtener el correlativo)
+                    // Algoritmo principal
                     string nombreGrupoAsignado;
                     int correlativoGenerado;
                     List<ItemRutina> rutinaGenerada = EjecutarAlgoritmoComplejo(
@@ -174,28 +189,7 @@ namespace Rutinas
                         GuardarDesmontajeEnRutina(correlativoGenerado, desmontaje);
                     }
 
-                    string logoutUrl = ResolveClientUrl("~/closesession.aspx");
-                    string script = $@"
-<script type='text/javascript'>
-    function cerrarSesionAlTerminarImpresion() {{
-        window.location.href = '{logoutUrl}';
-    }}
-    if (window.matchMedia) {{
-        var mediaQueryList = window.matchMedia('print');
-        mediaQueryList.addListener(function(mql) {{
-            if (!mql.matches) {{ cerrarSesionAlTerminarImpresion(); }}
-        }});
-    }} else {{
-        window.onafterprint = cerrarSesionAlTerminarImpresion;
-    }}
-    window.onload = function() {{
-        var originalTitle = document.title;
-        document.title = '';
-        window.print();
-        document.title = originalTitle;
-    }};
-</script>";
-                    this.ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirCerrarSesion", script);
+                    RegistrarScriptImpresion();
                 }
             }
         }
@@ -922,6 +916,181 @@ namespace Rutinas
             return lista;
         }
         #endregion
+        #region auxiliar
+        private void RegistrarScriptImpresion()
+        {
+            string logoutUrl = ResolveClientUrl("~/closesession.aspx");
+            string script = $@"
+<script type='text/javascript'>
+    function cerrarSesionAlTerminarImpresion() {{
+        window.location.href = '{logoutUrl}';
+    }}
+    if (window.matchMedia) {{
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {{
+            if (!mql.matches) {{ cerrarSesionAlTerminarImpresion(); }}
+        }});
+    }} else {{
+        window.onafterprint = cerrarSesionAlTerminarImpresion;
+    }}
+    window.onload = function() {{
+        var originalTitle = document.title;
+        document.title = '';
+        window.print();
+        document.title = originalTitle;
+    }};
+</script>";
+            ClientScript.RegisterClientScriptBlock(this.GetType(), "ImprimirCerrarSesion", script);
+        }
+
+        private void CargarInstrumentistas()
+        {
+            ddlInstrumentistas.Items.Clear();
+            ddlInstrumentistas.Items.Add(new ListItem("-- Seleccione instrumentista --", ""));
+            string sql = "SELECT Codigo_empleado, Nombre FROM Empleado WHERE Cargo = 'Instrumentista' ORDER BY Nombre";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                using (SqlDataReader dr = new SqlCommand(sql, conn).ExecuteReader())
+                    while (dr.Read())
+                        ddlInstrumentistas.Items.Add(new ListItem(
+                            dr["Nombre"].ToString(),
+                            dr["Codigo_empleado"].ToString()));
+            }
+        }
+
+        protected void btnGenerarAuxiliar_Click(object sender, EventArgs e)
+        {
+            string codigoAuxiliar = Session["CodigoEmpleado"].ToString();
+
+            if (rdoRelevar.Checked)
+            {
+                string codigoInstrumentista = ddlInstrumentistas.SelectedValue;
+                if (string.IsNullOrEmpty(codigoInstrumentista))
+                {
+                    lblAuxMsg.Text = "Seleccione un instrumentista.";
+                    return;
+                }
+                string turnoRelevar = DeterminarTurnoActual();
+                lblturno.Text = turnoRelevar;
+                GenerarRutinaRelevar(codigoInstrumentista, codigoAuxiliar, turnoRelevar);
+            }
+            else if (rdoTachos.Checked)
+            {
+                int cantidad = 4;
+                int.TryParse(txtCantTachos.Text.Trim(), out cantidad);
+                if (cantidad <= 0) cantidad = 4;
+                lblturno.Text = "7AM a 5PM";
+                GenerarRutinaTachos(cantidad, codigoAuxiliar, "7AM a 5PM");
+            }
+            else
+            {
+                lblAuxMsg.Text = "Seleccione el tipo de rutina.";
+                return;
+            }
+
+            pnlOpcionAuxiliar.Visible = false;
+            RegistrarScriptImpresion();
+        }
+
+        private void GenerarRutinaRelevar(string codigoInstrumentista, string codigoAuxiliar, string turnoActual)
+        {
+            ConfigDesmontaje config = ObtenerConfigDesmontaje();
+            pnlInstrumentos.Visible = config.MostrarInstrumentos;
+            pnlObligatorios.Visible = config.MostrarObligatorios;
+            pnlDesmontaje.Visible   = false;
+
+            // Área calculada según el instrumentista relevado
+            string areaCalculada = ObtenerAreaDeterminista(codigoInstrumentista);
+            int    idGrupo       = (areaCalculada == "Extracción") ? 1 : 2;
+
+            // Instrumentos para el área del instrumentista, guardados bajo el código del Auxiliar
+            List<ItemRutina> instrumentos = SeleccionarInstrumentos(idGrupo, turnoActual);
+            int correlativo = GuardarNuevaRutina(codigoAuxiliar, turnoActual, idGrupo, instrumentos);
+
+            List<ItemRutina> obligatorios = SeleccionarEquiposObligatorios(areaCalculada, turnoActual);
+            HashSet<string> tagsObl = new HashSet<string>(
+                obligatorios.Select(o => o.TAG.Trim()), StringComparer.OrdinalIgnoreCase);
+            instrumentos = instrumentos.Where(i => !tagsObl.Contains(i.TAG.Trim())).ToList();
+
+            if (config.MostrarInstrumentos) { rptRutina.DataSource = instrumentos; rptRutina.DataBind(); }
+            if (config.MostrarObligatorios) { rptObligatorios.DataSource = obligatorios; rptObligatorios.DataBind(); }
+            GuardarObligatoriosEnRutinaInstrumento(correlativo, obligatorios);
+        }
+
+        private void GenerarRutinaTachos(int cantidad, string codigoAuxiliar, string turnoActual)
+        {
+            pnlInstrumentos.Visible = false;
+            pnlObligatorios.Visible = true;
+            pnlDesmontaje.Visible   = false;
+
+            List<ItemRutina> tachos = SeleccionarInstrumentosTachos(cantidad);
+
+            // Guardar cabecera de rutina bajo código del Auxiliar (IDgrupo 2 = Alcalizado/Brix)
+            int correlativo = GuardarCabeceraRutina(codigoAuxiliar, turnoActual, 2);
+
+            rptObligatorios.DataSource = tachos;
+            rptObligatorios.DataBind();
+
+            // Guardar como EsObligatorio=1 para excluirlos de las siguientes 24h (3 turnos)
+            GuardarObligatoriosEnRutinaInstrumento(correlativo, tachos);
+        }
+
+        private List<ItemRutina> SeleccionarInstrumentosTachos(int cantidad)
+        {
+            string sql = $@"
+                SELECT TOP {cantidad}
+                    I.TAG,
+                    I.Nombre AS NombreInstrumento,
+                    A.Nombre AS NombreArea
+                FROM Instrumentos I
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                WHERE I.TipoAnalisis = 'Brix'
+                  AND I.TAG NOT IN (
+                      SELECT RI.TAG
+                      FROM Rutina_instrumento RI
+                      INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
+                      WHERE R.Fecha >= DATEADD(hour, -24, GETDATE())
+                        AND RI.EsObligatorio = 1
+                  )
+                ORDER BY NEWID()";
+
+            var lista = EjecutarConsultaObligatorios(sql);
+
+            // Fallback: si no hay suficientes Brix sin repetir, permitir repetir
+            if (lista.Count < cantidad)
+            {
+                sql = $@"
+                    SELECT TOP {cantidad}
+                        I.TAG,
+                        I.Nombre AS NombreInstrumento,
+                        A.Nombre AS NombreArea
+                    FROM Instrumentos I
+                    INNER JOIN Area A ON I.IDarea = A.IDarea
+                    WHERE I.TipoAnalisis = 'Brix'
+                    ORDER BY NEWID()";
+                lista = EjecutarConsultaObligatorios(sql);
+            }
+            return lista;
+        }
+
+        private int GuardarCabeceraRutina(string codigoEmpleado, string turnoActual, int idGrupo)
+        {
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                string sql = @"INSERT INTO Rutinas (Fecha, Turno, Codigo_empleado, IDgrupo)
+                               VALUES (GETDATE(), @Turno, @Empleado, @IDGrupo);
+                               SELECT SCOPE_IDENTITY();";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Turno",    turnoActual);
+                cmd.Parameters.AddWithValue("@Empleado", codigoEmpleado);
+                cmd.Parameters.AddWithValue("@IDGrupo",  idGrupo);
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+        #endregion
+
         #region ultimarutina
         private void CargarUltimaRutina()
         {
@@ -1011,7 +1180,8 @@ namespace Rutinas
             // --- C. LLENADO DE ENCABEZADO Y REPEATER ---
 
             ConfigDesmontaje config = ObtenerConfigDesmontaje();
-            pnlInstrumentos.Visible = config.MostrarInstrumentos;
+            // Ocultar tabla de instrumentos si la rutina no tiene registros regulares (ej: TACHOS)
+            pnlInstrumentos.Visible = config.MostrarInstrumentos && dt.Rows.Count > 0;
             pnlObligatorios.Visible = config.MostrarObligatorios;
             pnlDesmontaje.Visible   = config.MostrarDesmontaje;
 
@@ -1020,7 +1190,7 @@ namespace Rutinas
             lblturno.Text = turnoGuardado;
             MostrarDiaZafra();
 
-            if (config.MostrarInstrumentos)
+            if (config.MostrarInstrumentos && dt.Rows.Count > 0)
             {
                 rptRutina.DataSource = dt;
                 rptRutina.DataBind();

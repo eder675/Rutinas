@@ -133,37 +133,42 @@ namespace Rutinas
 
         private bool RutinaRecienteExiste()
         {
-            if (Session["CodigoEmpleado"] == null)
-            {
-                return false;
-            }
+            if (Session["CodigoEmpleado"] == null) return false;
 
             string codigoEmpleado = Session["CodigoEmpleado"].ToString();
 
-            // 1. Definir el límite de tiempo (8 horas atrás)
-            DateTime limiteTiempo = DateTime.Now.AddHours(-8);
+            // Para el Auxiliar (PuestoFijo=3): verificar por inicio del turno actual,
+            // no por ventana fija de 8h, para que el botón se desbloquee en cada cambio de turno.
+            var perfil = ConsultarDatosEmpleado(codigoEmpleado);
+            DateTime limiteTiempo = (perfil != null && perfil.PuestoFijo == 3)
+                ? ObtenerInicioTurnoActual()
+                : DateTime.Now.AddHours(-8);
 
-            // 2. Consulta SQL: Verificar existencia en las últimas 8 horas
-            // Nota: Reemplaza [TuTablaRutinas] por Rutinas.
-            string sql = @"
-        SELECT COUNT(Correlativo) 
-        FROM Rutinas 
-        WHERE Codigo_empleado = @CodigoEmpleado AND Fecha >= @LimiteTiempo";
+            string sql = @"SELECT COUNT(Correlativo) FROM Rutinas
+                           WHERE Codigo_empleado = @CodigoEmpleado AND Fecha >= @LimiteTiempo";
 
-            int count = 0;
-
-            using (SqlConnection conn = new SqlConnection(connectionString)) // Asegúrate de tener ConnString definido
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@CodigoEmpleado", codigoEmpleado);
                 cmd.Parameters.AddWithValue("@LimiteTiempo", limiteTiempo);
-
-                count = (int)cmd.ExecuteScalar();
+                return (int)cmd.ExecuteScalar() > 0;
             }
+        }
 
-            // Si la cuenta es mayor que cero, la rutina ya existe.
-            return count > 0;
+        private DateTime ObtenerInicioTurnoActual()
+        {
+            DateTime ahora = DateTime.Now;
+            TimeSpan hora  = ahora.TimeOfDay;
+
+            if (hora >= new TimeSpan(6, 0, 0) && hora < new TimeSpan(14, 0, 0))
+                return ahora.Date.AddHours(6);          // Mañana:  desde 06:00 hoy
+            if (hora >= new TimeSpan(14, 0, 0) && hora < new TimeSpan(22, 0, 0))
+                return ahora.Date.AddHours(14);         // Tarde:   desde 14:00 hoy
+            if (hora >= new TimeSpan(22, 0, 0))
+                return ahora.Date.AddHours(22);         // Noche:   desde 22:00 hoy
+            return ahora.Date.AddDays(-1).AddHours(22); // Madrugada: desde 22:00 ayer
         }
     }
 }

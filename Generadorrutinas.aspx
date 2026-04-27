@@ -8,6 +8,23 @@
     <title>Creando Formulario</title>
     <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="estilosgenerador.css"/>
+    <style type="text/css">
+        @media screen {
+            .aux-panel { display:flex; justify-content:center; align-items:center; min-height:80vh; }
+            .aux-card  { background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.13); border-top:4px solid var(--c-primary); padding:32px 40px; min-width:360px; max-width:480px; }
+            .aux-titulo { color:var(--c-primary-dark); font-size:1.15em; font-weight:700; text-align:center; margin:0 0 22px; }
+            .aux-opcion-label { display:flex; align-items:center; gap:10px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+            .aux-opcion-label input[type="radio"] { width:17px; height:17px; accent-color:var(--c-primary); cursor:pointer; }
+            .aux-sub  { margin-left:28px; margin-bottom:12px; }
+            .aux-ddl  { width:100%; padding:7px 10px; border:1.5px solid var(--c-border); border-radius:6px; font-size:0.95em; margin-top:4px; }
+            .aux-cantidad-lbl { font-size:0.9em; color:#555; }
+            .aux-cant { width:64px; padding:5px 8px; border:1.5px solid var(--c-border); border-radius:6px; text-align:center; font-size:1em; margin-top:4px; }
+            .aux-btn-generar { display:block; width:100%; margin-top:24px; padding:13px; background:linear-gradient(135deg,var(--c-primary) 0%,var(--c-primary-dark) 100%); color:#fff; border:none; border-radius:8px; font-size:1.05em; font-weight:700; letter-spacing:0.04em; cursor:pointer; transition:transform 0.15s,filter 0.15s; }
+            .aux-btn-generar:hover { transform:translateY(-2px); filter:brightness(1.08); }
+            .aux-msg  { display:block; margin-top:8px; font-size:0.9em; color:#c00; text-align:center; }
+        }
+        @media print { .aux-panel { display:none !important; } }
+    </style>
     </head>
 <body>
     <form id="form1" runat="server">
@@ -33,6 +50,31 @@
                 </div>
             </div>
         </div>
+
+    <%-- PANEL AUXILIAR: elección de tipo de rutina --%>
+    <asp:Panel ID="pnlOpcionAuxiliar" runat="server" Visible="false" CssClass="aux-panel">
+        <div class="aux-card">
+            <h3 class="aux-titulo">¿Qué tipo de rutina va a realizar?</h3>
+            <label class="aux-opcion-label">
+                <asp:RadioButton ID="rdoRelevar" runat="server" GroupName="grpTipoAux" CssClass="aux-rdo-relevar" />
+                Relevar a un instrumentista
+            </label>
+            <div id="divRelevar" class="aux-sub" style="display:none;">
+                <asp:DropDownList ID="ddlInstrumentistas" runat="server" CssClass="aux-ddl" />
+            </div>
+            <label class="aux-opcion-label" style="margin-top:10px;">
+                <asp:RadioButton ID="rdoTachos" runat="server" GroupName="grpTipoAux" CssClass="aux-rdo-tachos" />
+                Rutina de TACHOS
+            </label>
+            <div id="divTachos" class="aux-sub" style="display:none;">
+                <label class="aux-cantidad-lbl">Cantidad de equipos Brix:</label><br />
+                <asp:TextBox ID="txtCantTachos" runat="server" Text="4" CssClass="aux-cant" MaxLength="2" />
+            </div>
+            <asp:Button ID="btnGenerarAuxiliar" runat="server" Text="GENERAR RUTINA"
+                CssClass="aux-btn-generar" OnClick="btnGenerarAuxiliar_Click" />
+            <asp:Label ID="lblAuxMsg" runat="server" Text="" CssClass="aux-msg" />
+        </div>
+    </asp:Panel>
 
     <%-- TABLA 1: INSTRUMENTOS --%>
     <asp:Panel ID="pnlInstrumentos" runat="server">
