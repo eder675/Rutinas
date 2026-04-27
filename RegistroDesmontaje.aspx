@@ -41,11 +41,11 @@
                                 <span class="rdm-nombre"><%# Eval("NombreInstrumento") %></span>
                                 <div class="rdm-radio-group">
                                     <label class="rdm-radio-label rdm-radio-si">
-                                        <asp:RadioButton ID="rdoDesmontado"   runat="server" GroupName="grpDesmontaje" />
+                                        <asp:RadioButton ID="rdoDesmontado"   runat="server" GroupName="grpDesmontaje" CssClass="rdm-rdo-si" />
                                         Desmontado
                                     </label>
                                     <label class="rdm-radio-label rdm-radio-no">
-                                        <asp:RadioButton ID="rdoNoDesmontado" runat="server" GroupName="grpDesmontaje" />
+                                        <asp:RadioButton ID="rdoNoDesmontado" runat="server" GroupName="grpDesmontaje" CssClass="rdm-rdo-no" />
                                         No desmontado
                                     </label>
                                 </div>
@@ -57,7 +57,7 @@
                                     <label>Motivo por el que no se desmontó:</label>
                                     <asp:DropDownList ID="ddlRazon" runat="server" CssClass="rdm-select">
                                         <asp:ListItem Value="">-- Seleccione --</asp:ListItem>
-                                        <asp:ListItem Value="Falta de tiempo">Falta de tiempo</asp:ListItem>
+                                        <asp:ListItem Value="Falta de tiempo" Selected="True">Falta de tiempo</asp:ListItem>
                                         <asp:ListItem Value="Acceso restringido">Acceso restringido</asp:ListItem>
                                         <asp:ListItem Value="Falta de herramienta">Falta de herramienta</asp:ListItem>
                                         <asp:ListItem Value="Equipo en operacion">Equipo en operación</asp:ListItem>
@@ -87,18 +87,18 @@
         window.addEventListener('load', function () {
             var items = document.querySelectorAll('.rdm-item');
             items.forEach(function (item) {
-                var rdoSi  = item.querySelector('input[id$="rdoDesmontado"]');
-                var rdoNo  = item.querySelector('input[id$="rdoNoDesmontado"]');
-                var panel  = item.querySelector('.rdm-razon-panel');
-                var lblSi  = item.querySelector('.rdm-radio-si');
-                var lblNo  = item.querySelector('.rdm-radio-no');
+                var rdoSi = item.querySelector('input.rdm-rdo-si');
+                var rdoNo = item.querySelector('input.rdm-rdo-no');
+                var panel = item.querySelector('.rdm-razon-panel');
+                var lblSi = item.querySelector('.rdm-radio-si');
+                var lblNo = item.querySelector('.rdm-radio-no');
                 if (!panel) return;
 
                 function actualizar() {
                     if (rdoNo && rdoNo.checked) {
                         panel.classList.add('visible');
-                        if (lblSi) lblSi.classList.remove('marcado');
                         if (lblNo) lblNo.classList.add('marcado');
+                        if (lblSi) lblSi.classList.remove('marcado');
                     } else {
                         panel.classList.remove('visible');
                         if (lblNo) lblNo.classList.remove('marcado');
