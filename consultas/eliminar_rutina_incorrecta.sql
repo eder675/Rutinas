@@ -59,7 +59,7 @@ SELECT * FROM Rutina_desmontaje  WHERE RutinaId    = 999;
 --  Usar cuando el empleado Auxiliar (16134) generó una rutina
 --  de TACHOS incorrecta. Solo tiene registros en Rutina_instrumento
 --  con EsObligatorio=1. No tiene entradas en Rutina_desmontaje.
-
+USE REPORTES
 --  PASO 2A: Identificar el correlativo de TACHOS del Auxiliar
 SELECT TOP 5
     R.Correlativo,
@@ -83,17 +83,17 @@ SELECT
     CASE RI.EsObligatorio WHEN 1 THEN 'OBLIGATORIO/TACHOS' ELSE 'regular' END AS Tipo
 FROM Rutina_instrumento RI
 INNER JOIN Instrumentos I ON RI.TAG = I.TAG
-WHERE RI.Correlativo = 999;              -- <-- reemplazar con el Correlativo
+WHERE RI.Correlativo = 204;              -- <-- reemplazar con el Correlativo
 
 --  ELIMINACIÓN — rutina TACHOS (no hay entradas en Rutina_desmontaje)
 BEGIN TRANSACTION;
-    DELETE FROM Rutina_instrumento WHERE Correlativo = 999;  -- <-- Correlativo
-    DELETE FROM Rutinas            WHERE Correlativo = 999;  -- <-- Correlativo
+    DELETE FROM Rutina_instrumento WHERE Correlativo = 204;  -- <-- Correlativo
+    DELETE FROM Rutinas            WHERE Correlativo = 204;  -- <-- Correlativo
 COMMIT TRANSACTION;
 
 --  Verificación post-eliminación (deben devolver 0 filas):
-SELECT * FROM Rutinas            WHERE Correlativo = 999;
-SELECT * FROM Rutina_instrumento WHERE Correlativo = 999;
+SELECT * FROM Rutinas            WHERE Correlativo = 204;
+SELECT * FROM Rutina_instrumento WHERE Correlativo = 204;
 
 
 -- ===========================================================
@@ -125,17 +125,17 @@ SELECT
     CASE RI.EsObligatorio WHEN 1 THEN 'OBLIGATORIO' ELSE 'regular' END AS Tipo
 FROM Rutina_instrumento RI
 INNER JOIN Instrumentos I ON RI.TAG = I.TAG
-WHERE RI.Correlativo = 999;              -- <-- reemplazar con el Correlativo
+WHERE RI.Correlativo = 205;              -- <-- reemplazar con el Correlativo
 
 --  ELIMINACIÓN — rutina relevado (no hay entradas en Rutina_desmontaje)
 BEGIN TRANSACTION;
-    DELETE FROM Rutina_instrumento WHERE Correlativo = 999;  -- <-- Correlativo
-    DELETE FROM Rutinas            WHERE Correlativo = 999;  -- <-- Correlativo
+    DELETE FROM Rutina_instrumento WHERE Correlativo = 205;  -- <-- Correlativo
+    DELETE FROM Rutinas            WHERE Correlativo = 205;  -- <-- Correlativo
 COMMIT TRANSACTION;
 
 --  Verificación post-eliminación (deben devolver 0 filas):
-SELECT * FROM Rutinas            WHERE Correlativo = 999;
-SELECT * FROM Rutina_instrumento WHERE Correlativo = 999;
+SELECT * FROM Rutinas            WHERE Correlativo = 205;
+SELECT * FROM Rutina_instrumento WHERE Correlativo = 205;
 
 
 -- ============================================================

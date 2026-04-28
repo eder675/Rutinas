@@ -872,7 +872,7 @@ namespace Rutinas
                 var brix = EjecutarConsultaObligatorios(sqlBrix);
                 if (brix.Count < CANT_OBL_BRIX_G2[t])
                 {
-                    // Fallback: no hay suficientes instrumentos Brix nuevos, se permite repetir
+                    // Fallback: pool agotado — selecciona los menos usados recientemente
                     string sqlBrixFallback = $@"
                         SELECT TOP {CANT_OBL_BRIX_G2[t]}
                             I.TAG,
@@ -880,8 +880,15 @@ namespace Rutinas
                             A.Nombre AS NombreArea
                         FROM Instrumentos I
                         INNER JOIN Area A ON I.IDarea = A.IDarea
+                        LEFT JOIN (
+                            SELECT RI.TAG, MAX(R.Fecha) AS UltimoUso
+                            FROM Rutina_instrumento RI
+                            INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
+                            WHERE RI.EsObligatorio = 1
+                            GROUP BY RI.TAG
+                        ) UU ON I.TAG = UU.TAG
                         WHERE I.TipoAnalisis = 'Brix'
-                        ORDER BY NEWID()";
+                        ORDER BY ISNULL(UU.UltimoUso, '19000101') ASC";
                     brix = EjecutarConsultaObligatorios(sqlBrixFallback);
                 }
                 lista.AddRange(brix);
@@ -1057,7 +1064,7 @@ namespace Rutinas
 
             var lista = EjecutarConsultaObligatorios(sql);
 
-            // Fallback: si no hay suficientes Brix sin repetir, permitir repetir
+            // Fallback: pool agotado — selecciona los menos usados recientemente
             if (lista.Count < cantidad)
             {
                 sql = $@"
@@ -1067,8 +1074,15 @@ namespace Rutinas
                         A.Nombre AS NombreArea
                     FROM Instrumentos I
                     INNER JOIN Area A ON I.IDarea = A.IDarea
+                    LEFT JOIN (
+                        SELECT RI.TAG, MAX(R.Fecha) AS UltimoUso
+                        FROM Rutina_instrumento RI
+                        INNER JOIN Rutinas R ON RI.Correlativo = R.Correlativo
+                        WHERE RI.EsObligatorio = 1
+                        GROUP BY RI.TAG
+                    ) UU ON I.TAG = UU.TAG
                     WHERE I.TipoAnalisis = 'Brix'
-                    ORDER BY NEWID()";
+                    ORDER BY ISNULL(UU.UltimoUso, '19000101') ASC";
                 lista = EjecutarConsultaObligatorios(sql);
             }
             return lista;
