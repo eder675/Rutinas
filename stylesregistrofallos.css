@@ -9,7 +9,7 @@ body {
     margin: 0;
     min-height: 100vh;
     background-color: var(--c-bg);
-    background-image: url('media/IngenioLaCabana.jpg');
+    d-background-image: url('media/IngenioLaCabana.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -190,6 +190,69 @@ body {
     transform: translateY(0);
     filter: brightness(0.95);
     box-shadow: var(--sh-sm);
+}
+
+/* ── BÚSQUEDA DE INSTRUMENTO ── */
+.rf-search-wrap {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.rf-autocomplete {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1.5px solid var(--c-border);
+    border-top: none;
+    border-radius: 0 0 var(--r-sm) var(--r-sm);
+    box-shadow: var(--sh-md);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.rf-ac-item {
+    padding: 9px 12px;
+    font-size: 0.88em;
+    cursor: pointer;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-text);
+    transition: background var(--t-fast);
+}
+
+.rf-ac-item:last-child { border-bottom: none; }
+
+.rf-ac-item:hover { background: #f0faf0; }
+
+.rf-ac-empty {
+    color: var(--c-text-muted);
+    cursor: default;
+    font-style: italic;
+}
+
+.rf-tag-desc {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.rf-tag-desc-full { flex: 1; }
+
+.rf-label-sm {
+    display: block;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    margin-bottom: 4px;
+}
+
+.rf-input-readonly {
+    background: var(--c-bg) !important;
+    color: var(--c-text-muted);
+    cursor: default;
 }
 
 /* ── RESPONSIVO ── */

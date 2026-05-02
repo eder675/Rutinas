@@ -15,19 +15,27 @@
         <nav>
             <ul>
                 <li>
-                    <asp:Button ID="registros" 
-                                runat="server" 
+                    <asp:Button ID="registros"
+                                runat="server"
                                 Text="REGISTROS DE RUTINAS"
                                 OnClick="registros_Click"
                                 CssClass="nav-button-link"/>
-                    </li> 
+                </li>
                 <li>
-            <asp:Button 
-                ID="logout" 
-                runat="server" 
-                Text="CERRAR SESION" 
-                OnClick="logout_Click"
-                CssClass="nav-button-link" /> </li>
+                    <asp:Button ID="btnFallos"
+                                runat="server"
+                                Text="REGISTRO DE FALLOS"
+                                OnClick="btnFallos_Click"
+                                CssClass="nav-button-link" />
+                </li>
+                <li>
+                    <asp:Button
+                        ID="logout"
+                        runat="server"
+                        Text="CERRAR SESION"
+                        OnClick="logout_Click"
+                        CssClass="nav-button-link" />
+                </li>
                 <li>
                 </li>
             </ul>
