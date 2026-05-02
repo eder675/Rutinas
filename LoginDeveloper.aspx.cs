@@ -35,6 +35,7 @@ namespace Rutinas
             if (viewIndex == 2) gvarea.DataBind();
             if (viewIndex == 3) gvinstrumentos.DataBind();
             if (viewIndex == 4) CargarConfigDesmontaje();
+            if (viewIndex == 5) CargarEmpleadosBorrar();
         }
 
         #region config desmontaje
@@ -697,5 +698,89 @@ namespace Rutinas
             }
         }
     }
+        #endregion
+
+        #region borrar rutina
+        private void CargarEmpleadosBorrar()
+        {
+            lblMsgBorrar.Text = string.Empty;
+            txtCorrelativoBorrar.Text = string.Empty;
+            ddlEmpleadoBorrar.Items.Clear();
+            ddlEmpleadoBorrar.Items.Add(new ListItem("-- Seleccione empleado --", ""));
+
+            string sql = "SELECT Codigo_empleado, Nombre FROM Empleado ORDER BY Nombre";
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                using (SqlDataReader dr = new SqlCommand(sql, conn).ExecuteReader())
+                    while (dr.Read())
+                        ddlEmpleadoBorrar.Items.Add(new ListItem(
+                            dr["Nombre"].ToString(),
+                            dr["Codigo_empleado"].ToString()));
+            }
+        }
+
+        protected void btnBorrarRutina_Click(object sender, EventArgs e)
+        {
+            lblMsgBorrar.ForeColor = System.Drawing.Color.Red;
+
+            if (!int.TryParse(txtCorrelativoBorrar.Text.Trim(), out int correlativo) || correlativo <= 0)
+            {
+                lblMsgBorrar.Text = "Ingrese un correlativo valido.";
+                return;
+            }
+
+            string codigoEmpleado = ddlEmpleadoBorrar.SelectedValue;
+            if (string.IsNullOrEmpty(codigoEmpleado))
+            {
+                lblMsgBorrar.Text = "Seleccione un empleado.";
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+
+                    // Verificar que el correlativo pertenece al empleado seleccionado
+                    string sqlVerificar = "SELECT COUNT(1) FROM Rutinas WHERE Correlativo = @Corr AND Codigo_empleado = @Emp";
+                    SqlCommand cmdVerificar = new SqlCommand(sqlVerificar, conn);
+                    cmdVerificar.Parameters.AddWithValue("@Corr", correlativo);
+                    cmdVerificar.Parameters.AddWithValue("@Emp", codigoEmpleado);
+                    int existe = (int)cmdVerificar.ExecuteScalar();
+
+                    if (existe == 0)
+                    {
+                        lblMsgBorrar.Text = $"El correlativo {correlativo} no pertenece al empleado seleccionado.";
+                        return;
+                    }
+
+                    using (SqlTransaction tx = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            new SqlCommand($"DELETE FROM Rutina_desmontaje  WHERE RutinaId   = {correlativo}", conn, tx).ExecuteNonQuery();
+                            new SqlCommand($"DELETE FROM Rutina_instrumento WHERE Correlativo = {correlativo}", conn, tx).ExecuteNonQuery();
+                            new SqlCommand($"DELETE FROM Rutinas            WHERE Correlativo = {correlativo}", conn, tx).ExecuteNonQuery();
+                            tx.Commit();
+                        }
+                        catch
+                        {
+                            tx.Rollback();
+                            throw;
+                        }
+                    }
+                }
+
+                lblMsgBorrar.ForeColor = System.Drawing.Color.Green;
+                lblMsgBorrar.Text = $"Rutina {correlativo} eliminada correctamente.";
+                txtCorrelativoBorrar.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                lblMsgBorrar.Text = $"Error al borrar la rutina: {ex.Message}";
+            }
+        }
         #endregion
 }

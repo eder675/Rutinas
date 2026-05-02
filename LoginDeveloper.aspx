@@ -65,6 +65,14 @@
         </li>
         <li>
             <asp:LinkButton
+            ID="lnkBorrarRutina"
+            runat="server"
+            Text="Borrar rutina."
+            OnClick="lnk_Click"
+            CommandArgument="5" />
+        </li>
+        <li>
+            <asp:LinkButton
             ID="lnkLogout"
             runat="server"
             Text="Cerrar sesion."
@@ -472,6 +480,38 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                             </asp:TemplateField>
                         </Columns>
                     </asp:GridView>
+                </fieldset>
+            </asp:View>
+            <asp:View ID="vborrarrutina" runat="server">
+                <fieldset style="max-width:480px; padding:16px;">
+                    <legend><b>Borrar rutina</b></legend>
+                    <table cellspacing="6">
+                        <tr>
+                            <td><b>Empleado:</b></td>
+                            <td>
+                                <asp:DropDownList ID="ddlEmpleadoBorrar" runat="server" Style="width:280px;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Correlativo:</b></td>
+                            <td>
+                                <asp:TextBox ID="txtCorrelativoBorrar" runat="server" MaxLength="10" Style="width:120px;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <asp:Button ID="btnBorrarRutina" runat="server" Text="BORRAR RUTINA"
+                                    OnClick="btnBorrarRutina_Click"
+                                    OnClientClick="return confirm('¿Confirma que desea borrar esta rutina? La accion no se puede deshacer.');"
+                                    Style="padding:6px 18px; background:#c0392b; color:#fff; border:none; cursor:pointer;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <asp:Label ID="lblMsgBorrar" runat="server" Text="" />
+                            </td>
+                        </tr>
+                    </table>
                 </fieldset>
             </asp:View>
         </asp:MultiView>
