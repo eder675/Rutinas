@@ -207,7 +207,7 @@ namespace Rutinas
                 {
                     string respuesta = reader.ReadToEnd().Trim();
                     if (int.TryParse(respuesta, out int diaZafra))
-                        return diaZafra;
+                        return diaZafra + (DateTime.Now.Hour < 7 ? 1 : 0);
                 }
             }
             catch { }
