@@ -1033,6 +1033,9 @@ namespace Rutinas
 
             List<ItemRutina> tachos = SeleccionarInstrumentosTachos(cantidad);
 
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                tachos.AddRange(SeleccionarEquiposAPeso());
+
             // Guardar cabecera de rutina bajo código del Auxiliar (IDgrupo 2 = Alcalizado/Brix)
             int correlativo = GuardarCabeceraRutina(codigoAuxiliar, turnoActual, 2);
 
@@ -1086,6 +1089,17 @@ namespace Rutinas
                 lista = EjecutarConsultaObligatorios(sql);
             }
             return lista;
+        }
+
+        private List<ItemRutina> SeleccionarEquiposAPeso()
+        {
+            string sql = @"
+                SELECT I.TAG, I.Nombre AS NombreInstrumento, A.Nombre AS NombreArea
+                FROM Instrumentos I
+                INNER JOIN Area A ON I.IDarea = A.IDarea
+                WHERE I.TipoAnalisis = 'A-Peso'
+                ORDER BY A.Nombre, I.Nombre";
+            return EjecutarConsultaObligatorios(sql);
         }
 
         private int GuardarCabeceraRutina(string codigoEmpleado, string turnoActual, int idGrupo)
