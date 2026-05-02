@@ -15,7 +15,7 @@ namespace Rutinas
 {
     public partial class LoginDeveloper : System.Web.UI.Page
     {
-        private readonly string ConnString        = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+        private readonly string ConnString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
         private readonly string VinetasConnString = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -54,10 +54,10 @@ namespace Rutinas
                     {
                         chkMostrarInstrumentos.Checked = Convert.ToBoolean(dr["MostrarTablaInstrumentos"]);
                         chkMostrarObligatorios.Checked = Convert.ToBoolean(dr["MostrarTablaObligatorios"]);
-                        chkMostrarDesmontaje.Checked   = Convert.ToBoolean(dr["MostrarTablaDesmontaje"]);
-                        txtCantManana.Text             = dr["CantManana"].ToString();
-                        txtCantTarde.Text              = dr["CantTarde"].ToString();
-                        txtCantNoche.Text              = dr["CantNoche"].ToString();
+                        chkMostrarDesmontaje.Checked = Convert.ToBoolean(dr["MostrarTablaDesmontaje"]);
+                        txtCantManana.Text = dr["CantManana"].ToString();
+                        txtCantTarde.Text = dr["CantTarde"].ToString();
+                        txtCantNoche.Text = dr["CantNoche"].ToString();
                     }
                 }
             }
@@ -69,8 +69,8 @@ namespace Rutinas
                 conn.Open();
                 new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
             }
-            cblAreas.DataSource     = dtAreas;
-            cblAreas.DataTextField  = "Nombre";
+            cblAreas.DataSource = dtAreas;
+            cblAreas.DataTextField = "Nombre";
             cblAreas.DataValueField = "IDarea";
             cblAreas.DataBind();
 
@@ -129,8 +129,8 @@ namespace Rutinas
                     conn.Open();
                     new SqlDataAdapter(new SqlCommand(sqlVinetas, conn)).Fill(dtVinetas);
                 }
-                ddlInst.DataSource     = dtVinetas;
-                ddlInst.DataTextField  = "Descripcion";
+                ddlInst.DataSource = dtVinetas;
+                ddlInst.DataTextField = "Descripcion";
                 ddlInst.DataValueField = "TAG";
                 ddlInst.DataBind();
                 ddlInst.Items.Insert(0, new ListItem("-- Seleccione equipo --", ""));
@@ -146,8 +146,8 @@ namespace Rutinas
                     conn.Open();
                     new SqlDataAdapter("SELECT IDarea, Nombre FROM Area ORDER BY IDarea", conn).Fill(dtAreas);
                 }
-                ddlArea.DataSource     = dtAreas;
-                ddlArea.DataTextField  = "Nombre";
+                ddlArea.DataSource = dtAreas;
+                ddlArea.DataTextField = "Nombre";
                 ddlArea.DataValueField = "IDarea";
                 ddlArea.DataBind();
                 ddlArea.Items.Insert(0, new ListItem("-- Seleccione área --", ""));
@@ -158,8 +158,8 @@ namespace Rutinas
         {
             int cantManana = 0, cantTarde = 0, cantNoche = 0;
             int.TryParse(txtCantManana.Text.Trim(), out cantManana);
-            int.TryParse(txtCantTarde.Text.Trim(),  out cantTarde);
-            int.TryParse(txtCantNoche.Text.Trim(),  out cantNoche);
+            int.TryParse(txtCantTarde.Text.Trim(), out cantTarde);
+            int.TryParse(txtCantNoche.Text.Trim(), out cantNoche);
 
             using (SqlConnection conn = new SqlConnection(ConnString))
             {
@@ -176,11 +176,11 @@ namespace Rutinas
                         WHERE Id = 1";
                     SqlCommand cmdCfg = new SqlCommand(sqlCfg, conn, tx);
                     cmdCfg.Parameters.AddWithValue("@Inst", chkMostrarInstrumentos.Checked ? 1 : 0);
-                    cmdCfg.Parameters.AddWithValue("@Obl",  chkMostrarObligatorios.Checked ? 1 : 0);
-                    cmdCfg.Parameters.AddWithValue("@Des",  chkMostrarDesmontaje.Checked   ? 1 : 0);
-                    cmdCfg.Parameters.AddWithValue("@M",    cantManana);
-                    cmdCfg.Parameters.AddWithValue("@T",    cantTarde);
-                    cmdCfg.Parameters.AddWithValue("@N",    cantNoche);
+                    cmdCfg.Parameters.AddWithValue("@Obl", chkMostrarObligatorios.Checked ? 1 : 0);
+                    cmdCfg.Parameters.AddWithValue("@Des", chkMostrarDesmontaje.Checked ? 1 : 0);
+                    cmdCfg.Parameters.AddWithValue("@M", cantManana);
+                    cmdCfg.Parameters.AddWithValue("@T", cantTarde);
+                    cmdCfg.Parameters.AddWithValue("@N", cantNoche);
                     cmdCfg.ExecuteNonQuery();
 
                     // Reconstruir áreas habilitadas (borrar todo y re-insertar marcadas)
@@ -197,13 +197,13 @@ namespace Rutinas
                     }
 
                     tx.Commit();
-                    lblConfigMsg.Text      = "Configuración guardada correctamente.";
+                    lblConfigMsg.Text = "Configuración guardada correctamente.";
                     lblConfigMsg.ForeColor = System.Drawing.Color.Green;
                 }
                 catch (Exception ex)
                 {
                     tx.Rollback();
-                    lblConfigMsg.Text      = "Error al guardar: " + ex.Message;
+                    lblConfigMsg.Text = "Error al guardar: " + ex.Message;
                     lblConfigMsg.ForeColor = System.Drawing.Color.Red;
                 }
             }
@@ -257,9 +257,9 @@ namespace Rutinas
                 if (ddlInst == null || string.IsNullOrEmpty(ddlInst.SelectedValue) ||
                     ddlArea == null || string.IsNullOrEmpty(ddlArea.SelectedValue)) return;
 
-                string tag    = ddlInst.SelectedValue;
+                string tag = ddlInst.SelectedValue;
                 string nombre = ddlInst.SelectedItem?.Text ?? tag;
-                int    areaId = Convert.ToInt32(ddlArea.SelectedValue);
+                int areaId = Convert.ToInt32(ddlArea.SelectedValue);
 
                 using (SqlConnection conn = new SqlConnection(ConnString))
                 {
@@ -272,7 +272,7 @@ namespace Rutinas
                         SqlCommand cmdIns = new SqlCommand(@"
                             INSERT INTO DesmontajeInstrumento (TAG, Nombre, AreaId, Estado)
                             VALUES (@TAG, @Nombre, @AreaId, 0)", conn);
-                        cmdIns.Parameters.AddWithValue("@TAG",    tag);
+                        cmdIns.Parameters.AddWithValue("@TAG", tag);
                         cmdIns.Parameters.AddWithValue("@Nombre", nombre);
                         cmdIns.Parameters.AddWithValue("@AreaId", areaId);
                         cmdIns.ExecuteNonQuery();
@@ -305,8 +305,8 @@ namespace Rutinas
             }
 
             string btnUniqueId = btnGuardarAsignaciones.UniqueID;
-            string onEnter     = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
-            string iStyle      = "font-size:0.85em;width:155px;margin-top:3px;display:block;";
+            string onEnter = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
+            string iStyle = "font-size:0.85em;width:155px;margin-top:3px;display:block;";
 
             string Kw(DataRow r, string col) =>
                 r[col] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(r[col].ToString()) : "";
@@ -314,7 +314,7 @@ namespace Rutinas
             var sb = new System.Text.StringBuilder();
             foreach (DataRow row in dtEmps.Rows)
             {
-                string cod    = System.Web.HttpUtility.HtmlEncode(row["Codigo_empleado"].ToString());
+                string cod = System.Web.HttpUtility.HtmlEncode(row["Codigo_empleado"].ToString());
                 string nombre = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
 
                 sb.Append("<tr>");
@@ -322,32 +322,32 @@ namespace Rutinas
 
                 // Columna INCLUIR (11 textboxes)
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
-                sb.Append($"<input type=\"text\" name=\"kw1_{cod}\" value=\"{Kw(row,"Keyword1")}\" placeholder=\"Incluir 1\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw2_{cod}\" value=\"{Kw(row,"Keyword2")}\" placeholder=\"Incluir 2\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw3_{cod}\" value=\"{Kw(row,"Keyword3")}\" placeholder=\"Incluir 3\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw4_{cod}\" value=\"{Kw(row,"Keyword4")}\" placeholder=\"Incluir 4\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw5_{cod}\" value=\"{Kw(row,"Keyword5")}\" placeholder=\"Incluir 5\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw6_{cod}\" value=\"{Kw(row,"Keyword6")}\" placeholder=\"Incluir 6\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw7_{cod}\" value=\"{Kw(row,"Keyword7")}\" placeholder=\"Incluir 7\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw8_{cod}\" value=\"{Kw(row,"Keyword8")}\" placeholder=\"Incluir 8\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw9_{cod}\" value=\"{Kw(row,"Keyword9")}\" placeholder=\"Incluir 9\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw10_{cod}\" value=\"{Kw(row,"Keyword10")}\" placeholder=\"Incluir 10\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kw11_{cod}\" value=\"{Kw(row,"Keyword11")}\" placeholder=\"Incluir 11\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw1_{cod}\" value=\"{Kw(row, "Keyword1")}\" placeholder=\"Incluir 1\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw2_{cod}\" value=\"{Kw(row, "Keyword2")}\" placeholder=\"Incluir 2\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw3_{cod}\" value=\"{Kw(row, "Keyword3")}\" placeholder=\"Incluir 3\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw4_{cod}\" value=\"{Kw(row, "Keyword4")}\" placeholder=\"Incluir 4\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw5_{cod}\" value=\"{Kw(row, "Keyword5")}\" placeholder=\"Incluir 5\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw6_{cod}\" value=\"{Kw(row, "Keyword6")}\" placeholder=\"Incluir 6\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw7_{cod}\" value=\"{Kw(row, "Keyword7")}\" placeholder=\"Incluir 7\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw8_{cod}\" value=\"{Kw(row, "Keyword8")}\" placeholder=\"Incluir 8\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw9_{cod}\" value=\"{Kw(row, "Keyword9")}\" placeholder=\"Incluir 9\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw10_{cod}\" value=\"{Kw(row, "Keyword10")}\" placeholder=\"Incluir 10\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kw11_{cod}\" value=\"{Kw(row, "Keyword11")}\" placeholder=\"Incluir 11\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
                 sb.Append("</td>");
 
                 // Columna EXCLUIR (11 textboxes)
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;'>");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir1_{cod}\" value=\"{Kw(row,"ExcludeKeyword1")}\" placeholder=\"Excluir 1\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir2_{cod}\" value=\"{Kw(row,"ExcludeKeyword2")}\" placeholder=\"Excluir 2\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir3_{cod}\" value=\"{Kw(row,"ExcludeKeyword3")}\" placeholder=\"Excluir 3\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir4_{cod}\" value=\"{Kw(row,"ExcludeKeyword4")}\" placeholder=\"Excluir 4\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir5_{cod}\" value=\"{Kw(row,"ExcludeKeyword5")}\" placeholder=\"Excluir 5\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir6_{cod}\" value=\"{Kw(row,"ExcludeKeyword6")}\" placeholder=\"Excluir 6\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir7_{cod}\" value=\"{Kw(row,"ExcludeKeyword7")}\" placeholder=\"Excluir 7\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir8_{cod}\" value=\"{Kw(row,"ExcludeKeyword8")}\" placeholder=\"Excluir 8\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir9_{cod}\" value=\"{Kw(row,"ExcludeKeyword9")}\" placeholder=\"Excluir 9\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir10_{cod}\" value=\"{Kw(row,"ExcludeKeyword10")}\" placeholder=\"Excluir 10\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
-                sb.Append($"<input type=\"text\" name=\"kwExcluir11_{cod}\" value=\"{Kw(row,"ExcludeKeyword11")}\" placeholder=\"Excluir 11\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir1_{cod}\" value=\"{Kw(row, "ExcludeKeyword1")}\" placeholder=\"Excluir 1\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir2_{cod}\" value=\"{Kw(row, "ExcludeKeyword2")}\" placeholder=\"Excluir 2\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir3_{cod}\" value=\"{Kw(row, "ExcludeKeyword3")}\" placeholder=\"Excluir 3\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir4_{cod}\" value=\"{Kw(row, "ExcludeKeyword4")}\" placeholder=\"Excluir 4\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir5_{cod}\" value=\"{Kw(row, "ExcludeKeyword5")}\" placeholder=\"Excluir 5\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir6_{cod}\" value=\"{Kw(row, "ExcludeKeyword6")}\" placeholder=\"Excluir 6\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir7_{cod}\" value=\"{Kw(row, "ExcludeKeyword7")}\" placeholder=\"Excluir 7\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir8_{cod}\" value=\"{Kw(row, "ExcludeKeyword8")}\" placeholder=\"Excluir 8\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir9_{cod}\" value=\"{Kw(row, "ExcludeKeyword9")}\" placeholder=\"Excluir 9\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir10_{cod}\" value=\"{Kw(row, "ExcludeKeyword10")}\" placeholder=\"Excluir 10\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append($"<input type=\"text\" name=\"kwExcluir11_{cod}\" value=\"{Kw(row, "ExcludeKeyword11")}\" placeholder=\"Excluir 11\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
                 sb.Append("</td>");
 
                 sb.Append("</tr>");
@@ -364,7 +364,7 @@ namespace Rutinas
             sb.Append($"<option value='{primerVal}'{sel}>{System.Web.HttpUtility.HtmlEncode(primerLabel)}</option>");
             foreach (DataRow row in dtAreas.Rows)
             {
-                string id  = row["IDarea"].ToString();
+                string id = row["IDarea"].ToString();
                 string nom = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
                 sel = (id == selectedValue && !string.IsNullOrEmpty(selectedValue)) ? " selected" : "";
                 sb.Append($"<option value='{id}'{sel}>{nom}</option>");
@@ -393,31 +393,32 @@ namespace Rutinas
                 {
                     string codigo = empRow["Codigo_empleado"].ToString();
 
-                    object Leer(string campo) {
+                    object Leer(string campo)
+                    {
                         string v = Request.Form[campo + "_" + codigo];
                         return string.IsNullOrWhiteSpace(v) ? (object)DBNull.Value : v.Trim();
                     }
 
-                    object kw1    = Leer("kw1");
-                    object kw2    = Leer("kw2");
-                    object kw3    = Leer("kw3");
-                    object kw4    = Leer("kw4");
-                    object kw5    = Leer("kw5");
-                    object kw6    = Leer("kw6");
-                    object kw7    = Leer("kw7");
-                    object kw8    = Leer("kw8");
-                    object kw9    = Leer("kw9");
-                    object kw10   = Leer("kw10");
-                    object kw11   = Leer("kw11");
-                    object kwEx1  = Leer("kwExcluir1");
-                    object kwEx2  = Leer("kwExcluir2");
-                    object kwEx3  = Leer("kwExcluir3");
-                    object kwEx4  = Leer("kwExcluir4");
-                    object kwEx5  = Leer("kwExcluir5");
-                    object kwEx6  = Leer("kwExcluir6");
-                    object kwEx7  = Leer("kwExcluir7");
-                    object kwEx8  = Leer("kwExcluir8");
-                    object kwEx9  = Leer("kwExcluir9");
+                    object kw1 = Leer("kw1");
+                    object kw2 = Leer("kw2");
+                    object kw3 = Leer("kw3");
+                    object kw4 = Leer("kw4");
+                    object kw5 = Leer("kw5");
+                    object kw6 = Leer("kw6");
+                    object kw7 = Leer("kw7");
+                    object kw8 = Leer("kw8");
+                    object kw9 = Leer("kw9");
+                    object kw10 = Leer("kw10");
+                    object kw11 = Leer("kw11");
+                    object kwEx1 = Leer("kwExcluir1");
+                    object kwEx2 = Leer("kwExcluir2");
+                    object kwEx3 = Leer("kwExcluir3");
+                    object kwEx4 = Leer("kwExcluir4");
+                    object kwEx5 = Leer("kwExcluir5");
+                    object kwEx6 = Leer("kwExcluir6");
+                    object kwEx7 = Leer("kwExcluir7");
+                    object kwEx8 = Leer("kwExcluir8");
+                    object kwEx9 = Leer("kwExcluir9");
                     object kwEx10 = Leer("kwExcluir10");
                     object kwEx11 = Leer("kwExcluir11");
 
@@ -463,33 +464,33 @@ namespace Rutinas
                                         @Ex1, @Ex2, @Ex3, @Ex4, @Ex5, @Ex6, @Ex7, @Ex8, @Ex9, @Ex10, @Ex11)";
                         SqlCommand cmdMerge = new SqlCommand(sqlMerge, conn);
                         cmdMerge.Parameters.AddWithValue("@Codigo", codigo);
-                        cmdMerge.Parameters.AddWithValue("@K1",   kw1);
-                        cmdMerge.Parameters.AddWithValue("@K2",   kw2);
-                        cmdMerge.Parameters.AddWithValue("@K3",   kw3);
-                        cmdMerge.Parameters.AddWithValue("@K4",   kw4);
-                        cmdMerge.Parameters.AddWithValue("@K5",   kw5);
-                        cmdMerge.Parameters.AddWithValue("@K6",   kw6);
-                        cmdMerge.Parameters.AddWithValue("@K7",   kw7);
-                        cmdMerge.Parameters.AddWithValue("@K8",   kw8);
-                        cmdMerge.Parameters.AddWithValue("@K9",   kw9);
-                        cmdMerge.Parameters.AddWithValue("@K10",  kw10);
-                        cmdMerge.Parameters.AddWithValue("@K11",  kw11);
-                        cmdMerge.Parameters.AddWithValue("@Ex1",  kwEx1);
-                        cmdMerge.Parameters.AddWithValue("@Ex2",  kwEx2);
-                        cmdMerge.Parameters.AddWithValue("@Ex3",  kwEx3);
-                        cmdMerge.Parameters.AddWithValue("@Ex4",  kwEx4);
-                        cmdMerge.Parameters.AddWithValue("@Ex5",  kwEx5);
-                        cmdMerge.Parameters.AddWithValue("@Ex6",  kwEx6);
-                        cmdMerge.Parameters.AddWithValue("@Ex7",  kwEx7);
-                        cmdMerge.Parameters.AddWithValue("@Ex8",  kwEx8);
-                        cmdMerge.Parameters.AddWithValue("@Ex9",  kwEx9);
+                        cmdMerge.Parameters.AddWithValue("@K1", kw1);
+                        cmdMerge.Parameters.AddWithValue("@K2", kw2);
+                        cmdMerge.Parameters.AddWithValue("@K3", kw3);
+                        cmdMerge.Parameters.AddWithValue("@K4", kw4);
+                        cmdMerge.Parameters.AddWithValue("@K5", kw5);
+                        cmdMerge.Parameters.AddWithValue("@K6", kw6);
+                        cmdMerge.Parameters.AddWithValue("@K7", kw7);
+                        cmdMerge.Parameters.AddWithValue("@K8", kw8);
+                        cmdMerge.Parameters.AddWithValue("@K9", kw9);
+                        cmdMerge.Parameters.AddWithValue("@K10", kw10);
+                        cmdMerge.Parameters.AddWithValue("@K11", kw11);
+                        cmdMerge.Parameters.AddWithValue("@Ex1", kwEx1);
+                        cmdMerge.Parameters.AddWithValue("@Ex2", kwEx2);
+                        cmdMerge.Parameters.AddWithValue("@Ex3", kwEx3);
+                        cmdMerge.Parameters.AddWithValue("@Ex4", kwEx4);
+                        cmdMerge.Parameters.AddWithValue("@Ex5", kwEx5);
+                        cmdMerge.Parameters.AddWithValue("@Ex6", kwEx6);
+                        cmdMerge.Parameters.AddWithValue("@Ex7", kwEx7);
+                        cmdMerge.Parameters.AddWithValue("@Ex8", kwEx8);
+                        cmdMerge.Parameters.AddWithValue("@Ex9", kwEx9);
                         cmdMerge.Parameters.AddWithValue("@Ex10", kwEx10);
                         cmdMerge.Parameters.AddWithValue("@Ex11", kwEx11);
                         cmdMerge.ExecuteNonQuery();
                     }
                 }
             }
-            lblAsignMsg.Text      = "Asignaciones guardadas correctamente.";
+            lblAsignMsg.Text = "Asignaciones guardadas correctamente.";
             lblAsignMsg.ForeColor = System.Drawing.Color.Green;
             CargarAsignacionesEmpleados();
         }
@@ -510,7 +511,7 @@ namespace Rutinas
                 // 2. Validar que los campos no estén vacíos (opcional pero recomendado)
                 if (string.IsNullOrEmpty(txtCod.Text) || string.IsNullOrEmpty(txtNom.Text))
                 {
-                    
+
                     return;
                 }
 
@@ -571,7 +572,7 @@ namespace Rutinas
 
                     // 5. Limpiar los campos para una nueva entrada
                     txtName.Text = "";
-                   
+
                     // El dropdown regresa a su primer valor automáticamente al recargar
 
                     // El GridView se refresca solo gracias al SqlDataSource
@@ -617,7 +618,7 @@ namespace Rutinas
                 //if (string.IsNullOrEmpty(valorTAG) || string.IsNullOrEmpty(valorNombre) ||
                 //    string.IsNullOrEmpty(txtactividad.Text) || ddlGrupo.SelectedIndex == 0 || ddlPrioridad.SelectedIndex == 0)
                 //{
-               //     Response.Write("<script>alert('Por favor, complete todos los campos requeridos.');</script>");
+                //     Response.Write("<script>alert('Por favor, complete todos los campos requeridos.');</script>");
                 //    return;
                 //}
 
@@ -697,7 +698,7 @@ namespace Rutinas
                 }
             }
         }
-    }
+
         #endregion
 
         #region borrar rutina
@@ -782,5 +783,7 @@ namespace Rutinas
                 lblMsgBorrar.Text = $"Error al borrar la rutina: {ex.Message}";
             }
         }
-        #endregion
+    }
 }
+        #endregion
+

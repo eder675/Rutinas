@@ -232,5 +232,17 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.Button btnGuardarAsignaciones;
 
         protected global::System.Web.UI.WebControls.Label lblAsignMsg;
+
+        protected global::System.Web.UI.WebControls.LinkButton lnkBorrarRutina;
+
+        protected global::System.Web.UI.WebControls.View vborrarrutina;
+
+        protected global::System.Web.UI.WebControls.DropDownList ddlEmpleadoBorrar;
+
+        protected global::System.Web.UI.WebControls.TextBox txtCorrelativoBorrar;
+
+        protected global::System.Web.UI.WebControls.Button btnBorrarRutina;
+
+        protected global::System.Web.UI.WebControls.Label lblMsgBorrar;
     }
 }
