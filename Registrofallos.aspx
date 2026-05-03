@@ -14,10 +14,14 @@
 <body>
     <form id="form1" runat="server">
 
+        <div id="rf-toast" class="rf-toast"></div>
+
         <div class="rf-card">
 
             <!-- ENCABEZADO -->
             <div class="rf-header">
+                <asp:Button ID="btnSalir" runat="server" Text="← Salir" OnClick="btnSalir_Click"
+                    CssClass="rf-btn-salir" CausesValidation="false" />
                 <h1>REGISTRO DE FALLOS DE INSTRUMENTOS</h1>
                 <p>Ingenio La Cabaña — Departamento de Tecnologia Industrial</p>
             </div>
@@ -188,6 +192,14 @@
                 $results.hide();
         });
     })();
+
+    function mostrarToast(mensaje, tipo) {
+        var $t = $('#rf-toast');
+        $t.removeClass('rf-toast-ok rf-toast-error')
+          .addClass(tipo === 'error' ? 'rf-toast-error' : 'rf-toast-ok')
+          .text(mensaje).fadeIn(200);
+        setTimeout(function () { $t.fadeOut(400); }, 4000);
+    }
     </script>
 </body>
 </html>

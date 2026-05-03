@@ -192,6 +192,51 @@ body {
     box-shadow: var(--sh-sm);
 }
 
+/* ── BOTÓN SALIR ── */
+.rf-btn-salir {
+    display: block;
+    margin-bottom: 14px;
+    padding: 6px 14px;
+    background: transparent;
+    color: var(--c-text-muted);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-sm);
+    font-size: 0.83em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--t-fast), color var(--t-fast);
+}
+
+.rf-btn-salir:hover {
+    background: var(--c-bg);
+    color: var(--c-text);
+}
+
+/* ── TOAST ── */
+.rf-toast {
+    display: none;
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    max-width: 360px;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: var(--r-sm);
+    box-shadow: var(--sh-lg);
+    font-size: 0.92em;
+    font-weight: 600;
+    z-index: 999;
+    animation: toastIn 0.3s ease;
+}
+
+.rf-toast-ok    { background: #2e7d32; }
+.rf-toast-error { background: #c62828; }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── BÚSQUEDA DE INSTRUMENTO ── */
 .rf-search-wrap {
     position: relative;
