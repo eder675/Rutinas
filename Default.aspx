@@ -29,6 +29,13 @@
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
+                    <asp:Button ID="btnDashboard"
+                                runat="server"
+                                Text="DASHBOARD"
+                                OnClick="btnDashboard_Click"
+                                CssClass="nav-button-link" />
+                </li>
+                <li>
                     <asp:Button
                         ID="logout"
                         runat="server"

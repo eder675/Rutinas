@@ -125,6 +125,11 @@ namespace Rutinas
             Response.Redirect("Registrofallos.aspx");
         }
 
+        protected void btnDashboard_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("Dashboard.aspx");
+        }
+
         protected void logout_Click(object sender, EventArgs e)
         {
             FormsAuthentication.SignOut(); //eliminar la cookie de autenticacion

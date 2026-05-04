@@ -44,6 +44,7 @@ namespace Rutinas
             ddltipodano.Items.Add(new ListItem("Fallo mecánico por desacople", "Fallo mecánico por desacople"));
             ddltipodano.Items.Add(new ListItem("Fallo mecanico por mal montaje", "Fallo mecanico por mal montaje"));
             ddltipodano.Items.Add(new ListItem("Fallo mecanico por golpe", "Fallo mecanico por golpe"));
+            ddltipodano.Items.Add(new ListItem("Fallo de sellos", "Fallo de sellos"));
             ddltipodano.Items.Add(new ListItem("Fallo de señal (4-20mA)", "Fallo de señal (4-20mA)"));
             ddltipodano.Items.Add(new ListItem("Fallo electronico por condiciones inapropiadas", "Fallo electronico por condiciones inapropiadas"));
             ddltipodano.Items.Add(new ListItem("Daño físico por caida", "Daño físico por caida"));
@@ -54,6 +55,7 @@ namespace Rutinas
 
             ddlcausadano.Items.Clear();
             ddlcausadano.Items.Add(new ListItem("-- Seleccione --", ""));
+            ddlcausadano.Items.Add(new ListItem("Sellos dañadps por temperatura", "Sellos dañados por temperatura"));
             ddlcausadano.Items.Add(new ListItem("No fue protegido contra el clima adverso", "No fue protegido contra el clima adverso"));
             ddlcausadano.Items.Add(new ListItem("Desgaste natural", "Desgaste natural"));
             ddlcausadano.Items.Add(new ListItem("Vibraciones excesivas", "Vibraciones excesivas"));
@@ -76,6 +78,8 @@ namespace Rutinas
             ddlsolucion.Items.Clear();
             ddlsolucion.Items.Add(new ListItem("-- Seleccione --", ""));
             ddlsolucion.Items.Add(new ListItem("Reemplazo temporal", "Reemplazo temporal"));
+            ddlsolucion.Items.Add(new ListItem("Reemplazo de quit de sellos", "Reemplazo de quit de sellos"));
+            ddlsolucion.Items.Add(new ListItem("Reemplazo de placa", "Reemplazo de placa"));
             ddlsolucion.Items.Add(new ListItem("Reemplazo de pieza dañada", "Reemplazo de pieza dañada"));
             ddlsolucion.Items.Add(new ListItem("Reparación en sitio", "Reparación en sitio"));
             ddlsolucion.Items.Add(new ListItem("Se agregó o adaptó pieza que ayuda a estabilizarse", "Se agrego o adapto pieza que ayuda a estabilizarse"));

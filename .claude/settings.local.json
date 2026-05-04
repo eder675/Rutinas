@@ -12,7 +12,9 @@
       "Bash(python -c \"import pyodbc; print\\('pyodbc ok'\\)\")",
       "Bash(python -c \"import pymssql; print\\('pymssql ok'\\)\")",
       "Bash(python *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "PowerShell($now = Get-Date; Write-Output \"Fecha y hora: $now\"; Write-Output \"Dia semana: $\\($now.DayOfWeek\\)\"; Write-Output \"Hora: $\\($now.TimeOfDay\\)\")",
+      "PowerShell(sqlcmd *)"
     ]
   }
 }
