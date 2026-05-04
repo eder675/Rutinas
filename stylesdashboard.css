@@ -366,9 +366,11 @@ body {
         align-items: flex-start;
     }
 
-    .db-btn-exportar {
+    .db-btn-exportar,
+    .db-filter-select {
         margin-left: 0;
         width: 100%;
+        min-width: unset;
         text-align: center;
     }
 

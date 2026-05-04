@@ -41,14 +41,29 @@ body {
     text-align: center;
 }
 
+/* ── FILAS DEL FORMULARIO ── */
+.auto-style1 p,
+.CONTENEDOR p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
 /* ── INPUTS dentro del login ── */
 .auto-style1 input[type="text"],
+.auto-style1 input[type="password"],
 .auto-style1 input[type="number"],
 .CONTENEDOR input[type="text"],
+.CONTENEDOR input[type="password"],
 .CONTENEDOR input[type="number"] {
-    width: 60%;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
     padding: 8px 12px;
     font-size: 0.97em;
+    box-sizing: border-box;
 }
 
 /* ── RADIO BUTTONS ── */
@@ -101,6 +116,11 @@ footer {
     .auto-style1,
     .CONTENEDOR {
         width: 95%;
-        padding: 20px;
+        padding: 20px 16px;
+    }
+
+    #btnentrar,
+    #btnAbout {
+        width: 100%;
     }
 }

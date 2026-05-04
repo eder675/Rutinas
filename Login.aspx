@@ -1,20 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Rutinas.Login" %>
 
 <!DOCTYPE html>
-<style type="text/css">
-    .auto-style1 {
-        background-position: 0% 0%;
-        padding: 20px 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        background-color: rgba(255, 255, 255, 0.90);
-        width: 627px;
-        background-image: none;
-        background-repeat: repeat;
-        background-attachment: scroll;
-        margin-top: 0px;
-    }
-</style>
 <div id="divNotificacion" 
     style="display:none; 
            position: fixed; 
@@ -31,6 +17,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rutinas Cabana</title>
     <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="styles.css" />

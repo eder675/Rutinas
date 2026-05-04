@@ -256,12 +256,35 @@ body {
 }
 
 /* ── RESPONSIVO ── */
+@media (max-width: 768px) {
+    .rf-card {
+        padding: 28px 20px 32px;
+    }
+
+    .rf-tag-desc {
+        flex-direction: column;
+    }
+
+    .rf-tag-desc > div {
+        width: 100%;
+    }
+
+    .rf-tag-desc .rf-input {
+        width: 100% !important;
+    }
+}
+
 @media (max-width: 520px) {
     .rf-card {
-        padding: 24px 18px 28px;
+        padding: 20px 14px 24px;
     }
 
     .rf-radio-group {
         flex-direction: column;
+    }
+
+    .rf-btn-salir {
+        width: 100%;
+        text-align: center;
     }
 }
