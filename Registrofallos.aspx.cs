@@ -55,7 +55,7 @@ namespace Rutinas
 
             ddlcausadano.Items.Clear();
             ddlcausadano.Items.Add(new ListItem("-- Seleccione --", ""));
-            ddlcausadano.Items.Add(new ListItem("Sellos dañadps por temperatura", "Sellos dañados por temperatura"));
+            ddlcausadano.Items.Add(new ListItem("Sellos dañados por temperatura", "Sellos dañados por temperatura"));
             ddlcausadano.Items.Add(new ListItem("No fue protegido contra el clima adverso", "No fue protegido contra el clima adverso"));
             ddlcausadano.Items.Add(new ListItem("Desgaste natural", "Desgaste natural"));
             ddlcausadano.Items.Add(new ListItem("Vibraciones excesivas", "Vibraciones excesivas"));
@@ -74,7 +74,7 @@ namespace Rutinas
             ddlcausadano.Items.Add(new ListItem("Le cayo algo encima", "Le cayo algo encima"));
             ddlcausadano.Items.Add(new ListItem("Impacto por rayo", "Impacto por rayo"));
             ddlcausadano.Items.Add(new ListItem("Ubicacion donde se puede inundar o caer agua", "Ubicacion donde se puede inundar o caer agua"));
-
+            //aqui falta filtrar los componentes por seleccion.
             ddlsolucion.Items.Clear();
             ddlsolucion.Items.Add(new ListItem("-- Seleccione --", ""));
             ddlsolucion.Items.Add(new ListItem("Reemplazo temporal", "Reemplazo temporal"));
