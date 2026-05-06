@@ -255,6 +255,97 @@ body {
     cursor: default;
 }
 
+/* ── MODAL DE CONFIRMACIÓN ── */
+.rf-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rf-modal {
+    background: #fff;
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    border-top: 4px solid var(--c-primary);
+    padding: 28px 32px 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    animation: scaleIn 0.25s cubic-bezier(0.34,1.26,0.64,1) both;
+}
+
+.rf-modal-titulo {
+    font-size: 1.1em;
+    color: var(--c-primary-dark);
+    margin: 0 0 18px;
+    font-weight: 700;
+}
+
+.rf-modal-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+    margin-bottom: 20px;
+}
+
+.rf-modal-tabla tr {
+    border-bottom: 1px solid var(--c-border);
+}
+
+.rf-modal-tabla tr:last-child {
+    border-bottom: none;
+}
+
+.rf-modal-tabla td {
+    padding: 7px 6px;
+    vertical-align: top;
+}
+
+.rf-modal-label {
+    font-weight: 600;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    width: 40%;
+}
+
+.rf-modal-botones {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.rf-modal-btn-cancelar,
+.rf-modal-btn-aceptar {
+    padding: 9px 22px;
+    border-radius: var(--r-sm);
+    font-size: 0.9em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: filter var(--t-fast), transform var(--t-fast);
+}
+
+.rf-modal-btn-cancelar {
+    background: var(--c-bg);
+    border: 1.5px solid var(--c-border);
+    color: var(--c-text);
+}
+
+.rf-modal-btn-aceptar {
+    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
+    color: #fff;
+}
+
+.rf-modal-btn-cancelar:hover { filter: brightness(0.95); }
+.rf-modal-btn-aceptar:hover  { filter: brightness(1.08); transform: translateY(-1px); }
+
 /* ── RESPONSIVO ── */
 @media (max-width: 768px) {
     .rf-card {

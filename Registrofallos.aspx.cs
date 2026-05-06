@@ -26,73 +26,23 @@ namespace Rutinas
         {
             ddlniveldano.Items.Clear();
             ddlniveldano.Items.Add(new ListItem("-- Seleccione --", ""));
-            ddlniveldano.Items.Add(new ListItem("Electrónica", "Electrónica"));
-            ddlniveldano.Items.Add(new ListItem("Fuente de poder", "Fuente de poder"));
+            ddlniveldano.Items.Add(new ListItem("Transmisor o posicionador", "Transmisor o posicionador"));
+            ddlniveldano.Items.Add(new ListItem("Electrónica del transmisor", "Electrónica del transmisor"));
             ddlniveldano.Items.Add(new ListItem("Placa perteneciente al equipo", "Placa perteneciente al equipo"));
             ddlniveldano.Items.Add(new ListItem("Transmisor esclavo", "Transmisor esclavo"));
+            ddlniveldano.Items.Add(new ListItem("Fuente de poder", "Fuente de poder"));
             ddlniveldano.Items.Add(new ListItem("Accesorio mecanico", "Accesorio mecanico"));
-            ddlniveldano.Items.Add(new ListItem("Software o parametrizacion incorrecta", "Software o parametrizacion incorrecta"));
+            ddlniveldano.Items.Add(new ListItem("Software o parametrización incorrecta", "Software o parametrización incorrecta"));
             ddlniveldano.Items.Add(new ListItem("Pieza no reemplazable", "Pieza no reemplazable"));
 
             ddltipodano.Items.Clear();
             ddltipodano.Items.Add(new ListItem("-- Seleccione --", ""));
-            ddltipodano.Items.Add(new ListItem("Fallo eléctrico por humedad", "Fallo eléctrico por humedad"));
-            ddltipodano.Items.Add(new ListItem("Fallo por sensor golpeado", "Fallo por sensor golpeado"));
-            ddltipodano.Items.Add(new ListItem("Fallo eléctrico por mala conexion", "Fallo eléctrico por mala conexion"));
-            ddltipodano.Items.Add(new ListItem("Fallo eléctrico por inundacion", "Fallo eléctrico por inundacion"));
-            ddltipodano.Items.Add(new ListItem("Fallo eléctrico por sobretension", "Fallo eléctrico por sobretension"));
-            ddltipodano.Items.Add(new ListItem("Fallo mecánico por desacople", "Fallo mecánico por desacople"));
-            ddltipodano.Items.Add(new ListItem("Fallo mecanico por mal montaje", "Fallo mecanico por mal montaje"));
-            ddltipodano.Items.Add(new ListItem("Fallo mecanico por golpe", "Fallo mecanico por golpe"));
-            ddltipodano.Items.Add(new ListItem("Fallo de sellos", "Fallo de sellos"));
-            ddltipodano.Items.Add(new ListItem("Fallo de señal (4-20mA)", "Fallo de señal (4-20mA)"));
-            ddltipodano.Items.Add(new ListItem("Fallo electronico por condiciones inapropiadas", "Fallo electronico por condiciones inapropiadas"));
-            ddltipodano.Items.Add(new ListItem("Daño físico por caida", "Daño físico por caida"));
-            ddltipodano.Items.Add(new ListItem("Corrosión de bornes", "Corrosión de bornes"));
-            ddltipodano.Items.Add(new ListItem("Fuga de aire", "Fuga de aire"));
-            ddltipodano.Items.Add(new ListItem("Sobrecalentamiento por fallo electronico", "Sobrecalentamiento por fallo electronico"));
-            ddltipodano.Items.Add(new ListItem("Sobrecalentamiento por mala ubicacion", "Sobrecalentamiento por mala ubicacion"));
 
             ddlcausadano.Items.Clear();
             ddlcausadano.Items.Add(new ListItem("-- Seleccione --", ""));
-            ddlcausadano.Items.Add(new ListItem("Sellos dañados por temperatura", "Sellos dañados por temperatura"));
-            ddlcausadano.Items.Add(new ListItem("No fue protegido contra el clima adverso", "No fue protegido contra el clima adverso"));
-            ddlcausadano.Items.Add(new ListItem("Desgaste natural", "Desgaste natural"));
-            ddlcausadano.Items.Add(new ListItem("Vibraciones excesivas", "Vibraciones excesivas"));
-            ddlcausadano.Items.Add(new ListItem("Mal manejo del equipo", "Mal manejo del equipo"));
-            ddlcausadano.Items.Add(new ListItem("Falta de mantenimiento", "Falta de mantenimiento"));
-            ddlcausadano.Items.Add(new ListItem("Condiciones ambientales (lluvia)", "Condiciones ambientales (lluvia)"));
-            ddlcausadano.Items.Add(new ListItem("Condiciones ambientales (calor excesivo)", "Condiciones ambientales (calor excesivo)"));
-            ddlcausadano.Items.Add(new ListItem("Sobretensión eléctrica", "Sobretensión eléctrica"));
-            ddlcausadano.Items.Add(new ListItem("Empaque o sello no reemplazado en mantenimiento", "Empaque o sello no reemplazado en mantenimiento"));
-            ddlcausadano.Items.Add(new ListItem("Tuberias y coraza en malas condiciones", "Tuberias y coraza en malas condiciones"));
-            ddlcausadano.Items.Add(new ListItem("Los cables que llegan al equipo no estan protegidos", "Los cables que llegan al equipo no estan protegidos"));
-            ddlcausadano.Items.Add(new ListItem("Agua que entro por la coraza", "Agua que entro por la coraza"));
-            ddlcausadano.Items.Add(new ListItem("Agua que entro por una abertura", "Agua que entro por una abertura"));
-            ddlcausadano.Items.Add(new ListItem("Caja de campo en mal estado", "Caja de campo en mal estado"));
-            ddlcausadano.Items.Add(new ListItem("Fue golpeado por una persona", "Fue golpeado por una persona"));
-            ddlcausadano.Items.Add(new ListItem("Le cayo algo encima", "Le cayo algo encima"));
-            ddlcausadano.Items.Add(new ListItem("Impacto por rayo", "Impacto por rayo"));
-            ddlcausadano.Items.Add(new ListItem("Ubicacion donde se puede inundar o caer agua", "Ubicacion donde se puede inundar o caer agua"));
-            //aqui falta filtrar los componentes por seleccion.
+
             ddlsolucion.Items.Clear();
             ddlsolucion.Items.Add(new ListItem("-- Seleccione --", ""));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo temporal", "Reemplazo temporal"));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo de quit de sellos", "Reemplazo de quit de sellos"));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo de placa", "Reemplazo de placa"));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo de pieza dañada", "Reemplazo de pieza dañada"));
-            ddlsolucion.Items.Add(new ListItem("Reparación en sitio", "Reparación en sitio"));
-            ddlsolucion.Items.Add(new ListItem("Se agregó o adaptó pieza que ayuda a estabilizarse", "Se agrego o adapto pieza que ayuda a estabilizarse"));
-            ddlsolucion.Items.Add(new ListItem("Se instalo un soporte extra", "Se instalo un soporte extra"));
-            ddlsolucion.Items.Add(new ListItem("Reparacion en el taller", "Reparacion en el taller"));
-            ddlsolucion.Items.Add(new ListItem("Equipo fuera de servicio", "Equipo fuera de servicio"));
-            ddlsolucion.Items.Add(new ListItem("Pendiente de revisión", "Pendiente de revisión"));
-            ddlsolucion.Items.Add(new ListItem("Sin solución aplicada", "Sin solución aplicada"));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo de la electronica", "Reemplazo de la electronica"));
-            ddlsolucion.Items.Add(new ListItem("Reemplazo de su sensor", "Reemplazo de su sensor"));
-            ddlsolucion.Items.Add(new ListItem("Fue movido de donde estaba", "Fue movido de donde estaba"));
-            ddlsolucion.Items.Add(new ListItem("Se le puso techo provisional", "Se le puso techo provisional"));
-            ddlsolucion.Items.Add(new ListItem("Se tiro cable desde otro lado o solo se cambio el cable", "Se tiro cable desde otro lado o solo se cambio el cable"));
         }
 
         protected void btninsert_Click(object sender, EventArgs e)
@@ -123,6 +73,34 @@ namespace Rutinas
                 return;
             }
 
+            if (string.IsNullOrEmpty(ddlniveldano.SelectedValue))
+            {
+                lblMsgInsert.Text = "Seleccione el nivel de daño.";
+                return;
+            }
+
+            string tipoDano  = Request.Form[ddltipodano.UniqueID]  ?? "";
+            string causaDano = Request.Form[ddlcausadano.UniqueID] ?? "";
+            string solucion  = Request.Form[ddlsolucion.UniqueID]  ?? "";
+
+            if (string.IsNullOrEmpty(tipoDano))
+            {
+                lblMsgInsert.Text = "Seleccione el tipo de daño.";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(causaDano))
+            {
+                lblMsgInsert.Text = "Seleccione la posible causa.";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(solucion))
+            {
+                lblMsgInsert.Text = "Seleccione la solución actual.";
+                return;
+            }
+
             try
             {
                 string sql = @"INSERT INTO RegistroFallos
@@ -139,12 +117,12 @@ namespace Rutinas
                     cmd.Parameters.AddWithValue("@Instrumento",    hfDescripcion.Value.Trim());
                     cmd.Parameters.AddWithValue("@FalloInducido",  rbinducitrue.Checked ? 1 : 0);
                     cmd.Parameters.AddWithValue("@NivelDano",      ddlniveldano.SelectedValue);
-                    cmd.Parameters.AddWithValue("@TipoDano",       ddltipodano.SelectedValue);
-                    cmd.Parameters.AddWithValue("@PosibleCausa",   ddlcausadano.SelectedValue);
+                    cmd.Parameters.AddWithValue("@TipoDano",       tipoDano);
+                    cmd.Parameters.AddWithValue("@PosibleCausa",   causaDano);
                     cmd.Parameters.AddWithValue("@Comentarios",    txtcomentario.Text.Trim());
                     cmd.Parameters.AddWithValue("@Reemplaza",      rbtremplazatrue.Checked ? 1 : 0);
                     cmd.Parameters.AddWithValue("@Interviene",     rbtintervienetrue.Checked ? 1 : 0);
-                    cmd.Parameters.AddWithValue("@Solucion",       ddlsolucion.SelectedValue);
+                    cmd.Parameters.AddWithValue("@Solucion",       solucion);
                     cmd.ExecuteNonQuery();
                 }
 
