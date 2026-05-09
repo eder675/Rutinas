@@ -113,12 +113,16 @@
     <Content Include="media\iconoimpresora.jpg" />
     <Content Include="media\IngenioLaCabana.jpg" />
     <Content Include="media\paisajeILC.jpg" />
+    <Content Include="BuscarEquiposArea.ashx" />
     <Content Include="BuscarInstrumento.ashx" />
+    <Content Include="DeclaracionDesmontaje.aspx" />
     <Content Include="Registrofallos.aspx" />
     <Content Include="RegistroDesmontaje.aspx" />
     <Content Include="Registros.aspx" />
+    <Content Include="consultas\crear_tabla_desmontajeavance.sql" />
     <Content Include="ScriptsDesmontaje.sql" />
     <Content Include="styles-shared.css" />
+    <Content Include="stylesdeclaracion.css" />
     <Content Include="stylesdashboard.css" />
     <Content Include="stylesregistrofallos.css" />
     <Content Include="stylesregistrodesmontaje.css" />
@@ -175,8 +179,18 @@
     </Compile>
     <Compile Include="Models\RutinaDataModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BuscarEquiposArea.ashx.cs">
+      <DependentUpon>BuscarEquiposArea.ashx</DependentUpon>
+    </Compile>
     <Compile Include="BuscarInstrumento.ashx.cs">
       <DependentUpon>BuscarInstrumento.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="DeclaracionDesmontaje.aspx.cs">
+      <DependentUpon>DeclaracionDesmontaje.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DeclaracionDesmontaje.aspx.designer.cs">
+      <DependentUpon>DeclaracionDesmontaje.aspx</DependentUpon>
     </Compile>
     <Compile Include="Registrofallos.aspx.cs">
       <DependentUpon>Registrofallos.aspx</DependentUpon>

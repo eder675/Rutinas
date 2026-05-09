@@ -66,6 +66,13 @@ namespace Rutinas
                     {
                         lblNaturales.Text = cmd.ExecuteScalar()?.ToString() ?? "0";
                     }
+
+                    // Pendientes de reemplazo
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT COUNT(*) FROM RegistroFallos WHERE Reemplaza = 1", conn))
+                    {
+                        lblReemplazar.Text = cmd.ExecuteScalar()?.ToString() ?? "0";
+                    }
                 }
             }
             catch (Exception ex)
@@ -128,7 +135,7 @@ namespace Rutinas
                 if (!string.IsNullOrEmpty(filtroNivel))
                     sql.Append(" WHERE NivelDano = @NivelDano");
 
-                sql.Append(" ORDER BY ID DESC");
+                sql.Append(" ORDER BY Reemplaza DESC, ID DESC");
 
                 using (SqlConnection conn = new SqlConnection(ConnString))
                 using (SqlCommand cmd = new SqlCommand(sql.ToString(), conn))
@@ -235,7 +242,10 @@ namespace Rutinas
         // ────────────────────────────────────────────────────────────────────
         protected void gvFallos_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            // Reservado para extensiones futuras.
+            if (e.Row.RowType != DataControlRowType.DataRow) return;
+            DataRowView drv = (DataRowView)e.Row.DataItem;
+            if (Convert.ToBoolean(drv["Reemplaza"]))
+                e.Row.Style["background-color"] = "rgba(183,28,28,0.10)";
         }
 
         // ────────────────────────────────────────────────────────────────────
@@ -258,7 +268,7 @@ namespace Rutinas
                 if (!string.IsNullOrEmpty(filtroNivel))
                     sql.Append(" WHERE NivelDano = @NivelDano");
 
-                sql.Append(" ORDER BY ID DESC");
+                sql.Append(" ORDER BY Reemplaza DESC, ID DESC");
 
                 DataTable dt = new DataTable();
 
@@ -314,11 +324,11 @@ namespace Rutinas
                         ws.Cell(row + 2, 11).Value = Convert.ToBoolean(dr["Interviene"]) ? "SI" : "NO";
                         ws.Cell(row + 2, 12).Value = dr["Solucion"]?.ToString() ?? "";
 
-                        // Alternar colores de fila
-                        if (row % 2 == 1)
-                        {
+                        // Filas de reemplazo en rojo, demás alternan gris claro
+                        if (Convert.ToBoolean(dr["Reemplaza"]))
+                            ws.Row(row + 2).Style.Fill.BackgroundColor = XLColor.FromHtml("#FFCDD2");
+                        else if (row % 2 == 1)
                             ws.Row(row + 2).Style.Fill.BackgroundColor = XLColor.FromHtml("#F2F5F2");
-                        }
                     }
 
                     // Autoajustar columnas

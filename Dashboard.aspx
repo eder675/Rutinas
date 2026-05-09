@@ -55,6 +55,12 @@
                         <span class="db-metric-sub">fallas por desgaste u otras causas</span>
                     </div>
 
+                    <div class="db-metric-card db-metric-reemplazar">
+                        <span class="db-metric-label">Pendientes de Reemplazo</span>
+                        <asp:Label ID="lblReemplazar" runat="server" Text="0" CssClass="db-metric-value"></asp:Label>
+                        <span class="db-metric-sub">equipos a reemplazar en mantenimiento</span>
+                    </div>
+
                 </div>
             </div>
 

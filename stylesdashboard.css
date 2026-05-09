@@ -119,6 +119,14 @@ body {
     border-top-color: #1565C0;
 }
 
+.db-metric-card.db-metric-reemplazar {
+    border-top-color: #B71C1C;
+}
+
+.db-metric-card.db-metric-reemplazar .db-metric-value {
+    color: #B71C1C;
+}
+
 .db-metric-label {
     font-size: 0.78rem;
     font-weight: 700;

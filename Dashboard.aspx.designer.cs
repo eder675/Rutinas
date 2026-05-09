@@ -42,6 +42,11 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.Label lblNaturales;
 
         /// <summary>
+        /// Etiqueta con el total de equipos pendientes de reemplazo (Reemplaza = 1).
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblReemplazar;
+
+        /// <summary>
         /// DropDownList para filtrar registros por NivelDano.
         /// AutoPostBack = true.
         /// </summary>
