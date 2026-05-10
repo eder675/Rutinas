@@ -606,7 +606,11 @@ namespace Rutinas
         // ════════════════════════════════════════════════════════════════════
         protected void btnSalir_Click(object sender, EventArgs e)
         {
-            Response.Redirect("Default.aspx");
+            string cargo = Session["Cargo"]?.ToString() ?? "";
+            if (cargo.Equals("Administrador", StringComparison.OrdinalIgnoreCase))
+                Response.Redirect("LoginDeveloper.aspx");
+            else
+                Response.Redirect("Default.aspx");
         }
 
         // ════════════════════════════════════════════════════════════════════

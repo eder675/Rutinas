@@ -47,6 +47,8 @@ namespace Rutinas
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hfDatos;
 
+        protected global::System.Web.UI.WebControls.HiddenField hfSeleccionados;
+
         /// <summary>
         /// Control btnGuardar.
         /// </summary>

@@ -35,72 +35,41 @@ namespace Rutinas
         {
             lblMsg.Text = string.Empty;
 
-            // 1. Validar que existen datos de búsqueda
-            if (string.IsNullOrWhiteSpace(hfDatos.Value))
+            // Leer del carrito (hfSeleccionados)
+            string json = hfSeleccionados.Value;
+            if (string.IsNullOrWhiteSpace(json) || json == "[]")
             {
-                lblMsg.Text = "No hay equipos para guardar. Realice primero una busqueda.";
+                lblMsg.Text = "No hay equipos seleccionados para guardar.";
                 return;
             }
 
-            // 2. Deserializar JSON
             var ser = new JavaScriptSerializer();
-            List<Dictionary<string, string>> equipos;
+            List<Dictionary<string, string>> seleccionados;
             try
             {
-                equipos = ser.Deserialize<List<Dictionary<string, string>>>(hfDatos.Value);
+                seleccionados = ser.Deserialize<List<Dictionary<string, string>>>(json);
             }
             catch
             {
-                lblMsg.Text = "Error al leer los datos de equipos. Intente de nuevo.";
+                lblMsg.Text = "Error al leer los datos. Intente de nuevo.";
                 return;
             }
 
-            // 3. Leer el formulario y filtrar los marcados como desmontados
+            if (seleccionados.Count == 0)
+            {
+                lblMsg.Text = "No hay equipos seleccionados para guardar.";
+                return;
+            }
+
             string codigoEmpleado = Session["CodigoEmpleado"]?.ToString() ?? "";
             string nombreEmpleado = Session["NombreEmpleado"]?.ToString() ?? "";
 
-            var desmontados = new List<Dictionary<string, string>>();
-
-            foreach (var item in equipos)
-            {
-                string tag      = item.ContainsKey("tag")         ? item["tag"]         : "";
-                string desc     = item.ContainsKey("descripcion")  ? item["descripcion"]  : "";
-                string area     = item.ContainsKey("area")         ? item["area"]         : "";
-
-                // Nombre del radio button: rb_ + tag con caracteres no-alfanuméricos reemplazados por _
-                string fieldName = "rb_" + Regex.Replace(tag, @"[^a-zA-Z0-9]", "_");
-                string valor     = Request.Form[fieldName] ?? "0";
-
-                if (valor == "1")
-                {
-                    desmontados.Add(new Dictionary<string, string>
-                    {
-                        { "tag",         tag  },
-                        { "descripcion", desc },
-                        { "area",        area }
-                    });
-                }
-            }
-
-            // 4. Validar que al menos uno fue marcado
-            if (desmontados.Count == 0)
-            {
-                lblMsg.Text = "Ningun equipo fue marcado como desmontado.";
-                return;
-            }
-
-            // 5. MERGE en BD REPORTES
             const string sqlMerge = @"
                 MERGE DesmontajeAvance AS t
                 USING (SELECT @TAG AS TAG) AS s ON t.TAG = s.TAG
                 WHEN MATCHED THEN
-                    UPDATE SET
-                        Desmontado       = 1,
-                        Descripcion      = @Desc,
-                        Area             = @Area,
-                        FechaDeclaracion = GETDATE(),
-                        CodigoEmpleado   = @Codigo,
-                        NombreEmpleado   = @Nombre
+                    UPDATE SET Desmontado=1, Descripcion=@Desc, Area=@Area,
+                               FechaDeclaracion=GETDATE(), CodigoEmpleado=@Codigo, NombreEmpleado=@Nombre
                 WHEN NOT MATCHED THEN
                     INSERT (TAG, Descripcion, Area, Desmontado, CodigoEmpleado, NombreEmpleado)
                     VALUES (@TAG, @Desc, @Area, 1, @Codigo, @Nombre);";
@@ -110,14 +79,13 @@ namespace Rutinas
                 using (SqlConnection conn = new SqlConnection(ConnString))
                 {
                     conn.Open();
-
-                    foreach (var d in desmontados)
+                    foreach (var item in seleccionados)
                     {
                         using (SqlCommand cmd = new SqlCommand(sqlMerge, conn))
                         {
-                            cmd.Parameters.AddWithValue("@TAG",    d["tag"]);
-                            cmd.Parameters.AddWithValue("@Desc",   d["descripcion"]);
-                            cmd.Parameters.AddWithValue("@Area",   d["area"]);
+                            cmd.Parameters.AddWithValue("@TAG",    item.ContainsKey("tag")         ? item["tag"]         : "");
+                            cmd.Parameters.AddWithValue("@Desc",   item.ContainsKey("descripcion")  ? item["descripcion"]  : "");
+                            cmd.Parameters.AddWithValue("@Area",   item.ContainsKey("area")         ? item["area"]         : "");
                             cmd.Parameters.AddWithValue("@Codigo", codigoEmpleado);
                             cmd.Parameters.AddWithValue("@Nombre", nombreEmpleado);
                             cmd.ExecuteNonQuery();
@@ -125,23 +93,16 @@ namespace Rutinas
                     }
                 }
 
-                // 6. Exito — limpiar hidden field y mostrar toast
-                hfDatos.Value = string.Empty;
-                lblMsg.Text   = string.Empty;
-
-                string msgOk = desmontados.Count + " equipo(s) guardado(s) correctamente.";
-                Page.ClientScript.RegisterStartupScript(
-                    GetType(), "toastOk",
-                    "mostrarToast('" + msgOk + "', 'ok');", true);
+                hfSeleccionados.Value = "[]";
+                lblMsg.Text = string.Empty;
+                string msgOk = seleccionados.Count + " equipo(s) guardado(s) correctamente.";
+                Page.ClientScript.RegisterStartupScript(GetType(), "toastOk",
+                    "mostrarToast('" + msgOk + "', 'ok'); limpiarCarrito();", true);
             }
             catch (Exception ex)
             {
-                string msg = ex.Message.Replace("'", "\\'")
-                                       .Replace("\r", "")
-                                       .Replace("\n", " ");
-
-                Page.ClientScript.RegisterStartupScript(
-                    GetType(), "toastErr",
+                string msg = ex.Message.Replace("'", "\\'").Replace("\r", "").Replace("\n", " ");
+                Page.ClientScript.RegisterStartupScript(GetType(), "toastErr",
                     "mostrarToast('Error al guardar: " + msg + "', 'error');", true);
             }
         }

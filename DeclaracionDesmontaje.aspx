@@ -53,25 +53,27 @@
                 </div>
             </div>
 
-            <!-- RESULTADOS -->
-            <div id="divResultados" style="display:none;">
-
-                <div class="dd-results-bar">
-                    <span id="spanConteo" class="dd-conteo"></span>
+            <!-- CARRITO DE SELECCIONADOS -->
+            <div id="divCarrito" class="dd-carrito" style="display:none;">
+                <div class="dd-carrito-header">
+                    <div>
+                        <span class="dd-carrito-titulo">Equipos a declarar como desmontados</span>
+                        <span id="spanCarritoConteo" class="dd-carrito-conteo"></span>
+                    </div>
                     <asp:Button ID="btnGuardar" runat="server" Text="GUARDAR DECLARACION"
                         CssClass="dd-btn-guardar" OnClick="btnGuardar_Click" />
                 </div>
+                <div id="divCarritoLista" class="dd-carrito-lista"></div>
+            </div>
+            <asp:HiddenField ID="hfSeleccionados" runat="server" Value="[]" />
 
-                <asp:HiddenField ID="hfDatos" runat="server" />
-
-                <div id="divLista" class="dd-lista"></div>
-
-                <div class="dd-results-bar dd-results-bar-bottom">
-                    <span></span>
-                    <asp:Button ID="btnGuardar2" runat="server" Text="GUARDAR DECLARACION"
-                        CssClass="dd-btn-guardar" OnClick="btnGuardar_Click" />
+            <!-- RESULTADOS DE BUSQUEDA -->
+            <div id="divResultados" style="display:none;">
+                <div class="dd-results-bar">
+                    <span id="spanConteo" class="dd-conteo"></span>
                 </div>
-
+                <asp:HiddenField ID="hfDatos" runat="server" />
+                <div id="divLista" class="dd-lista"></div>
             </div>
 
             <asp:Label ID="lblMsg" runat="server" CssClass="dd-msg" Text=""></asp:Label>
@@ -82,6 +84,58 @@
         <div id="dd-toast" class="dd-toast"></div>
 
         <script type="text/javascript">
+
+        // ── CARRITO (acumulador de seleccionados) ─────────────────
+        var carrito = {}; // { tag: {tag, descripcion, area} }
+        var hfSelId = '<%= hfSeleccionados.ClientID %>';
+
+        function agregarAlCarrito(item) {
+            carrito[item.tag] = item;
+            actualizarCarrito();
+        }
+
+        function quitarDelCarrito(tag) {
+            delete carrito[tag];
+            // Desmarcar el radio en resultados si está visible
+            var fn = 'rb_' + tag.replace(/[^a-zA-Z0-9]/g, '_');
+            $('input[name="' + fn + '"][value="0"]').prop('checked', true);
+            $('input[name="' + fn + '"]').closest('.dd-item').removeClass('dd-item-desmontado');
+            actualizarCarrito();
+        }
+
+        function actualizarCarrito() {
+            var items = Object.values(carrito);
+            $('#' + hfSelId).val(JSON.stringify(items));
+
+            if (!items.length) {
+                $('#divCarrito').slideUp(200);
+                return;
+            }
+
+            var html = '';
+            items.forEach(function (item) {
+                var tagEsc = item.tag.replace(/'/g, "\\'");
+                html += '<div class="dd-carrito-item">';
+                html +=   '<div class="dd-item-info">';
+                html +=     '<span class="dd-item-tag">'  + $('<span>').text(item.tag).html()         + '</span>';
+                html +=     '<span class="dd-item-desc">' + $('<span>').text(item.descripcion).html() + '</span>';
+                html +=     '<span class="dd-item-area">' + $('<span>').text(item.area).html()        + '</span>';
+                html +=   '</div>';
+                html +=   '<button type="button" class="dd-carrito-quitar" onclick="quitarDelCarrito(\'' + tagEsc + '\')">&#10005;</button>';
+                html += '</div>';
+            });
+
+            $('#divCarritoLista').html(html);
+            $('#spanCarritoConteo').text('(' + items.length + ')');
+            $('#divCarrito').slideDown(200);
+        }
+
+        function limpiarCarrito() {
+            carrito = {};
+            actualizarCarrito();
+            $('#divResultados').hide();
+            $('#divLista').empty();
+        }
 
         // ── CARGAR ÁREAS AL INICIAR ───────────────────────────────
         $.getJSON('ObtenerAreas.ashx', function (areas) {
@@ -110,26 +164,23 @@
                         return;
                     }
 
-                    // Guardar JSON en hidden field para el postback
-                    $('#<%= hfDatos.ClientID %>').val(JSON.stringify(data));
-
-                    // Construir HTML de items
                     var html = '';
                     $.each(data, function (i, item) {
-                        var fn = 'rb_' + item.tag.replace(/[^a-zA-Z0-9]/g, '_');
-                        html += '<div class="dd-item" data-tag="' + $('<span>').text(item.tag).html() + '">';
+                        var fn           = 'rb_' + item.tag.replace(/[^a-zA-Z0-9]/g, '_');
+                        var enCarrito    = carrito.hasOwnProperty(item.tag);
+                        var checked0     = enCarrito ? '' : 'checked';
+                        var checked1     = enCarrito ? 'checked' : '';
+                        var claseItem    = enCarrito ? 'dd-item dd-item-desmontado' : 'dd-item';
+
+                        html += '<div class="' + claseItem + '" data-tag="' + $('<span>').text(item.tag).html() + '" data-desc="' + $('<span>').text(item.descripcion).html() + '" data-area="' + $('<span>').text(item.area).html() + '">';
                         html +=   '<div class="dd-item-info">';
                         html +=     '<span class="dd-item-tag">'  + $('<span>').text(item.tag).html()         + '</span>';
                         html +=     '<span class="dd-item-desc">' + $('<span>').text(item.descripcion).html() + '</span>';
                         html +=     '<span class="dd-item-area">' + $('<span>').text(item.area).html()        + '</span>';
                         html +=   '</div>';
                         html +=   '<div class="dd-item-opciones">';
-                        html +=     '<label class="dd-radio-label dd-radio-no">';
-                        html +=       '<input type="radio" name="' + fn + '" value="0" checked> No desmontado';
-                        html +=     '</label>';
-                        html +=     '<label class="dd-radio-label dd-radio-si">';
-                        html +=       '<input type="radio" name="' + fn + '" value="1"> Desmontado &#10003;';
-                        html +=     '</label>';
+                        html +=     '<label class="dd-radio-label dd-radio-no"><input type="radio" name="' + fn + '" value="0" ' + checked0 + '> No desmontado</label>';
+                        html +=     '<label class="dd-radio-label dd-radio-si"><input type="radio" name="' + fn + '" value="1" ' + checked1 + '> Desmontado &#10003;</label>';
                         html +=   '</div>';
                         html += '</div>';
                     });
@@ -146,18 +197,25 @@
                 });
         });
 
-        // ── RESALTAR ITEM AL MARCAR DESMONTADO ───────────────────
+        // ── RADIO CHANGE: agregar/quitar del carrito ──────────────
         $(document).on('change', 'input[type="radio"]', function () {
             var $item = $(this).closest('.dd-item');
-            $item.toggleClass('dd-item-desmontado', $(this).val() === '1');
+            var esDesmontado = $(this).val() === '1';
+            $item.toggleClass('dd-item-desmontado', esDesmontado);
+
+            var item = {
+                tag:         $item.data('tag'),
+                descripcion: $item.data('desc'),
+                area:        $item.data('area')
+            };
+
+            if (esDesmontado) agregarAlCarrito(item);
+            else              quitarDelCarrito(item.tag);
         });
 
         // ── ENTER EN CAMPO DE BUSQUEDA ────────────────────────────
         $('#txtBusqueda').on('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                $('#btnBuscarJS').trigger('click');
-            }
+            if (e.key === 'Enter') { e.preventDefault(); $('#btnBuscarJS').trigger('click'); }
         });
 
         // ── TOAST ─────────────────────────────────────────────────
@@ -165,14 +223,9 @@
             var $t = $('#dd-toast');
             $t.removeClass('dd-toast-ok dd-toast-error')
               .addClass(tipo === 'error' ? 'dd-toast-error' : 'dd-toast-ok')
-              .text(msg)
-              .css({ display: 'flex', opacity: 0 })
-              .animate({ opacity: 1 }, 200);
-
+              .text(msg).css({ display: 'flex', opacity: 0 }).animate({ opacity: 1 }, 200);
             setTimeout(function () {
-                $t.animate({ opacity: 0 }, 400, function () {
-                    $(this).hide();
-                });
+                $t.animate({ opacity: 0 }, 400, function () { $(this).hide(); });
             }, 4000);
         }
 
