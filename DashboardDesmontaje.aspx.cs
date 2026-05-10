@@ -526,12 +526,13 @@ namespace Rutinas
                         for (int c = 2; c <= 5; c++)
                             ws2.Cell(xlRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                        // Color por nivel de avance
+                        // Paleta por nivel de avance — 0% sin color
                         XLColor rowColor;
-                        if (a.Avance >= 100)      rowColor = XLColor.FromHtml("#C8E6C9"); // verde
-                        else if (a.Avance >= 50)   rowColor = XLColor.FromHtml("#FFF9C4"); // amarillo
-                        else if (row % 2 == 0)     rowColor = XLColor.White;
-                        else                        rowColor = XLColor.FromHtml("#F5F5F5");
+                        if (a.Avance == 0)         rowColor = XLColor.White;               // sin avance
+                        else if (a.Avance < 35)    rowColor = XLColor.FromHtml("#FFEBEE"); // rojo claro
+                        else if (a.Avance < 70)    rowColor = XLColor.FromHtml("#FFF8E1"); // ámbar claro
+                        else if (a.Avance < 100)   rowColor = XLColor.FromHtml("#E3F2FD"); // azul claro
+                        else                        rowColor = XLColor.FromHtml("#E8F5E9"); // verde claro (100%)
 
                         ws2.Range(xlRow, 1, xlRow, 5).Style.Fill.BackgroundColor = rowColor;
                         ws2.Range(xlRow, 1, xlRow, 5).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
