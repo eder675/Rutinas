@@ -73,6 +73,13 @@
         </li>
         <li>
             <asp:LinkButton
+            ID="lnkAvanceDesmontaje"
+            runat="server"
+            Text="Avance desmontaje."
+            OnClick="lnkAvanceDesmontaje_Click" />
+        </li>
+        <li>
+            <asp:LinkButton
             ID="lnkLogout"
             runat="server"
             Text="Cerrar sesion."

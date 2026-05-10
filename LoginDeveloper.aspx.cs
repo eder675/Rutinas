@@ -24,6 +24,11 @@ namespace Rutinas
             lblnameadmin.Text = "Administrador en sesion: " + Adminname;
         }
 
+        protected void lnkAvanceDesmontaje_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("DashboardDesmontaje.aspx");
+        }
+
         protected void lnk_Click(object sender, EventArgs e)
         {
             LinkButton lnb = (LinkButton)sender;
