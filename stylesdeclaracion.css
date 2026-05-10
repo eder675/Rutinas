@@ -115,6 +115,22 @@ body {
     gap: 10px;
 }
 
+.dd-search-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+}
+
+.dd-search-field-grow {
+    flex: 1;
+}
+
+.dd-search-btn-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
 .dd-input {
     flex: 1;
     border: 1.5px solid var(--c-border);

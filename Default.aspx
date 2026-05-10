@@ -43,6 +43,13 @@
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
+                    <asp:Button ID="btnDashboardDesmontaje"
+                                runat="server"
+                                Text="AVANCE DESMONTAJE"
+                                OnClick="btnDashboardDesmontaje_Click"
+                                CssClass="nav-button-link" />
+                </li>
+                <li>
                     <asp:Button
                         ID="logout"
                         runat="server"

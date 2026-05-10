@@ -135,6 +135,11 @@ namespace Rutinas
             Response.Redirect("DeclaracionDesmontaje.aspx");
         }
 
+        protected void btnDashboardDesmontaje_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("DashboardDesmontaje.aspx");
+        }
+
         protected void logout_Click(object sender, EventArgs e)
         {
             FormsAuthentication.SignOut(); //eliminar la cookie de autenticacion

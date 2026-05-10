@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Script.Serialization;
+using System.Linq;
 
 namespace Rutinas
 {
@@ -13,11 +14,26 @@ namespace Rutinas
             context.Response.ContentType = "application/json";
             context.Response.ContentEncoding = System.Text.Encoding.UTF8;
 
-            string q = (context.Request.QueryString["q"] ?? "").Trim();
-            if (q.Length < 2)
+            string q    = (context.Request.QueryString["q"]    ?? "").Trim();
+            string area = (context.Request.QueryString["area"] ?? "").Trim();
+
+            if (q.Length < 2 && string.IsNullOrEmpty(area))
             {
                 context.Response.Write("[]");
                 return;
+            }
+
+            // TAGs ya declarados como desmontados en REPORTES
+            var yaDeclarados = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+            string connReportes = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
+            using (SqlConnection connR = new SqlConnection(connReportes))
+            {
+                connR.Open();
+                using (SqlCommand cmdR = new SqlCommand(
+                    "SELECT RTRIM(TAG) FROM DesmontajeAvance WHERE Desmontado = 1", connR))
+                using (var drR = cmdR.ExecuteReader())
+                    while (drR.Read())
+                        yaDeclarados.Add(drR.GetString(0).Trim());
             }
 
             string connStr = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
@@ -27,32 +43,36 @@ namespace Rutinas
             {
                 conn.Open();
 
-                const string sql = @"
-                    SELECT TOP 100
-                        RTRIM(e.TAG)                        AS TAG,
-                        RTRIM(e.Descripcion)                AS Descripcion,
-                        ISNULL(RTRIM(a.Area), 'Sin area')   AS Area
-                    FROM equipos e
-                    LEFT JOIN Areas a ON RTRIM(e.TAG) = RTRIM(a.Tag)
-                    WHERE UPPER(RTRIM(e.Descripcion)) LIKE UPPER(@q)
-                       OR UPPER(RTRIM(e.TAG))         LIKE UPPER(@q)
-                    ORDER BY a.Area, e.TAG";
+                var where = new System.Collections.Generic.List<string>();
+                if (q.Length >= 2)
+                    where.Add("(UPPER(RTRIM(Descripcion)) LIKE UPPER(@q) OR UPPER(RTRIM(TAG)) LIKE UPPER(@q))");
+                if (!string.IsNullOrEmpty(area))
+                    where.Add("RTRIM(Area) = @area");
+
+                string sql = $@"
+                    SELECT TOP 200
+                        RTRIM(TAG)         AS TAG,
+                        RTRIM(Descripcion) AS Descripcion,
+                        ISNULL(RTRIM(Area), 'Sin area') AS Area
+                    FROM equipos
+                    WHERE {string.Join(" AND ", where)}
+                    ORDER BY Area, TAG";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@q", "%" + q + "%");
+                if (q.Length >= 2)    cmd.Parameters.AddWithValue("@q",    "%" + q + "%");
+                if (!string.IsNullOrEmpty(area)) cmd.Parameters.AddWithValue("@area", area);
 
                 using (var dr = cmd.ExecuteReader())
-                {
                     while (dr.Read())
                     {
-                        lista.Add(new
-                        {
-                            tag         = dr["TAG"].ToString(),
-                            descripcion = dr["Descripcion"].ToString(),
-                            area        = dr["Area"].ToString()
-                        });
+                        string tag = dr["TAG"].ToString().Trim();
+                        if (!yaDeclarados.Contains(tag))
+                            lista.Add(new {
+                                tag,
+                                descripcion = dr["Descripcion"].ToString(),
+                                area        = dr["Area"].ToString()
+                            });
                     }
-                }
             }
 
             context.Response.Write(new JavaScriptSerializer().Serialize(lista));

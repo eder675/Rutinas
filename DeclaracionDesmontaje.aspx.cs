@@ -19,10 +19,8 @@ namespace Rutinas
         {
             if (!IsPostBack)
             {
-                lblNombre.Text   = Session["NombreEmpleado"]?.ToString() ?? "";
-                btnGuardar.Visible  = false;
-                btnGuardar2.Visible = false;
-                lblMsg.Text = string.Empty;
+                lblNombre.Text  = Session["NombreEmpleado"]?.ToString() ?? "";
+                lblMsg.Text     = string.Empty;
             }
         }
 

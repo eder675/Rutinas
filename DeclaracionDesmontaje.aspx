@@ -34,11 +34,22 @@
 
             <!-- BUSQUEDA -->
             <div class="dd-search-section">
-                <label class="dd-label" for="txtBusqueda">Buscar equipos por TAG o descripcion</label>
                 <div class="dd-search-row">
-                    <input type="text" id="txtBusqueda" class="dd-input"
-                        placeholder="Escriba TAG o descripcion..." autocomplete="off" />
-                    <button type="button" id="btnBuscarJS" class="dd-btn-buscar">Buscar</button>
+                    <div class="dd-search-field">
+                        <label class="dd-label" for="ddlAreaFiltro">Filtrar por área</label>
+                        <select id="ddlAreaFiltro" class="dd-input">
+                            <option value="">-- Todas las áreas --</option>
+                        </select>
+                    </div>
+                    <div class="dd-search-field dd-search-field-grow">
+                        <label class="dd-label" for="txtBusqueda">Buscar por TAG o descripción</label>
+                        <input type="text" id="txtBusqueda" class="dd-input"
+                            placeholder="Opcional: escriba TAG o descripción..." autocomplete="off" />
+                    </div>
+                    <div class="dd-search-btn-wrap">
+                        <label class="dd-label">&nbsp;</label>
+                        <button type="button" id="btnBuscarJS" class="dd-btn-buscar">Buscar</button>
+                    </div>
                 </div>
             </div>
 
@@ -67,24 +78,32 @@
 
         </div>
 
-    </form>
+        <!-- TOAST -->
+        <div id="dd-toast" class="dd-toast"></div>
 
-    <!-- TOAST — fuera del form -->
-    <div id="dd-toast" class="dd-toast"></div>
+        <script type="text/javascript">
 
-    <script type="text/javascript">
+        // ── CARGAR ÁREAS AL INICIAR ───────────────────────────────
+        $.getJSON('ObtenerAreas.ashx', function (areas) {
+            var $ddl = $('#ddlAreaFiltro');
+            $.each(areas, function (i, area) {
+                $ddl.append($('<option>').val(area).text(area));
+            });
+        });
 
         // ── BUSQUEDA AJAX ──────────────────────────────────────────
         $('#btnBuscarJS').on('click', function () {
-            var q = $('#txtBusqueda').val().trim();
-            if (q.length < 2) {
-                mostrarToast('Ingrese al menos 2 caracteres.', 'error');
+            var q    = $('#txtBusqueda').val().trim();
+            var area = $('#ddlAreaFiltro').val();
+
+            if (q.length < 2 && area === '') {
+                mostrarToast('Seleccione un área o ingrese al menos 2 caracteres.', 'error');
                 return;
             }
 
             var $btn = $(this).prop('disabled', true).text('Buscando...');
 
-            $.getJSON('BuscarEquiposArea.ashx', { q: q })
+            $.getJSON('BuscarEquiposArea.ashx', { q: q, area: area })
                 .done(function (data) {
                     if (!data.length) {
                         mostrarToast('No se encontraron equipos.', 'error');
@@ -158,5 +177,7 @@
         }
 
     </script>
+
+    </form>
 </body>
 </html>

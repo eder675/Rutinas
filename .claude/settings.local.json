@@ -14,7 +14,9 @@
       "Bash(python *)",
       "Bash(python3 -c ' *)",
       "PowerShell($now = Get-Date; Write-Output \"Fecha y hora: $now\"; Write-Output \"Dia semana: $\\($now.DayOfWeek\\)\"; Write-Output \"Hora: $\\($now.TimeOfDay\\)\")",
-      "PowerShell(sqlcmd *)"
+      "PowerShell(sqlcmd *)",
+      "Bash(pip show *)",
+      "Bash(pip install *)"
     ]
   }
 }
