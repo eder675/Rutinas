@@ -376,46 +376,198 @@ namespace Rutinas
                     .ThenBy(x => x.TAG)
                     .ToList();
 
+                // Calcular avance por área (todos los equipos de Vinetas, sin filtro)
+                List<EquipoAvance> todosEquipos = string.IsNullOrEmpty(areaFiltro)
+                    ? equipos
+                    : ObtenerEquiposVinetas("");
+
+                var avancePorArea = todosEquipos
+                    .GroupBy(eq => eq.Area ?? "Sin área")
+                    .Select(g =>
+                    {
+                        int total = g.Count();
+                        int desm  = g.Count(eq => desmontados.ContainsKey(eq.TAG.ToUpper()));
+                        double pct = total > 0 ? Math.Round(desm * 100.0 / total, 1) : 0;
+                        return new { Area = g.Key, Total = total, Desmontados = desm,
+                                     Pendientes = total - desm, Avance = pct };
+                    })
+                    .OrderByDescending(x => x.Avance)
+                    .ThenBy(x => x.Area)
+                    .ToList();
+
                 using (XLWorkbook wb = new XLWorkbook())
                 {
+                    // ── HOJA 1: Equipos desmontados ──────────────────────────
                     IXLWorksheet ws = wb.Worksheets.Add("Desmontados");
+                    ws.TabColor = XLColor.FromHtml("#2E7D32");
 
-                    // Encabezados
-                    string[] headers = new string[]
-                    {
-                        "TAG", "Descripcion", "Area", "Fecha Declaracion", "Declarado Por"
-                    };
+                    // Título
+                    ws.Cell(1, 1).Value = "REGISTRO DE EQUIPOS DESMONTADOS";
+                    ws.Range(1, 1, 1, 5).Merge();
+                    ws.Cell(1, 1).Style.Font.Bold = true;
+                    ws.Cell(1, 1).Style.Font.FontSize = 14;
+                    ws.Cell(1, 1).Style.Font.FontColor = XLColor.White;
+                    ws.Cell(1, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#1B5E20");
+                    ws.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    ws.Row(1).Height = 28;
 
-                    for (int col = 0; col < headers.Length; col++)
+                    // Subtítulo con fecha
+                    ws.Cell(2, 1).Value = "Generado: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                    ws.Range(2, 1, 2, 5).Merge();
+                    ws.Cell(2, 1).Style.Font.Italic = true;
+                    ws.Cell(2, 1).Style.Font.FontColor = XLColor.FromHtml("#555555");
+                    ws.Cell(2, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    // Encabezados columnas (fila 3)
+                    string[] h1 = { "TAG", "Descripción", "Área", "Fecha Declaración", "Declarado Por" };
+                    for (int col = 0; col < h1.Length; col++)
                     {
-                        IXLCell cell = ws.Cell(1, col + 1);
-                        cell.Value = headers[col];
+                        IXLCell cell = ws.Cell(3, col + 1);
+                        cell.Value = h1[col];
                         cell.Style.Font.Bold = true;
+                        cell.Style.Font.FontSize = 11;
                         cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#2E7D32");
                         cell.Style.Font.FontColor = XLColor.White;
                         cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        cell.Style.Border.OutsideBorderColor = XLColor.White;
                     }
+                    ws.Row(3).Height = 20;
 
-                    // Filas de datos
+                    // Datos desde fila 4
                     for (int row = 0; row < exportar.Count; row++)
                     {
                         var item = exportar[row];
-                        ws.Cell(row + 2, 1).Value = item.TAG;
-                        ws.Cell(row + 2, 2).Value = item.Descripcion;
-                        ws.Cell(row + 2, 3).Value = item.Area;
-                        ws.Cell(row + 2, 4).Value = item.FechaDeclaracion.HasValue
-                            ? item.FechaDeclaracion.Value.ToString("dd/MM/yyyy HH:mm")
-                            : "";
-                        ws.Cell(row + 2, 5).Value = item.NombreEmpleado;
+                        int xlRow = row + 4;
+                        ws.Cell(xlRow, 1).Value = item.TAG;
+                        ws.Cell(xlRow, 2).Value = item.Descripcion;
+                        ws.Cell(xlRow, 3).Value = item.Area;
+                        ws.Cell(xlRow, 4).Value = item.FechaDeclaracion.HasValue
+                            ? item.FechaDeclaracion.Value.ToString("dd/MM/yyyy HH:mm") : "";
+                        ws.Cell(xlRow, 5).Value = item.NombreEmpleado;
 
-                        // Filas alternas verde muy claro
-                        if (row % 2 == 1)
-                            ws.Row(row + 2).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F5E9");
+                        // Alineación
+                        ws.Cell(xlRow, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        ws.Cell(xlRow, 4).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        // Alternado
+                        var rowStyle = ws.Row(xlRow).Style;
+                        rowStyle.Fill.BackgroundColor = row % 2 == 0
+                            ? XLColor.White : XLColor.FromHtml("#F1F8F1");
+
+                        // Bordes
+                        ws.Range(xlRow, 1, xlRow, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        ws.Range(xlRow, 1, xlRow, 5).Style.Border.OutsideBorderColor = XLColor.FromHtml("#C8E6C9");
                     }
 
-                    // Ajustar columnas
+                    // Total al pie
+                    int totalRow1 = exportar.Count + 4;
+                    ws.Cell(totalRow1, 1).Value = "TOTAL DESMONTADOS:";
+                    ws.Cell(totalRow1, 1).Style.Font.Bold = true;
+                    ws.Cell(totalRow1, 2).Value = exportar.Count;
+                    ws.Cell(totalRow1, 2).Style.Font.Bold = true;
+                    ws.Range(totalRow1, 1, totalRow1, 5).Style.Fill.BackgroundColor = XLColor.FromHtml("#E8F5E9");
+
                     ws.Columns().AdjustToContents();
-                    ws.SheetView.FreezeRows(1);
+                    ws.Column(2).Width = Math.Min(ws.Column(2).Width, 50);
+                    ws.SheetView.FreezeRows(3);
+                    ws.RangeUsed().SetAutoFilter();
+
+                    // ── HOJA 2: Avance por área ───────────────────────────────
+                    IXLWorksheet ws2 = wb.Worksheets.Add("Avance por Area");
+                    ws2.TabColor = XLColor.FromHtml("#1565C0");
+
+                    // Título
+                    ws2.Cell(1, 1).Value = "AVANCE DE DESMONTAJE POR ÁREA";
+                    ws2.Range(1, 1, 1, 5).Merge();
+                    ws2.Cell(1, 1).Style.Font.Bold = true;
+                    ws2.Cell(1, 1).Style.Font.FontSize = 14;
+                    ws2.Cell(1, 1).Style.Font.FontColor = XLColor.White;
+                    ws2.Cell(1, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#0D47A1");
+                    ws2.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    ws2.Row(1).Height = 28;
+
+                    ws2.Cell(2, 1).Value = "Generado: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                    ws2.Range(2, 1, 2, 5).Merge();
+                    ws2.Cell(2, 1).Style.Font.Italic = true;
+                    ws2.Cell(2, 1).Style.Font.FontColor = XLColor.FromHtml("#555555");
+                    ws2.Cell(2, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    // Encabezados columnas (fila 3)
+                    string[] h2 = { "Área", "Total Equipos", "Desmontados", "Pendientes", "% Avance" };
+                    for (int col = 0; col < h2.Length; col++)
+                    {
+                        IXLCell cell = ws2.Cell(3, col + 1);
+                        cell.Value = h2[col];
+                        cell.Style.Font.Bold = true;
+                        cell.Style.Font.FontSize = 11;
+                        cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#1565C0");
+                        cell.Style.Font.FontColor = XLColor.White;
+                        cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        cell.Style.Border.OutsideBorderColor = XLColor.White;
+                    }
+                    ws2.Row(3).Height = 20;
+
+                    // Datos
+                    for (int row = 0; row < avancePorArea.Count; row++)
+                    {
+                        var a = avancePorArea[row];
+                        int xlRow = row + 4;
+
+                        ws2.Cell(xlRow, 1).Value = a.Area;
+                        ws2.Cell(xlRow, 2).Value = a.Total;
+                        ws2.Cell(xlRow, 3).Value = a.Desmontados;
+                        ws2.Cell(xlRow, 4).Value = a.Pendientes;
+                        ws2.Cell(xlRow, 5).Value = a.Avance / 100.0;
+                        ws2.Cell(xlRow, 5).Style.NumberFormat.Format = "0.0%";
+
+                        // Alineación numérica
+                        for (int c = 2; c <= 5; c++)
+                            ws2.Cell(xlRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        // Color por nivel de avance
+                        XLColor rowColor;
+                        if (a.Avance >= 100)      rowColor = XLColor.FromHtml("#C8E6C9"); // verde
+                        else if (a.Avance >= 50)   rowColor = XLColor.FromHtml("#FFF9C4"); // amarillo
+                        else if (row % 2 == 0)     rowColor = XLColor.White;
+                        else                        rowColor = XLColor.FromHtml("#F5F5F5");
+
+                        ws2.Range(xlRow, 1, xlRow, 5).Style.Fill.BackgroundColor = rowColor;
+                        ws2.Range(xlRow, 1, xlRow, 5).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                        ws2.Range(xlRow, 1, xlRow, 5).Style.Border.BottomBorderColor = XLColor.FromHtml("#DDDDDD");
+                    }
+
+                    // Fila de totales
+                    int totalRow = avancePorArea.Count + 4;
+                    int gtTotal  = avancePorArea.Sum(x => x.Total);
+                    int gtDesm   = avancePorArea.Sum(x => x.Desmontados);
+                    int gtPend   = avancePorArea.Sum(x => x.Pendientes);
+                    double gtPct = gtTotal > 0 ? Math.Round(gtDesm * 100.0 / gtTotal, 1) : 0;
+
+                    ws2.Cell(totalRow, 1).Value = "TOTAL GENERAL";
+                    ws2.Cell(totalRow, 2).Value = gtTotal;
+                    ws2.Cell(totalRow, 3).Value = gtDesm;
+                    ws2.Cell(totalRow, 4).Value = gtPend;
+                    ws2.Cell(totalRow, 5).Value = gtPct / 100.0;
+                    ws2.Cell(totalRow, 5).Style.NumberFormat.Format = "0.0%";
+                    ws2.Range(totalRow, 1, totalRow, 5).Style.Font.Bold = true;
+                    ws2.Range(totalRow, 1, totalRow, 5).Style.Fill.BackgroundColor = XLColor.FromHtml("#0D47A1");
+                    ws2.Range(totalRow, 1, totalRow, 5).Style.Font.FontColor = XLColor.White;
+                    for (int c = 2; c <= 5; c++)
+                        ws2.Cell(totalRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    // Barra de datos en columna % Avance (mini-barras visuales)
+                    if (avancePorArea.Count > 0)
+                    {
+                        var rangoBarras = ws2.Range(ws2.Cell(4, 5), ws2.Cell(avancePorArea.Count + 3, 5));
+                        rangoBarras.AddConditionalFormat().DataBar(XLColor.FromHtml("#1565C0"), true);
+                    }
+
+                    ws2.Columns().AdjustToContents();
+                    ws2.Column(1).Width = Math.Min(ws2.Column(1).Width, 45);
+                    ws2.SheetView.FreezeRows(3);
+                    ws2.SheetView.FreezeColumns(1);
 
                     // Nombre de archivo
                     string sufijo = string.IsNullOrEmpty(areaFiltro)
