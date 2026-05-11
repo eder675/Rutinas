@@ -202,15 +202,43 @@ namespace Rutinas
                 List<EquipoAvance> todos      = ObtenerEquiposVinetas("");
                 Dictionary<string, EquipoAvance> desmontados = ObtenerDesmontados();
 
-                int total       = todos.Count;
-                int desmCount   = todos.Count(e => desmontados.ContainsKey(e.TAG.ToUpper()));
-                int pendCount   = total - desmCount;
-                double pct      = total > 0 ? Math.Round((double)desmCount / total * 100.0, 1) : 0.0;
+                int total     = todos.Count;
+                int desmCount = todos.Count(e => desmontados.ContainsKey(e.TAG.ToUpper()));
+                int pendCount = total - desmCount;
+                double pct    = total > 0 ? Math.Round((double)desmCount / total * 100.0, 1) : 0.0;
 
                 lblTotal.Text       = total.ToString();
                 lblDesmontados.Text = desmCount.ToString();
                 lblPendientes.Text  = pendCount.ToString();
                 lblPorcentaje.Text  = pct.ToString("0.0") + "%";
+
+                // Delta: nuevos declarados hoy (desde medianoche)
+                int deltaHoy = 0;
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(
+                        @"SELECT COUNT(DISTINCT TAG) FROM DesmontajeAvance
+                          WHERE Desmontado = 1
+                            AND FechaDeclaracion >= CAST(GETDATE() AS DATE)", conn);
+                    deltaHoy = (int)cmd.ExecuteScalar();
+                }
+
+                if (deltaHoy > 0)
+                {
+                    double deltaPct = total > 0 ? Math.Round((double)deltaHoy / total * 100.0, 1) : 0.0;
+
+                    lblDeltaDia.Text    = "+" + deltaHoy + " hoy";
+                    lblDeltaDia.Visible = true;
+
+                    lblDeltaPct.Text    = "+" + deltaPct.ToString("0.0") + "% hoy";
+                    lblDeltaPct.Visible = true;
+                }
+                else
+                {
+                    lblDeltaDia.Visible = false;
+                    lblDeltaPct.Visible = false;
+                }
             }
             catch (Exception ex)
             {

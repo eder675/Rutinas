@@ -45,6 +45,7 @@
                 <div class="ddb-metric-card ddb-verde">
                     <span class="ddb-metric-label">Desmontados</span>
                     <asp:Label ID="lblDesmontados" runat="server" Text="0" CssClass="ddb-metric-value"></asp:Label>
+                    <asp:Label ID="lblDeltaDia" runat="server" Text="" CssClass="ddb-metric-delta" Visible="false"></asp:Label>
                     <span class="ddb-metric-sub">declarados como desmontados</span>
                 </div>
 
@@ -57,6 +58,7 @@
                 <div class="ddb-metric-card ddb-azul">
                     <span class="ddb-metric-label">% Avance Global</span>
                     <asp:Label ID="lblPorcentaje" runat="server" Text="0.0%" CssClass="ddb-metric-value"></asp:Label>
+                    <asp:Label ID="lblDeltaPct" runat="server" Text="" CssClass="ddb-metric-delta" Visible="false"></asp:Label>
                     <span class="ddb-metric-sub">sobre el total de equipos</span>
                 </div>
 

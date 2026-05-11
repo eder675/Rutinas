@@ -41,6 +41,10 @@ namespace Rutinas
         /// </summary>
         protected global::System.Web.UI.WebControls.Label lblPorcentaje;
 
+        protected global::System.Web.UI.WebControls.Label lblDeltaDia;
+
+        protected global::System.Web.UI.WebControls.Label lblDeltaPct;
+
         /// <summary>
         /// DropDownList para filtrar equipos por área. AutoPostBack = true.
         /// </summary>
