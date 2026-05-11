@@ -29,34 +29,19 @@
         <div class="auto-style1">
             <h1>Bienvenido a Rutinas MTI</h1>
             <p>
-                <asp:TextBox ID="txtname" runat="server" input type="text" placeholder="Nombre y Apellido" Enabled="False" ></asp:TextBox>
-                <asp:RequiredFieldValidator ID="rfvName" runat="server" ControlToValidate="txtname" ErrorMessage="Ingrese su nombre" ForeColor="Red"></asp:RequiredFieldValidator>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:RadioButton ID="rbtInstrumentista" runat="server" AutoPostBack="True" Checked="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtInstrumentista_CheckedChanged" Text="Instrumentista" />
+                <asp:TextBox ID="txtcodigo" runat="server" TextMode="Password" placeholder="Codigo de empleado" Width="220px"></asp:TextBox>
+                <asp:RequiredFieldValidator ID="rfvCodigo" runat="server" ControlToValidate="txtcodigo" ErrorMessage="Complete este campo" ForeColor="Red"></asp:RequiredFieldValidator>
             </p>
             <p>
-                <asp:TextBox ID="txtcodigo" runat="server" TextMode="Password" placeholder="Codigo de empleado"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="rfvCodigo" runat="server" ControlToValidate="txtcodigo" ErrorMessage="Complete este campo " ForeColor="Red"></asp:RequiredFieldValidator>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:RadioButton ID="rbtAdministrador" runat="server" AutoPostBack="True" ForeColor="#CC0000" GroupName="RolesDeUsuario" OnCheckedChanged="rbtAdministrador_CheckedChanged" Text="Administrador " />
-            </p>
-            <p>
-                <asp:Button ID="btnentrar" runat="server" button type="submit" Text="INICIAR SESION" OnClick="btnentrar_Click" />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <asp:Button ID="btnentrar" runat="server" Text="INICIAR SESION" OnClick="btnentrar_Click" />
                 <asp:Button ID="btnAbout" runat="server" BorderColor="#CCFF66" BorderStyle="Outset" OnClick="Button1_Click" Text="Acerca de." CausesValidation="False" Width="143px" />
-            </p
+            </p>
+            <footer>
+                <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
+            </footer>
         </div>
 
-    
-    
-      
-        </form>
-
-    
-    
-<footer>
-        <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
-    </footer>  
+        </form>  
     <script src="shared.js"></script>
 </body>
 </html>

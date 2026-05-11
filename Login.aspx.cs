@@ -12,50 +12,23 @@ namespace Rutinas
         protected void Page_Load(object sender, EventArgs e)
         {
             UnobtrusiveValidationMode = UnobtrusiveValidationMode.None;
-            rfvName.Enabled = false;
-            txtcodigo.Focus();  
+            txtcodigo.Focus();
         }
 
         protected void btnentrar_Click(object sender, EventArgs e)
         {
-            // NO es necesario llamar a Page.Validate() si ya usas los RequiredFieldValidator, 
-            // pero lo mantendremos para consistencia.
             Page.Validate();
 
-            // Solo necesitamos la cadena de conexión si las validaciones son correctas
-            // string connectionString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
-            
             if (Page.IsValid)
             {
-                // 1. Obtener datos de los TextBox (Asegúrate que los IDs sean correctos: txtname y txtcodigo)
-                string nombreIngresado = txtname.Text.Trim();
                 string codigoIngresado = txtcodigo.Text.Trim();
-
-                // 2. Obtener la Cadena de Conexión
                 string connectionString = WebConfigurationManager.ConnectionStrings["ConexionRutinasMTI"].ConnectionString;
-
-                // 3. Consulta SQL para verificar la credencial
-                // Buscamos un registro que COINCIDA en Nombre Y Codigo_empleado
-                string consulta;
-                bool esInstrumentista = rbtInstrumentista.Checked;
-
-                if (esInstrumentista)
-                {
-                    // A) Lógica para INSTRUMENTISTA: Solo validar por Codigo_empleado
-                    consulta = "SELECT Nombre, Cargo, Codigo_empleado FROM Empleado WHERE Codigo_empleado = @Codigo";
-                }
-                else // Se asume que es Administrador (o la única otra opción)
-                {
-                    // B) Lógica para ADMINISTRADOR: Validar por Nombre Y Codigo_empleado
-                    consulta = "SELECT Nombre, Cargo, Codigo_empleado FROM Empleado WHERE Nombre = @Nombre AND Codigo_empleado = @Codigo";
-                }
+                string consulta = "SELECT Nombre, Cargo, Codigo_empleado FROM Empleado WHERE Codigo_empleado = @Codigo";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     using (SqlCommand cmd = new SqlCommand(consulta, conn))
                     {
-                        // Parámetros SQL: ¡CLAVE para la seguridad (prevención de Inyección SQL)!
-                        cmd.Parameters.AddWithValue("@Nombre", nombreIngresado);
                         cmd.Parameters.AddWithValue("@Codigo", codigoIngresado);
 
                         try
@@ -159,25 +132,6 @@ namespace Rutinas
             ScriptManager.RegisterStartupScript(this, GetType(), "MostrarMensajeValidacion", script, true);
         }
 
-        protected void txtname_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void rbtInstrumentista_CheckedChanged(object sender, EventArgs e)
-        {
-                txtname.Enabled = false;
-                rfvName.Enabled = false;
-                txtname.Text = "";
-
-        }
-
-        protected void rbtAdministrador_CheckedChanged(object sender, EventArgs e)
-        {
-            txtname.Enabled = true;
-            rfvName.Enabled = true;
-            txtname.Text = "";
-        }
 
         protected void Button1_Click(object sender, EventArgs e)
         {
