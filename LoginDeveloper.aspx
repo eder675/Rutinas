@@ -488,6 +488,23 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </Columns>
                     </asp:GridView>
                 </fieldset>
+
+                <fieldset style="margin-top:20px; padding:12px;">
+                    <legend><b>Áreas excluidas del avance y declaración de desmontaje</b></legend>
+                    <p style="margin:0 0 8px; font-size:0.9em; color:#555;">
+                        Las áreas marcadas <b>no aparecerán</b> en el buscador de declaración ni en el dashboard de desmontaje.
+                    </p>
+                    <asp:CheckBoxList ID="cblAreasExcluidas" runat="server"
+                        RepeatColumns="3"
+                        Style="margin-bottom:10px; font-size:0.9em;" />
+                    <br />
+                    <asp:Button ID="btnGuardarAreasExcluidas" runat="server"
+                        Text="GUARDAR EXCLUSIONES"
+                        OnClick="btnGuardarAreasExcluidas_Click"
+                        Style="padding:8px 20px;" />
+                    <asp:Label ID="lblAreasExclMsg" runat="server" Text="" ForeColor="Green" Style="margin-left:10px;" />
+                </fieldset>
+
             </asp:View>
             <asp:View ID="vborrarrutina" runat="server">
                 <fieldset style="max-width:480px; padding:16px;">

@@ -98,6 +98,70 @@ namespace Rutinas
 
             // Cargar asignaciones de áreas por empleado
             CargarAsignacionesEmpleados();
+
+            // Cargar áreas excluidas del avance de desmontaje
+            CargarAreasExcluidas();
+        }
+
+        private void CargarAreasExcluidas()
+        {
+            // Poblar CheckBoxList con todas las áreas de Vinetas
+            string vinetasConn = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
+            var todasAreas = new System.Collections.Generic.List<string>();
+            using (SqlConnection conn = new SqlConnection(vinetasConn))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT DISTINCT RTRIM(Area) AS Area FROM equipos WHERE Area IS NOT NULL AND RTRIM(Area)<>'' AND RTRIM(Area)<>'No Existe' ORDER BY Area",
+                    conn);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) todasAreas.Add(dr["Area"].ToString());
+            }
+
+            cblAreasExcluidas.Items.Clear();
+            foreach (string area in todasAreas)
+                cblAreasExcluidas.Items.Add(new ListItem(area, area));
+
+            // Marcar las que ya están excluidas
+            var excluidas = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT RTRIM(Area) FROM AreasDesmontajeExcluida", conn);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read()) excluidas.Add(dr.GetString(0));
+            }
+
+            foreach (ListItem item in cblAreasExcluidas.Items)
+                item.Selected = excluidas.Contains(item.Value);
+        }
+
+        protected void btnGuardarAreasExcluidas_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    new SqlCommand("DELETE FROM AreasDesmontajeExcluida", conn).ExecuteNonQuery();
+
+                    foreach (ListItem item in cblAreasExcluidas.Items)
+                    {
+                        if (!item.Selected) continue;
+                        SqlCommand cmd = new SqlCommand(
+                            "INSERT INTO AreasDesmontajeExcluida (Area) VALUES (@Area)", conn);
+                        cmd.Parameters.AddWithValue("@Area", item.Value);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                lblAreasExclMsg.ForeColor = System.Drawing.Color.Green;
+                lblAreasExclMsg.Text = "Exclusiones guardadas correctamente.";
+            }
+            catch (Exception ex)
+            {
+                lblAreasExclMsg.ForeColor = System.Drawing.Color.Red;
+                lblAreasExclMsg.Text = "Error: " + ex.Message;
+            }
         }
 
         private void BindPoolDesmontaje()

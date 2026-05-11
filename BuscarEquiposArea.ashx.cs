@@ -36,6 +36,15 @@ namespace Rutinas
                         yaDeclarados.Add(drR.GetString(0).Trim());
             }
 
+            var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
+
+            // Si se filtró por un área excluida, devolver vacío
+            if (!string.IsNullOrEmpty(area) && excluidas.Contains(area))
+            {
+                context.Response.Write("[]");
+                return;
+            }
+
             string connStr = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
             var lista = new List<object>();
 
@@ -65,13 +74,11 @@ namespace Rutinas
                 using (var dr = cmd.ExecuteReader())
                     while (dr.Read())
                     {
-                        string tag = dr["TAG"].ToString().Trim();
-                        if (!yaDeclarados.Contains(tag))
-                            lista.Add(new {
-                                tag,
-                                descripcion = dr["Descripcion"].ToString(),
-                                area        = dr["Area"].ToString()
-                            });
+                        string tag      = dr["TAG"].ToString().Trim();
+                        string areaEq   = dr["Area"].ToString();
+                        if (yaDeclarados.Contains(tag)) continue;
+                        if (excluidas.Contains(areaEq)) continue;
+                        lista.Add(new { tag, descripcion = dr["Descripcion"].ToString(), area = areaEq });
                     }
             }
 

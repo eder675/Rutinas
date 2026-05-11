@@ -115,6 +115,7 @@
     <Content Include="media\paisajeILC.jpg" />
     <Content Include="BuscarEquiposArea.ashx" />
     <Content Include="ObtenerAreas.ashx" />
+    <Content Include="ObtenerEquiposPorArea.ashx" />
     <Content Include="BuscarInstrumento.ashx" />
     <Content Include="DeclaracionDesmontaje.aspx" />
     <Content Include="Registrofallos.aspx" />
@@ -182,6 +183,10 @@
     </Compile>
     <Compile Include="Models\RutinaDataModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AreaExcluidaHelper.cs" />
+    <Compile Include="ObtenerEquiposPorArea.ashx.cs">
+      <DependentUpon>ObtenerEquiposPorArea.ashx</DependentUpon>
+    </Compile>
     <Compile Include="ObtenerAreas.ashx.cs">
       <DependentUpon>ObtenerAreas.ashx</DependentUpon>
     </Compile>

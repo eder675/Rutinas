@@ -43,7 +43,6 @@ namespace Rutinas
             }
 
             CargarMetricasGlobales();
-            CargarTablaEquipos();
             CargarAvancePorArea();
         }
 
@@ -57,6 +56,8 @@ namespace Rutinas
 
             try
             {
+                var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
+
                 const string sql = @"SELECT DISTINCT RTRIM(Area) AS Area
                                      FROM equipos
                                      WHERE Area IS NOT NULL AND RTRIM(Area) <> ''
@@ -71,7 +72,8 @@ namespace Rutinas
                         while (dr.Read())
                         {
                             string area = dr.GetString(0);
-                            ddlAreaFiltro.Items.Add(new ListItem(area, area));
+                            if (!excluidas.Contains(area))
+                                ddlAreaFiltro.Items.Add(new ListItem(area, area));
                         }
                     }
                 }
@@ -148,7 +150,8 @@ namespace Rutinas
         // ════════════════════════════════════════════════════════════════════
         private List<EquipoAvance> ObtenerEquiposVinetas(string area)
         {
-            var lista = new List<EquipoAvance>();
+            var lista     = new List<EquipoAvance>();
+            var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
 
             try
             {
@@ -174,11 +177,13 @@ namespace Rutinas
                     {
                         while (dr.Read())
                         {
+                            string areaEq = dr.IsDBNull(2) ? "" : dr.GetString(2).Trim();
+                            if (excluidas.Contains(areaEq)) continue;
                             lista.Add(new EquipoAvance
                             {
                                 TAG         = dr.IsDBNull(0) ? "" : dr.GetString(0).Trim(),
                                 Descripcion = dr.IsDBNull(1) ? "" : dr.GetString(1).Trim(),
-                                Area        = dr.IsDBNull(2) ? "" : dr.GetString(2).Trim()
+                                Area        = areaEq
                             });
                         }
                     }
@@ -246,47 +251,6 @@ namespace Rutinas
             }
         }
 
-        // ════════════════════════════════════════════════════════════════════
-        // TABLA DE EQUIPOS (con filtro de área si se seleccionó)
-        // ════════════════════════════════════════════════════════════════════
-        private void CargarTablaEquipos()
-        {
-            try
-            {
-                string areaFiltro = ddlAreaFiltro.SelectedValue;
-                List<EquipoAvance> equipos    = ObtenerEquiposVinetas(areaFiltro);
-                Dictionary<string, EquipoAvance> desmontados = ObtenerDesmontados();
-
-                var pendientes   = new List<EquipoAvance>();
-                var desmontadosList = new List<EquipoAvance>();
-
-                foreach (var eq in equipos.OrderBy(e => e.TAG))
-                {
-                    string key = eq.TAG.ToUpper();
-                    if (desmontados.TryGetValue(key, out EquipoAvance da))
-                        desmontadosList.Add(new EquipoAvance {
-                            TAG = eq.TAG, Descripcion = eq.Descripcion, Area = eq.Area,
-                            Desmontado = true, FechaDeclaracion = da.FechaDeclaracion,
-                            NombreEmpleado = da.NombreEmpleado });
-                    else
-                        pendientes.Add(new EquipoAvance {
-                            TAG = eq.TAG, Descripcion = eq.Descripcion, Area = eq.Area,
-                            Desmontado = false });
-                }
-
-                gvPendientes.DataSource = pendientes;
-                gvPendientes.DataBind();
-                lblContPendientes.Text = $"({pendientes.Count})";
-
-                gvDesmontados.DataSource = desmontadosList;
-                gvDesmontados.DataBind();
-                lblContDesmontados.Text = $"({desmontadosList.Count})";
-            }
-            catch (Exception ex)
-            {
-                MostrarError("Error al cargar tabla de equipos: " + ex.Message);
-            }
-        }
 
         // ════════════════════════════════════════════════════════════════════
         // AVANCE POR ÁREA (siempre todos los equipos, independiente del filtro)
@@ -341,16 +305,7 @@ namespace Rutinas
         }
 
         // ════════════════════════════════════════════════════════════════════
-        // ROW DATA BOUND — gvEquipos
-        // ════════════════════════════════════════════════════════════════════
-        protected void gvDesmontados_RowDataBound(object sender, GridViewRowEventArgs e)
-        {
-            if (e.Row.RowType != DataControlRowType.DataRow) return;
-            e.Row.Style["background-color"] = "rgba(46,125,50,0.08)";
-        }
-
-        // ════════════════════════════════════════════════════════════════════
-        // ROW DATA BOUND — gvAvanceAreas (colorear fila según % avance)
+        // ROW DATA BOUND — gvAvanceAreas
         // ════════════════════════════════════════════════════════════════════
         protected void gvAvanceAreas_RowDataBound(object sender, GridViewRowEventArgs e)
         {
@@ -358,6 +313,11 @@ namespace Rutinas
 
             DataRowView drv = e.Row.DataItem as DataRowView;
             if (drv == null) return;
+
+            // Atributos para el accordion JS
+            e.Row.Attributes["data-area"] = drv["Area"].ToString();
+            e.Row.CssClass += " ddb-area-row";
+            e.Row.Style["cursor"] = "pointer";
 
             double pct = Convert.ToDouble(drv["AvancePct"]);
             if (pct >= 100.0)
@@ -369,7 +329,6 @@ namespace Rutinas
         // ════════════════════════════════════════════════════════════════════
         protected void ddlAreaFiltro_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CargarTablaEquipos();
             CargarAvancePorArea();
         }
 

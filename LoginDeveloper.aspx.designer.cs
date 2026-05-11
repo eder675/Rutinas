@@ -233,6 +233,12 @@ namespace Rutinas
 
         protected global::System.Web.UI.WebControls.Label lblAsignMsg;
 
+        protected global::System.Web.UI.WebControls.CheckBoxList cblAreasExcluidas;
+
+        protected global::System.Web.UI.WebControls.Button btnGuardarAreasExcluidas;
+
+        protected global::System.Web.UI.WebControls.Label lblAreasExclMsg;
+
         protected global::System.Web.UI.WebControls.LinkButton lnkBorrarRutina;
 
         protected global::System.Web.UI.WebControls.View vborrarrutina;

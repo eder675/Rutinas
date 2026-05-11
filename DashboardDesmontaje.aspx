@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles-shared.css" />
     <link rel="stylesheet" href="stylesdashboarddesmontaje.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="Scripts/chart.umd.min.js"></script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -92,6 +93,11 @@
                         GridLines="None"
                         OnRowDataBound="gvAvanceAreas_RowDataBound">
                         <Columns>
+                            <asp:TemplateField HeaderText="" ItemStyle-Width="28px">
+                                <ItemTemplate>
+                                    <span class="ddb-expand-icon">▶</span>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:BoundField DataField="Area"        HeaderText="Área" />
                             <asp:BoundField DataField="Total"       HeaderText="Total"       ItemStyle-Width="70px" />
                             <asp:BoundField DataField="Desmontados" HeaderText="Desmontados" ItemStyle-Width="100px" />
@@ -115,81 +121,72 @@
                 </div>
             </div>
 
-            <!-- ════════════════════════════════════════════════
-                 DETALLE DE EQUIPOS
-            ═════════════════════════════════════════════════ -->
-            <!-- DESMONTADOS -->
-            <div class="ddb-section">
-                <h2>Equipos Desmontados <asp:Label ID="lblContDesmontados" runat="server" CssClass="ddb-seccion-conteo"/></h2>
-                <div class="ddb-table-wrap">
-                    <asp:GridView ID="gvDesmontados" runat="server"
-                        AutoGenerateColumns="false"
-                        CssClass="ddb-grid"
-                        GridLines="None"
-                        OnRowDataBound="gvDesmontados_RowDataBound">
-                        <Columns>
-                            <asp:BoundField DataField="TAG"         HeaderText="TAG"         ItemStyle-Width="90px" />
-                            <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
-                            <asp:BoundField DataField="Area"        HeaderText="Área"        ItemStyle-Width="140px" />
-                            <asp:TemplateField HeaderText="Fecha Declaración" ItemStyle-Width="140px">
-                                <ItemTemplate>
-                                    <%# Eval("FechaDeclaracion") != null
-                                        ? Convert.ToDateTime(Eval("FechaDeclaracion")).ToString("dd/MM/yyyy HH:mm")
-                                        : "—" %>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                            <asp:BoundField DataField="NombreEmpleado" HeaderText="Declarado por" />
-                        </Columns>
-                        <EmptyDataTemplate>
-                            <div class="ddb-empty-msg">No hay equipos desmontados para el área seleccionada.</div>
-                        </EmptyDataTemplate>
-                    </asp:GridView>
-                </div>
-            </div>
-
-            <!-- PENDIENTES -->
-            <div class="ddb-section">
-                <h2>Equipos Pendientes <asp:Label ID="lblContPendientes" runat="server" CssClass="ddb-seccion-conteo"/></h2>
-                <div class="ddb-table-wrap">
-                    <asp:GridView ID="gvPendientes" runat="server"
-                        AutoGenerateColumns="false"
-                        CssClass="ddb-grid"
-                        GridLines="None">
-                        <Columns>
-                            <asp:BoundField DataField="TAG"         HeaderText="TAG"         ItemStyle-Width="90px" />
-                            <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
-                            <asp:BoundField DataField="Area"        HeaderText="Área"        ItemStyle-Width="140px" />
-                        </Columns>
-                        <EmptyDataTemplate>
-                            <div class="ddb-empty-msg">No hay equipos pendientes para el área seleccionada.</div>
-                        </EmptyDataTemplate>
-                    </asp:GridView>
-                </div>
-                <div id="divMostrarMas" style="text-align:center; margin-top:12px; display:none;">
-                    <button type="button" class="ddb-btn-mostrar" onclick="mostrarTodosPendientes()">
-                        Mostrar todos los pendientes ▼
-                    </button>
-                </div>
-            </div>
-
     <script type="text/javascript">
-        var FILAS_INICIALES = 10;
 
-        function aplicarLimitePendientes() {
-            var $filas = $('#<%= gvPendientes.ClientID %> tr:not(:first-child)');
-            if ($filas.length > FILAS_INICIALES) {
-                $filas.slice(FILAS_INICIALES).hide();
-                $('#divMostrarMas').show();
+        function escHtml(str) { return $('<span>').text(str || '').html(); }
+
+        $(document).on('click', '.ddb-area-row', function () {
+            var $row   = $(this);
+            var area   = $row.attr('data-area');
+            var $detalle = $row.next('.ddb-detail-row');
+
+            // Si ya existe la fila de detalle, solo toggle
+            if ($detalle.length) {
+                $detalle.toggleClass('ddb-detail-hidden');
+                $row.toggleClass('ddb-area-row-open');
+                return;
             }
-        }
 
-        function mostrarTodosPendientes() {
-            $('#<%= gvPendientes.ClientID %> tr').show();
-            $('#divMostrarMas').hide();
-        }
+            $row.addClass('ddb-area-row-loading');
 
-        $(document).ready(function () {
-            aplicarLimitePendientes();
+            $.getJSON('ObtenerEquiposPorArea.ashx', { area: area })
+                .done(function (data) {
+                    var cols = $row.find('td').length;
+
+                    var html = '<tr class="ddb-detail-row"><td colspan="' + cols + '">';
+                    html += '<div class="ddb-detail-wrap">';
+
+                    // Caja desmontados
+                    html += '<div class="ddb-detail-box ddb-detail-desm">';
+                    html += '<div class="ddb-detail-box-titulo">&#10003; Desmontados (' + data.desmontados.length + ')</div>';
+                    html += '<div class="ddb-detail-lista">';
+                    if (data.desmontados.length) {
+                        data.desmontados.forEach(function (eq) {
+                            html += '<div class="ddb-detail-item">';
+                            html += '<span class="ddb-di-tag">'  + escHtml(eq.tag)         + '</span>';
+                            html += '<span class="ddb-di-desc">' + escHtml(eq.descripcion) + '</span>';
+                            if (eq.fecha) html += '<span class="ddb-di-fecha">' + escHtml(eq.fecha) + ' — ' + escHtml(eq.nombre) + '</span>';
+                            html += '</div>';
+                        });
+                    } else {
+                        html += '<div class="ddb-detail-empty">Ninguno declarado aún.</div>';
+                    }
+                    html += '</div></div>';
+
+                    // Caja pendientes
+                    html += '<div class="ddb-detail-box ddb-detail-pend">';
+                    html += '<div class="ddb-detail-box-titulo">&#9203; Pendientes (' + data.pendientes.length + ')</div>';
+                    html += '<div class="ddb-detail-lista">';
+                    if (data.pendientes.length) {
+                        data.pendientes.forEach(function (eq) {
+                            html += '<div class="ddb-detail-item">';
+                            html += '<span class="ddb-di-tag">'  + escHtml(eq.tag)         + '</span>';
+                            html += '<span class="ddb-di-desc">' + escHtml(eq.descripcion) + '</span>';
+                            html += '</div>';
+                        });
+                    } else {
+                        html += '<div class="ddb-detail-empty">&#127881; ¡Área completamente desmontada!</div>';
+                    }
+                    html += '</div></div>';
+
+                    html += '</div></td></tr>';
+
+                    $row.after(html);
+                    $row.removeClass('ddb-area-row-loading').addClass('ddb-area-row-open');
+                })
+                .fail(function () {
+                    $row.removeClass('ddb-area-row-loading');
+                });
         });
     </script>
 

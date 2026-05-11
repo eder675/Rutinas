@@ -13,6 +13,8 @@ namespace Rutinas
             context.Response.ContentType = "application/json";
             context.Response.ContentEncoding = System.Text.Encoding.UTF8;
 
+            var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
+
             string connStr = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
             var areas = new List<string>();
 
@@ -24,7 +26,11 @@ namespace Rutinas
                     conn);
                 using (var dr = cmd.ExecuteReader())
                     while (dr.Read())
-                        areas.Add(dr["Area"].ToString());
+                    {
+                        string area = dr["Area"].ToString();
+                        if (!excluidas.Contains(area))
+                            areas.Add(area);
+                    }
             }
 
             context.Response.Write(new JavaScriptSerializer().Serialize(areas));

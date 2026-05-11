@@ -60,12 +60,5 @@ namespace Rutinas
         /// </summary>
         protected global::System.Web.UI.WebControls.GridView gvAvanceAreas;
 
-        protected global::System.Web.UI.WebControls.Label lblContPendientes;
-
-        protected global::System.Web.UI.WebControls.GridView gvPendientes;
-
-        protected global::System.Web.UI.WebControls.Label lblContDesmontados;
-
-        protected global::System.Web.UI.WebControls.GridView gvDesmontados;
     }
 }
