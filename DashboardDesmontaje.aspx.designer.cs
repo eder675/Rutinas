@@ -60,5 +60,6 @@ namespace Rutinas
         /// </summary>
         protected global::System.Web.UI.WebControls.GridView gvAvanceAreas;
 
+        protected global::System.Web.UI.WebControls.GridView gvUltimos;
     }
 }

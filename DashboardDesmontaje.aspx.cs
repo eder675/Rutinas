@@ -44,6 +44,7 @@ namespace Rutinas
 
             CargarMetricasGlobales();
             CargarAvancePorArea();
+            CargarUltimosDeclarados();
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -327,6 +328,35 @@ namespace Rutinas
         // ════════════════════════════════════════════════════════════════════
         // EVENTO: Cambio de área en filtro
         // ════════════════════════════════════════════════════════════════════
+        private void CargarUltimosDeclarados()
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                using (SqlConnection conn = new SqlConnection(ConnReportes))
+                using (SqlCommand cmd = new SqlCommand(
+                    @"SELECT TOP 30
+                        RTRIM(TAG)          AS TAG,
+                        RTRIM(Descripcion)  AS Descripcion,
+                        RTRIM(Area)         AS Area,
+                        FechaDeclaracion,
+                        RTRIM(NombreEmpleado) AS NombreEmpleado
+                      FROM DesmontajeAvance
+                      WHERE Desmontado = 1
+                      ORDER BY FechaDeclaracion DESC", conn))
+                {
+                    conn.Open();
+                    new SqlDataAdapter(cmd).Fill(dt);
+                }
+                gvUltimos.DataSource = dt;
+                gvUltimos.DataBind();
+            }
+            catch (Exception ex)
+            {
+                MostrarError("Error al cargar últimos declarados: " + ex.Message);
+            }
+        }
+
         protected void ddlAreaFiltro_SelectedIndexChanged(object sender, EventArgs e)
         {
             CargarAvancePorArea();
@@ -550,6 +580,75 @@ namespace Rutinas
                     ws2.Column(1).Width = Math.Min(ws2.Column(1).Width, 45);
                     ws2.SheetView.FreezeRows(3);
                     ws2.SheetView.FreezeColumns(1);
+
+                    // ── HOJA 3: Últimos 30 declarados ────────────────────────
+                    IXLWorksheet ws3 = wb.Worksheets.Add("Ultimos Declarados");
+                    ws3.TabColor = XLColor.FromHtml("#E65100");
+
+                    ws3.Cell(1, 1).Value = "ÚLTIMOS 30 INSTRUMENTOS DECLARADOS";
+                    ws3.Range(1, 1, 1, 5).Merge();
+                    ws3.Cell(1, 1).Style.Font.Bold = true;
+                    ws3.Cell(1, 1).Style.Font.FontSize = 14;
+                    ws3.Cell(1, 1).Style.Font.FontColor = XLColor.White;
+                    ws3.Cell(1, 1).Style.Fill.BackgroundColor = XLColor.FromHtml("#BF360C");
+                    ws3.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    ws3.Row(1).Height = 28;
+
+                    ws3.Cell(2, 1).Value = "Generado: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                    ws3.Range(2, 1, 2, 5).Merge();
+                    ws3.Cell(2, 1).Style.Font.Italic = true;
+                    ws3.Cell(2, 1).Style.Font.FontColor = XLColor.FromHtml("#555555");
+                    ws3.Cell(2, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    string[] h3 = { "TAG", "Descripción", "Área", "Fecha Declaración", "Declarado Por" };
+                    for (int col = 0; col < h3.Length; col++)
+                    {
+                        IXLCell cell = ws3.Cell(3, col + 1);
+                        cell.Value = h3[col];
+                        cell.Style.Font.Bold = true;
+                        cell.Style.Font.FontSize = 11;
+                        cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#E65100");
+                        cell.Style.Font.FontColor = XLColor.White;
+                        cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        cell.Style.Border.OutsideBorderColor = XLColor.White;
+                    }
+                    ws3.Row(3).Height = 20;
+
+                    DataTable dtUltimos = new DataTable();
+                    using (SqlConnection conn3 = new SqlConnection(ConnReportes))
+                    using (SqlCommand cmd3 = new SqlCommand(
+                        @"SELECT TOP 30 RTRIM(TAG) AS TAG, RTRIM(Descripcion) AS Descripcion,
+                                 RTRIM(Area) AS Area, FechaDeclaracion,
+                                 RTRIM(NombreEmpleado) AS NombreEmpleado
+                          FROM DesmontajeAvance WHERE Desmontado=1
+                          ORDER BY FechaDeclaracion DESC", conn3))
+                    {
+                        conn3.Open();
+                        new SqlDataAdapter(cmd3).Fill(dtUltimos);
+                    }
+
+                    for (int row = 0; row < dtUltimos.Rows.Count; row++)
+                    {
+                        DataRow dr3 = dtUltimos.Rows[row];
+                        int xlRow = row + 4;
+                        ws3.Cell(xlRow, 1).Value = dr3["TAG"].ToString();
+                        ws3.Cell(xlRow, 2).Value = dr3["Descripcion"].ToString();
+                        ws3.Cell(xlRow, 3).Value = dr3["Area"].ToString();
+                        ws3.Cell(xlRow, 4).Value = dr3["FechaDeclaracion"] != DBNull.Value
+                            ? Convert.ToDateTime(dr3["FechaDeclaracion"]).ToString("dd/MM/yyyy HH:mm") : "";
+                        ws3.Cell(xlRow, 5).Value = dr3["NombreEmpleado"].ToString();
+
+                        ws3.Cell(xlRow, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        ws3.Cell(xlRow, 4).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        if (row % 2 == 1)
+                            ws3.Row(xlRow).Style.Fill.BackgroundColor = XLColor.FromHtml("#FBE9E7");
+                    }
+
+                    ws3.Columns().AdjustToContents();
+                    ws3.Column(2).Width = Math.Min(ws3.Column(2).Width, 50);
+                    ws3.SheetView.FreezeRows(3);
 
                     // Nombre de archivo
                     string sufijo = string.IsNullOrEmpty(areaFiltro)

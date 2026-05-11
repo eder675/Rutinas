@@ -121,6 +121,30 @@
                 </div>
             </div>
 
+            <!-- ════════════════════════════════════════════════
+                 ÚLTIMOS 30 INSTRUMENTOS DECLARADOS
+            ═════════════════════════════════════════════════ -->
+            <div class="ddb-section">
+                <h2>Últimos 30 instrumentos declarados</h2>
+                <div class="ddb-table-wrap">
+                    <asp:GridView ID="gvUltimos" runat="server"
+                        AutoGenerateColumns="false"
+                        CssClass="ddb-grid"
+                        GridLines="None">
+                        <Columns>
+                            <asp:BoundField DataField="TAG"              HeaderText="TAG"            ItemStyle-Width="90px" />
+                            <asp:BoundField DataField="Descripcion"      HeaderText="Descripción" />
+                            <asp:BoundField DataField="Area"             HeaderText="Área"           ItemStyle-Width="160px" />
+                            <asp:BoundField DataField="FechaDeclaracion" HeaderText="Fecha"          ItemStyle-Width="130px" DataFormatString="{0:dd/MM/yyyy HH:mm}" />
+                            <asp:BoundField DataField="NombreEmpleado"   HeaderText="Declarado por"  ItemStyle-Width="160px" />
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div class="ddb-empty-msg">No hay declaraciones registradas aún.</div>
+                        </EmptyDataTemplate>
+                    </asp:GridView>
+                </div>
+            </div>
+
     <script type="text/javascript">
 
         function escHtml(str) { return $('<span>').text(str || '').html(); }
