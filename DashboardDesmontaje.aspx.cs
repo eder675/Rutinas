@@ -545,12 +545,6 @@ namespace Rutinas
                     for (int c = 2; c <= 5; c++)
                         ws2.Cell(totalRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    // Barra de datos en columna % Avance (mini-barras visuales)
-                    if (avancePorArea.Count > 0)
-                    {
-                        var rangoBarras = ws2.Range(ws2.Cell(4, 5), ws2.Cell(avancePorArea.Count + 3, 5));
-                        rangoBarras.AddConditionalFormat().DataBar(XLColor.FromHtml("#1565C0"), true);
-                    }
 
                     ws2.Columns().AdjustToContents();
                     ws2.Column(1).Width = Math.Min(ws2.Column(1).Width, 45);
