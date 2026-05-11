@@ -214,7 +214,7 @@ namespace Rutinas
 
                 // Delta: nuevos declarados hoy (desde medianoche)
                 int deltaHoy = 0;
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnReportes))
                 {
                     conn.Open();
                     SqlCommand cmd = new SqlCommand(
