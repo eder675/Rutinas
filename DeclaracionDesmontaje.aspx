@@ -146,33 +146,36 @@
         });
 
         // ── BUSQUEDA AJAX ──────────────────────────────────────────
-        $('#btnBuscarJS').on('click', function () {
+        var busqTimer;
+
+        function ejecutarBusqueda() {
             var q    = $('#txtBusqueda').val().trim();
             var area = $('#ddlAreaFiltro').val();
 
-            if (q.length < 2 && area === '') {
-                mostrarToast('Seleccione un área o ingrese al menos 2 caracteres.', 'error');
-                return;
-            }
+            if (q.length < 2 && area === '') return;
 
-            var $btn = $(this).prop('disabled', true).text('Buscando...');
+            $('#btnBuscarJS').prop('disabled', true).text('Buscando...');
 
             $.getJSON('BuscarEquiposArea.ashx', { q: q, area: area })
                 .done(function (data) {
                     if (!data.length) {
+                        $('#divResultados').hide();
+                        $('#divLista').empty();
                         mostrarToast('No se encontraron equipos.', 'error');
                         return;
                     }
 
                     var html = '';
                     $.each(data, function (i, item) {
-                        var fn           = 'rb_' + item.tag.replace(/[^a-zA-Z0-9]/g, '_');
-                        var enCarrito    = carrito.hasOwnProperty(item.tag);
-                        var checked0     = enCarrito ? '' : 'checked';
-                        var checked1     = enCarrito ? 'checked' : '';
-                        var claseItem    = enCarrito ? 'dd-item dd-item-desmontado' : 'dd-item';
+                        var fn        = 'rb_' + item.tag.replace(/[^a-zA-Z0-9]/g, '_');
+                        var enCarrito = carrito.hasOwnProperty(item.tag);
+                        var checked0  = enCarrito ? '' : 'checked';
+                        var checked1  = enCarrito ? 'checked' : '';
+                        var clase     = enCarrito ? 'dd-item dd-item-desmontado' : 'dd-item';
 
-                        html += '<div class="' + claseItem + '" data-tag="' + $('<span>').text(item.tag).html() + '" data-desc="' + $('<span>').text(item.descripcion).html() + '" data-area="' + $('<span>').text(item.area).html() + '">';
+                        html += '<div class="' + clase + '" data-tag="'  + $('<span>').text(item.tag).html()
+                             + '" data-desc="' + $('<span>').text(item.descripcion).html()
+                             + '" data-area="' + $('<span>').text(item.area).html() + '">';
                         html +=   '<div class="dd-item-info">';
                         html +=     '<span class="dd-item-tag">'  + $('<span>').text(item.tag).html()         + '</span>';
                         html +=     '<span class="dd-item-desc">' + $('<span>').text(item.descripcion).html() + '</span>';
@@ -193,8 +196,29 @@
                     mostrarToast('Error ' + xhr.status + ': ' + xhr.statusText, 'error');
                 })
                 .always(function () {
-                    $btn.prop('disabled', false).text('Buscar');
+                    $('#btnBuscarJS').prop('disabled', false).text('Buscar');
                 });
+        }
+
+        // Botón manual
+        $('#btnBuscarJS').on('click', function () {
+            clearTimeout(busqTimer);
+            ejecutarBusqueda();
+        });
+
+        // Tiempo real al escribir (debounce 400ms)
+        $('#txtBusqueda').on('input', function () {
+            clearTimeout(busqTimer);
+            var q    = $(this).val().trim();
+            var area = $('#ddlAreaFiltro').val();
+            if (q.length < 2 && area === '') { return; }
+            busqTimer = setTimeout(ejecutarBusqueda, 400);
+        });
+
+        // Al cambiar el área busca inmediatamente
+        $('#ddlAreaFiltro').on('change', function () {
+            clearTimeout(busqTimer);
+            ejecutarBusqueda();
         });
 
         // ── RADIO CHANGE: agregar/quitar del carrito ──────────────
@@ -213,9 +237,9 @@
             else              quitarDelCarrito(item.tag);
         });
 
-        // ── ENTER EN CAMPO DE BUSQUEDA ────────────────────────────
+        // Enter fuerza búsqueda inmediata sin esperar el debounce
         $('#txtBusqueda').on('keydown', function (e) {
-            if (e.key === 'Enter') { e.preventDefault(); $('#btnBuscarJS').trigger('click'); }
+            if (e.key === 'Enter') { e.preventDefault(); clearTimeout(busqTimer); ejecutarBusqueda(); }
         });
 
         // ── TOAST ─────────────────────────────────────────────────

@@ -184,6 +184,7 @@
     <Compile Include="Models\RutinaDataModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AreaExcluidaHelper.cs" />
+    <Compile Include="EquipoExcluidoHelper.cs" />
     <Compile Include="ObtenerEquiposPorArea.ashx.cs">
       <DependentUpon>ObtenerEquiposPorArea.ashx</DependentUpon>
     </Compile>

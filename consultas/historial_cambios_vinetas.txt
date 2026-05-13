@@ -1,0 +1,191 @@
+================================================================================
+HISTORIAL DE CAMBIOS EN BASE DE DATOS VINETAS
+Tabla afectada: [Vinetas].[dbo].[equipos] — columna: Area
+Servidor: 10.1.1.43\SQLEXPRESS
+Realizados por: Departamento MTI — Sistema Rutinas
+Fechas: 2026-05-09 al 2026-05-13
+================================================================================
+
+CONTEXTO
+--------
+La columna Area de la tabla equipos presentaba valores truncados (con los primeros
+caracteres faltantes), probablemente causados por un desbordamiento de campo en el
+programa que administra la base de datos Vinetas, o por seleccion incorrecta de
+areas al registrar equipos. Se realizaron correcciones en tres etapas.
+
+
+================================================================================
+ETAPA 1 — CORRECCIONES AUTOMATICAS POR SUFIJO (85 registros)
+================================================================================
+Se identificaron valores cuyo texto era un sufijo unico de un area valida.
+Se corrigieron automaticamente con UPDATE donde RTRIM(Area) = valor_erroneo.
+
+  VALOR ERRONEO                              -> AREA CORREGIDA
+  ------------------------------------------ -> ----------------------------------------
+  'Jugo - Calentador #2'                     -> 'Calentadores de Jugo - Calentador #2'
+  'a de Alcohol - Dilucion'                  -> 'Planta de Alcohol - Dilucion'
+  'acion Electrica - TurboGenerador NG'      -> 'Generacion Electrica - TurboGenerador NG'
+  'alizadores'                               -> 'Cristalizadores'
+  'alizadores - Cristalizador Vertical'      -> 'Cristalizadores - Cristalizador Vertical'
+  'alizadores - Cristalizadora #2'           -> 'Cristalizadores - Cristalizadora #2'
+  'ccion'                                    -> 'Extraccion'
+  'ccion - Agua Imbibicion'                  -> 'Extraccion - Agua Imbibicion'
+  'ccion - Conductor Principal'              -> 'Extraccion - Conductor Principal'
+  'ccion - Desfibradora'                     -> 'Extraccion - Desfibradora'
+  'ccion - Molino #5'                        -> 'Extraccion - Molino #5'
+  'ccion - Picadora'                         -> 'Extraccion - Picadora'
+  'ccion - PrePicadora'                      -> 'Extraccion - PrePicadora'
+  'Clarificador de Meladura'                 -> 'Clarificacion - Clarificador de Meladura'
+  'Claro'                                    -> 'Clarificacion- Jugo Claro'
+  'Electrica Matizate - Generador TGM'       -> 'TermoElectrica Matizate - Generador TGM'
+  'ficacion - Clarificador de Meladura'      -> 'Clarificacion - Clarificador de Meladura'
+  'ficacion - Clarificador Rapido'           -> 'Clarificacion - Clarificador Rapido'
+  'ficacion - Filtro de Banda'               -> 'Clarificacion - Filtro de Banda'
+  'ficacion - Jugo Filtrado'                 -> 'Clarificacion - Jugo Filtrado'
+  'ficacion - Recalentadores de Jugo'        -> 'Clarificacion - Recalentadores de Jugo'
+  'ifugas - Centrifugas de Primera'          -> 'Centrifugas - Centrifugas de Primera'
+  'ion - Clarificador de Meladura'           -> 'Clarificacion - Clarificador de Meladura'
+  'ion - Clarificador Rapido'                -> 'Clarificacion - Clarificador Rapido'
+  'ion - Filtro de Banda'                    -> 'Clarificacion - Filtro de Banda'
+  'izacion - Jugo Pre-Alcalizado'            -> 'Alcalizacion - Jugo Pre-Alcalizado'
+  'izacion - Preparacion de Sacarato'        -> 'Alcalizacion - Preparacion de Sacarato'
+  'on - Preparacion de Sacarato'             -> 'Alcalizacion - Preparacion de Sacarato'
+  'ora - Azucar Blanca'                      -> 'Secadora - Azucar Blanca'
+  'ora - Empaqsa'                            -> 'Secadora - Empaqsa'
+  'Planta de tratamiento de agua'            -> 'Calderas -Planta de tratamiento de agua'
+  'ra Combustion Engineering #2'             -> 'Caldera Combustion Engineering #2'
+  'racion'                                   -> 'Evaporacion'
+  'racion - Melador #3'                      -> 'Evaporacion - Melador #3'
+  'racion - Pre-Evaporador #1'               -> 'Evaporacion - Pre-Evaporador #1'
+  'ras - Caldera Mitre'                      -> 'Calderas - Caldera Mitre'
+  'ras -Planta de tratamiento de agua'       -> 'Calderas -Planta de tratamiento de agua'
+  'rica Matizate - Generador TGM'            -> 'TermoElectrica Matizate - Generador TGM'
+  's - Centrifugas de Segunda'               -> 'Centrifugas - Centrifugas de Segunda'
+  's - Disolutores'                          -> 'Tachos - Disolutores'
+  's - Tacho #1'                             -> 'Tachos - Tacho #1'
+  's - Tacho #2'                             -> 'Tachos - Tacho #2'
+  's - Tacho #3'                             -> 'Tachos - Tacho #3'
+  's - Tacho #4'                             -> 'Tachos - Tacho #4'
+  's - Tacho #6'                             -> 'Tachos - Tacho #6'
+  's - Tacho #7'                             -> 'Tachos - Tacho #7'
+  'a Alcohol - Tanque Alcohol Final #3'      -> 'Planta de Alcohol - Tanque Alcohol Final #3'
+  'ifugas - Centrifuga 1a'                   -> 'Centrifugas - Centrifugas de Primera'
+  'ifugas - Centrifugas 1a'                  -> 'Centrifugas - Centrifugas de Primera'
+  'ra Mitre - Tratamiento de Agua'           -> 'Caldera Mitre - Tratamiento de Agua'
+  'racion - Evaporador #8'                   -> 'Evaporacion'
+  'radores'                                  -> 'Evaporacion'
+
+NOTA: Estas correcciones NO son facilmente reversibles porque varios equipos en
+esas areas ya tenian el nombre correcto antes de la correccion. Revertir
+implicaria saber exactamente que TAGs especificos fueron afectados, informacion
+que ya no esta disponible sin un backup previo.
+
+
+================================================================================
+ETAPA 2 — CORRECCIONES MANUALES POR TAG ESPECIFICO (10 registros)
+================================================================================
+Casos ambiguos resueltos manualmente. ESTOS SI SON REVERSIBLES.
+
+  TAG              AREA ANTERIOR    AREA ASIGNADA
+  ---------------- ---------------- ----------------------------------------
+  COMP-0700        's'              Cristalizadores
+  FVVGCV-0600      's'              Tachos
+  LMCLT-0600       's'              Tachos
+  LWT10T-0600      's'              Tachos
+  PCV-0209         'ra Mitre'       Caldera Mitre
+  FMFV-0800        'ifugas'         Centrifugas
+  LWCT-0501        'es'             Evaporacion - Pre-Evaporador #1
+  LAZT-0900        'ora'            Secadora
+  LWRT-1011        'ca'             Evaporacion
+  COMP-0500        'n'              Evaporacion
+
+CORRECCIONES POR PREFIJO CENTRIFUGAS (7 registros) — prefijo 'Centr' agregado:
+  ifugas - Centrifuga 1  -> Centrifugas - Centrifuga 1  (2 registros)
+  ifugas - Centrifuga 2  -> Centrifugas - Centrifuga 2  (2 registros)
+  ifugas - Centrifuga 3  -> Centrifugas - Centrifuga 3  (1 registro)
+  ifugas - Centrifuga BMA 3 -> Centrifugas - Centrifuga BMA 3 (1 registro)
+  ifugas - Centrifugas de 1 -> Centrifugas - Centrifugas de 1 (1 registro)
+
+CORRECCIONES DECLARADAS COMO 'No Existe' (9 registros):
+  'cion'  (6 reg) -> 'Planta Osmosis' (luego reasignados, ver Etapa 3)
+  'ras'   (3 reg) -> 'Calderas'
+  'iste'  (8 reg) -> 'No Existe'
+  'v'     (1 reg) -> 'No Existe'
+
+
+================================================================================
+ETAPA 3 — REASIGNACIONES DESDE 'No Existe' (34 registros)
+================================================================================
+Equipos que estaban en 'No Existe' movidos a sus areas correctas.
+ESTOS SON COMPLETAMENTE REVERSIBLES con el script adjunto.
+
+  TAGs con prefijo XV- y CE- (16 registros) -> Calderas -Planta de tratamiento de agua
+    XV-100, XV-101, XV-103, XV-104, XV-105, XV-106, XV-107, XV-108,
+    XV-109, XV-110, XV-111, XV-112,
+    CE-101, CE-102, CE-301, CE-401
+
+  TAGs individuales (9 registros) -> Calderas -Planta de tratamiento de agua
+    AE-102, FE-102, FT-201, FT-301, FT-401, LIT-301, LIT-401, PT-101, PT-102
+
+  TAGs individuales (2 registros) -> TermoElectrica Matizate - Generador TGM
+    LT-006, TT-007
+
+  TAGs individuales (3 registros) -> TermoElectrica Matizate - Generador TGM
+    PIT-0339, COMP-TGM-1205, PIT-0338
+
+  TAGs individuales (4 registros) -> Tachos - Bombas de Rechazo
+    CBRECHC-0615, PMBR T-0615, PWALIV-0615, PWOBRT-0615
+
+
+================================================================================
+SCRIPT SQL PARA REVERTIR ETAPA 3 (reasignaciones desde No Existe)
+================================================================================
+-- Ejecutar contra [Vinetas] si se desea revertir las reasignaciones de Etapa 3
+
+USE Vinetas;
+
+-- Revertir XV- y CE- + individuales a Calderas -Planta de tratamiento de agua
+UPDATE equipos SET Area = 'No Existe'
+WHERE RTRIM(TAG) IN (
+    'XV-100','XV-101','XV-103','XV-104','XV-105','XV-106','XV-107','XV-108',
+    'XV-109','XV-110','XV-111','XV-112',
+    'CE-101','CE-102','CE-301','CE-401',
+    'AE-102','FE-102','FT-201','FT-301','FT-401','LIT-301','LIT-401','PT-101','PT-102'
+);
+
+-- Revertir TermoElectrica Matizate - Generador TGM
+UPDATE equipos SET Area = 'No Existe'
+WHERE RTRIM(TAG) IN ('LT-006','TT-007','PIT-0339','COMP-TGM-1205','PIT-0338');
+
+-- Revertir Tachos - Bombas de Rechazo
+UPDATE equipos SET Area = 'No Existe'
+WHERE RTRIM(TAG) IN ('CBRECHC-0615','PMBR T-0615','PWALIV-0615','PWOBRT-0615');
+
+
+================================================================================
+SCRIPT SQL PARA REVERTIR ETAPA 2 (correcciones individuales por TAG)
+================================================================================
+-- ADVERTENCIA: estos equipos volverian a tener areas con texto truncado/erroneo
+
+USE Vinetas;
+
+UPDATE equipos SET Area = 's'        WHERE RTRIM(TAG) IN ('COMP-0700','FVVGCV-0600','LMCLT-0600','LWT10T-0600');
+UPDATE equipos SET Area = 'ra Mitre' WHERE RTRIM(TAG) = 'PCV-0209';
+UPDATE equipos SET Area = 'ifugas'   WHERE RTRIM(TAG) = 'FMFV-0800';
+UPDATE equipos SET Area = 'es'       WHERE RTRIM(TAG) = 'LWCT-0501';
+UPDATE equipos SET Area = 'ora'      WHERE RTRIM(TAG) = 'LAZT-0900';
+UPDATE equipos SET Area = 'ca'       WHERE RTRIM(TAG) = 'LWRT-1011';
+UPDATE equipos SET Area = 'n'        WHERE RTRIM(TAG) = 'COMP-0500';
+
+
+================================================================================
+RESUMEN GENERAL
+================================================================================
+  Etapa 1 — Correcciones automaticas por sufijo:   ~122 registros
+  Etapa 2 — Correcciones manuales por TAG:          ~17 registros
+  Etapa 3 — Reasignaciones desde No Existe:          34 registros
+  TOTAL APROXIMADO DE REGISTROS AFECTADOS:          ~173 registros
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================

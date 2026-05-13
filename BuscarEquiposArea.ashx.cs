@@ -36,7 +36,8 @@ namespace Rutinas
                         yaDeclarados.Add(drR.GetString(0).Trim());
             }
 
-            var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
+            var excluidas  = AreaExcluidaHelper.ObtenerExcluidas();
+            var keywords   = EquipoExcluidoHelper.ObtenerKeywords();
 
             // Si se filtró por un área excluida, devolver vacío
             if (!string.IsNullOrEmpty(area) && excluidas.Contains(area))
@@ -75,10 +76,12 @@ namespace Rutinas
                     while (dr.Read())
                     {
                         string tag      = dr["TAG"].ToString().Trim();
+                        string desc     = dr["Descripcion"].ToString();
                         string areaEq   = dr["Area"].ToString();
                         if (yaDeclarados.Contains(tag)) continue;
                         if (excluidas.Contains(areaEq)) continue;
-                        lista.Add(new { tag, descripcion = dr["Descripcion"].ToString(), area = areaEq });
+                        if (EquipoExcluidoHelper.EsExcluido(tag, desc, keywords)) continue;
+                        lista.Add(new { tag, descripcion = desc, area = areaEq });
                     }
             }
 

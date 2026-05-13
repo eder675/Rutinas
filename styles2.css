@@ -8,19 +8,32 @@ body {
 }
 
 /* ── HEADER ── */
+@keyframes headerShimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 header {
-    background: linear-gradient(135deg, #2E7D32 0%, #388E3C 60%, #62D151 100%);
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 40%, #388E3C 70%, #62D151 100%);
+    background-size: 200% 200%;
+    animation: headerShimmer 8s ease infinite;
     color: white;
     padding: 20px;
     text-align: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+}
+
+@keyframes titlePulse {
+    0%, 100% { text-shadow: 0 1px 4px rgba(0,0,0,0.22); }
+    50%       { text-shadow: 0 2px 16px rgba(98,209,81,0.6), 0 1px 4px rgba(0,0,0,0.22); }
 }
 
 header h1 {
     margin: 0 0 8px 0;
     font-size: 1.6em;
-    letter-spacing: 0.04em;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.22);
+    letter-spacing: 0.06em;
+    animation: titlePulse 4s ease infinite;
 }
 
 /* ── SECCIÓN BIENVENIDA ── */
@@ -45,32 +58,37 @@ nav ul li {
 
 /* ── BOTONES DE NAV ── */
 .nav-button-link {
-    background: none;
-    border: 1.5px solid rgba(255,255,255,0.45) !important;
+    background-color: transparent;
+    background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9));
+    background-size: 0% 2px;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    border: 1.5px solid rgba(255,255,255,0.35) !important;
     color: white;
-    text-decoration: none;
     cursor: pointer;
-    font-size: inherit;
+    font-size: 1.05em;
     font-family: inherit;
     text-transform: uppercase;
     border-radius: 8px;
     padding: 8px 14px;
-    background-color: transparent;
-    transition: background-color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
     font-weight: 600;
     letter-spacing: 0.03em;
+    transition: background-size 0.3s ease, background-color 0.22s ease,
+                border-color 0.22s ease, transform 0.18s ease, box-shadow 0.22s ease;
 }
 
 .nav-button-link:hover {
-    background-color: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.75) !important;
+    background-color: rgba(255,255,255,0.15);
+    background-size: 80% 2px;
+    border-color: rgba(255,255,255,0.7) !important;
     color: #fff;
-    text-decoration: none;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
 }
 
 .nav-button-link:active {
     transform: translateY(0);
+    box-shadow: none;
 }
 
 /* ── PANELS ── */
@@ -156,6 +174,54 @@ footer {
     padding: 15px;
     font-size: 0.87em;
 }
+
+/* ── BIENVENIDA ── */
+.bienvenida {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bienvenida-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.bienvenida-saludo {
+    font-size: 1em;
+    color: #555;
+    font-weight: 400;
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.bienvenida-nombre {
+    font-size: 1.9em;
+    font-weight: 700;
+    color: #2E7D32;
+    animation: fadeSlideIn 0.6s ease both;
+}
+
+.bienvenida-reloj {
+    font-size: 1.15em;
+    color: #2E7D32;
+    font-weight: 600;
+    background: #f0f5f0;
+    border: 1.5px solid #c8e6c9;
+    border-radius: 20px;
+    padding: 8px 20px;
+    letter-spacing: 0.04em;
+}
+
+/* ── SECCIÓN PANEL ── */
+#panel h2 { display: none; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {

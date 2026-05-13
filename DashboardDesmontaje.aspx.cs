@@ -153,6 +153,7 @@ namespace Rutinas
         {
             var lista     = new List<EquipoAvance>();
             var excluidas = AreaExcluidaHelper.ObtenerExcluidas();
+            var keywords  = EquipoExcluidoHelper.ObtenerKeywords();
 
             try
             {
@@ -179,7 +180,10 @@ namespace Rutinas
                         while (dr.Read())
                         {
                             string areaEq = dr.IsDBNull(2) ? "" : dr.GetString(2).Trim();
+                            string tagEq  = dr.IsDBNull(0) ? "" : dr.GetString(0).Trim();
+                            string descEq = dr.IsDBNull(1) ? "" : dr.GetString(1).Trim();
                             if (excluidas.Contains(areaEq)) continue;
+                            if (EquipoExcluidoHelper.EsExcluido(tagEq, descEq, keywords)) continue;
                             lista.Add(new EquipoAvance
                             {
                                 TAG         = dr.IsDBNull(0) ? "" : dr.GetString(0).Trim(),

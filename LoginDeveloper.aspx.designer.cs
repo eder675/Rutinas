@@ -239,6 +239,14 @@ namespace Rutinas
 
         protected global::System.Web.UI.WebControls.Label lblAreasExclMsg;
 
+        protected global::System.Web.UI.WebControls.GridView gvKeywordsExcluidas;
+
+        protected global::System.Web.UI.WebControls.TextBox txtNuevaKeyword;
+
+        protected global::System.Web.UI.WebControls.Button btnAgregarKeyword;
+
+        protected global::System.Web.UI.WebControls.Label lblKeywordMsg;
+
         protected global::System.Web.UI.WebControls.LinkButton lnkBorrarRutina;
 
         protected global::System.Web.UI.WebControls.View vborrarrutina;

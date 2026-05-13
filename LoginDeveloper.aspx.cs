@@ -101,6 +101,9 @@ namespace Rutinas
 
             // Cargar áreas excluidas del avance de desmontaje
             CargarAreasExcluidas();
+
+            // Cargar keywords de equipos excluidos
+            CargarKeywordsExcluidas();
         }
 
         private void CargarAreasExcluidas()
@@ -134,6 +137,62 @@ namespace Rutinas
 
             foreach (ListItem item in cblAreasExcluidas.Items)
                 item.Selected = excluidas.Contains(item.Value);
+        }
+
+        private void CargarKeywordsExcluidas()
+        {
+            lblKeywordMsg.Text = string.Empty;
+            txtNuevaKeyword.Text = string.Empty;
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter("SELECT ID, RTRIM(Keyword) AS Keyword FROM EquiposExcluidosDesmontaje ORDER BY Keyword", conn).Fill(dt);
+            }
+            gvKeywordsExcluidas.DataSource = dt;
+            gvKeywordsExcluidas.DataBind();
+        }
+
+        protected void btnAgregarKeyword_Click(object sender, EventArgs e)
+        {
+            string kw = txtNuevaKeyword.Text.Trim();
+            if (string.IsNullOrEmpty(kw)) { lblKeywordMsg.Text = "Ingrese una palabra clave."; return; }
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    new SqlCommand($"INSERT INTO EquiposExcluidosDesmontaje (Keyword) VALUES (@Kw)", conn)
+                        .Parameters.AddWithValue("@Kw", kw);
+                    SqlCommand cmd = new SqlCommand("INSERT INTO EquiposExcluidosDesmontaje (Keyword) VALUES (@Kw)", conn);
+                    cmd.Parameters.AddWithValue("@Kw", kw);
+                    cmd.ExecuteNonQuery();
+                }
+                lblKeywordMsg.ForeColor = System.Drawing.Color.Green;
+                lblKeywordMsg.Text = "Agregada correctamente.";
+                CargarKeywordsExcluidas();
+            }
+            catch (Exception ex)
+            {
+                lblKeywordMsg.ForeColor = System.Drawing.Color.Red;
+                lblKeywordMsg.Text = ex.Message.Contains("UQ_") ? "Esa palabra clave ya existe." : "Error: " + ex.Message;
+            }
+        }
+
+        protected void gvKeywordsExcluidas_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        {
+            if (e.CommandName != "eliminarKw") return;
+            int id = Convert.ToInt32(e.CommandArgument);
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("DELETE FROM EquiposExcluidosDesmontaje WHERE ID = @ID", conn);
+                cmd.Parameters.AddWithValue("@ID", id);
+                cmd.ExecuteNonQuery();
+            }
+            lblKeywordMsg.ForeColor = System.Drawing.Color.Green;
+            lblKeywordMsg.Text = "Eliminada correctamente.";
+            CargarKeywordsExcluidas();
         }
 
         protected void btnGuardarAreasExcluidas_Click(object sender, EventArgs e)

@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generador de Rutinas</title>
     <link rel="stylesheet" href="styles-shared.css"/>
     <link rel="stylesheet" href="styles2.css"/>
@@ -15,47 +16,34 @@
         <nav>
             <ul>
                 <li>
-                    <asp:Button ID="registros"
-                                runat="server"
-                                Text="REGISTROS DE RUTINAS"
-                                OnClick="registros_Click"
+                    <asp:Button ID="registros" runat="server"
+                                Text="📋 RUTINAS" OnClick="registros_Click"
                                 CssClass="nav-button-link"/>
                 </li>
                 <li>
-                    <asp:Button ID="btnFallos"
-                                runat="server"
-                                Text="REGISTRO DE FALLOS"
-                                OnClick="btnFallos_Click"
+                    <asp:Button ID="btnFallos" runat="server"
+                                Text="⚠️ FALLOS" OnClick="btnFallos_Click"
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
-                    <asp:Button ID="btnDashboard"
-                                runat="server"
-                                Text="DASHBOARD"
-                                OnClick="btnDashboard_Click"
+                    <asp:Button ID="btnDashboard" runat="server"
+                                Text="📊 DASHBOARD" OnClick="btnDashboard_Click"
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
-                    <asp:Button ID="btnDesmontaje"
-                                runat="server"
-                                Text="DECLARAR DESMONTAJE"
-                                OnClick="btnDesmontaje_Click"
+                    <asp:Button ID="btnDesmontaje" runat="server"
+                                Text="🔧 DESMONTAJE" OnClick="btnDesmontaje_Click"
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
-                    <asp:Button ID="btnDashboardDesmontaje"
-                                runat="server"
-                                Text="AVANCE DESMONTAJE"
-                                OnClick="btnDashboardDesmontaje_Click"
+                    <asp:Button ID="btnDashboardDesmontaje" runat="server"
+                                Text="📈 AVANCE" OnClick="btnDashboardDesmontaje_Click"
                                 CssClass="nav-button-link" />
                 </li>
                 <li>
-                    <asp:Button
-                        ID="logout"
-                        runat="server"
-                        Text="CERRAR SESION"
-                        OnClick="logout_Click"
-                        CssClass="nav-button-link" />
+                    <asp:Button ID="logout" runat="server"
+                                Text="🚪 SALIR" OnClick="logout_Click"
+                                CssClass="nav-button-link" />
                 </li>
                 <li>
                 </li>
@@ -64,9 +52,12 @@
     </header>
 
  <section id="panel">
-    <h2>
-        <asp:Label ID="lblnombremenu" runat="server" Text="Username"></asp:Label>
-     </h2>
+    <div class="bienvenida">
+        <div class="bienvenida-info">
+            &nbsp;<asp:Label ID="lblnombremenu" runat="server" Text="Username" CssClass="bienvenida-nombre"></asp:Label>
+        </div>
+        <div id="relojDisplay" class="bienvenida-reloj"></div>
+    </div>
     <div class="contenedor-panel">
 
         <asp:LinkButton ID="btnGenerarRutina" runat="server" OnClick="btnGenerarRutina_Click" CssClass="panel">
@@ -87,5 +78,20 @@
         <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
     </footer>  
     <script src="shared.js"></script>
+    <script type="text/javascript">
+        function actualizarReloj() {
+            var ahora = new Date();
+            var dias  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+            var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            var h = ahora.getHours().toString().padStart(2,'0');
+            var m = ahora.getMinutes().toString().padStart(2,'0');
+            var s = ahora.getSeconds().toString().padStart(2,'0');
+            var txt = dias[ahora.getDay()] + ' ' + ahora.getDate() + ' ' + meses[ahora.getMonth()]
+                    + ' &nbsp;|&nbsp; ' + h + ':' + m + ':' + s;
+            document.getElementById('relojDisplay').innerHTML = txt;
+        }
+        actualizarReloj();
+        setInterval(actualizarReloj, 1000);
+    </script>
 </body>
 </html>

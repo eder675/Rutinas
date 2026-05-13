@@ -505,6 +505,40 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                     <asp:Label ID="lblAreasExclMsg" runat="server" Text="" ForeColor="Green" Style="margin-left:10px;" />
                 </fieldset>
 
+                <fieldset style="margin-top:20px; padding:12px; max-width:560px;">
+                    <legend><b>Equipos excluidos del desmontaje (por palabra clave)</b></legend>
+                    <p style="margin:0 0 8px; font-size:0.9em; color:#555;">
+                        Los equipos cuyo TAG o descripción contenga alguna de estas palabras clave
+                        <b>no aparecerán</b> en la declaración ni en el dashboard de desmontaje.
+                    </p>
+                    <asp:GridView ID="gvKeywordsExcluidas" runat="server"
+                        AutoGenerateColumns="false"
+                        DataKeyNames="ID"
+                        CssClass="tabla-keywords"
+                        EmptyDataText="No hay palabras clave configuradas."
+                        OnRowCommand="gvKeywordsExcluidas_RowCommand"
+                        Style="margin-bottom:10px; width:100%;">
+                        <Columns>
+                            <asp:BoundField DataField="Keyword" HeaderText="Palabra clave" />
+                            <asp:TemplateField HeaderText="Acción" ItemStyle-Width="80px">
+                                <ItemTemplate>
+                                    <asp:Button ID="btnEliminarKw" runat="server" Text="Eliminar"
+                                        CommandName="eliminarKw" CommandArgument='<%# Eval("ID") %>'
+                                        CausesValidation="false" />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <asp:TextBox ID="txtNuevaKeyword" runat="server" Width="260px"
+                            placeholder="Ej: OSMOSIS, SCADA, HMI..." MaxLength="200" />
+                        <asp:Button ID="btnAgregarKeyword" runat="server" Text="AGREGAR"
+                            OnClick="btnAgregarKeyword_Click" CausesValidation="false"
+                            Style="padding:6px 16px;" />
+                        <asp:Label ID="lblKeywordMsg" runat="server" Text="" ForeColor="Green" />
+                    </div>
+                </fieldset>
+
             </asp:View>
             <asp:View ID="vborrarrutina" runat="server">
                 <fieldset style="max-width:480px; padding:16px;">

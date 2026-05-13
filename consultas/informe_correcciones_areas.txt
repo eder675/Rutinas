@@ -1,0 +1,1420 @@
+================================================================================
+INFORME DE CORRECCIONES DE AREAS - BASE DE DATOS VINETAS
+Ingenio La Cabana - Departamento MTI
+Generado: 12/05/2026 22:30
+================================================================================
+
+DESCRIPCION: Se corrigieron nombres de areas truncados o erroneos en la
+tabla [Vinetas].[dbo].[equipos]. El campo Area tenia valores con los
+primeros caracteres faltantes. A continuacion se listan los instrumentos
+afectados por area corregida.
+
+--------------------------------------------------------------------------------
+1. AREA CORREGIDA: Alcalizacion - Jugo Pre-Alcalizado
+   Valores originales erroneos: 'izacion - Jugo Pre-Alcalizado'
+   Instrumentos en esta area actualmente: 17
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   AJPREAT-0304           Transmisor De PH Jugo Pre-Alcalizado
+   FJT-0304               Transmisor  Flujo Jugo Pre-Alcalizado
+   FWCV-0304              Valvula De Control De Agua Condenso Calentador Barometrico
+   FWV-0304               Vál.  Flujo Agua Control Vacío Barométrico
+   LCAL1T-0304            Transmisor De Nivel Tanque Cal.
+   LJT-0304               Transmisor De Nivel Tanque Pulmon
+   LWCT-0304              Trans. Nivel Condenso Barometrico
+   PICBT-0304             Trans Pres. Entrada Calentador Barometrico
+   POCBT-0304             Trans. Pres. Salida Calentador Barometrico
+   TCB1T-0304             Temp. Entrada Calentador Barometrico
+   TCONBARO1T-0304        Temp Entrada Condensador Barometrico
+   TCONBARO2T-0304        Temp Salida Condensador Barometrico
+   TJCALB1T-0304          Trans Temp Entrada Calentador Barometrico
+   TJCALB2T-0304          Trans Temp Salida Calentador Barometrico
+   TJMAXT-0304            Transmisor Nivel Máximo Tanque Pulmón
+   VACBM-0304             Vacumanometro Calentador Barometrico
+   VACBT-0304             Transmisor Vacio Calentador Barometrico
+
+--------------------------------------------------------------------------------
+2. AREA CORREGIDA: Alcalizacion - Preparacion de Sacarato
+   Valores originales erroneos: 'izacion - Preparacion de Sacarato', 'on - Preparacion de Sacarato'
+   Instrumentos en esta area actualmente: 23
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FCAL3V-0303            Válvula Descarga De Cal (Sacarato)
+   FCALV-0303             Válvula Descarga De Cal
+   FMPULV-0303            Válvula Meladura A Tanque Pulmón Sacarato
+   FMV-0303               Válvula Descarga De Meladura (Sacarato)
+   FMV-0303               Flujo Meladura Preparación De Sacarato
+   FWJV-0303              Válvula Flujo Agua Hacia Preparacion  Cal
+   FWREST-0303            Trans. Flujo  Agua Residuales Fabrica
+   HMICALCI-0303          HMI PREP SACARATO
+   HMIMCAL-0303           Pantalla HMI Monitoreo/Control Planta Cal
+   LCAL1T-0303            Trans. Nivel Lechada De Cal Hacia Sacarato
+   LCAL2T-0303            Transmisor Nivel Tanque Lechada De Cal #2.
+   LCAL3T-0303            Nivel Máximo Lechada De cal
+   LCALMT-0303            Transmisor Nivel Maximo Lechada De Cal
+   LCALST-0303            Trans Nivel Silo Cal Tipo Radar
+   LM1T-0303              Tx Nivel Max Meladura Preparacion Sacato
+   LMCT-0303              Transmisor Nivel Tanque Sacarato
+   LMPULT-0303            TRANS. NIVEL . TANQ. PULMON MELAD. (SACAR)
+   LMT-0303                Nivel Max. Meladura Preparacion Sacarato
+   VIB-0303               Vibrador Neumático Tolva De Cal
+   WCAL1CI-0303           Celda De Carga Tolva de Cal
+   WCAL2CI-0303           Celda De Carga Tolva de Cal
+   WCAL3CI-0303           Celda De Carga Tolva de Cal
+   WCALCI-0303            Indicador de Bascula de bacheo de cal
+
+--------------------------------------------------------------------------------
+3. AREA CORREGIDA: Caldera Combustion Engineering #2
+   Valores originales erroneos: 'ra Combustion Engineering #2'
+   Instrumentos en esta area actualmente: 79
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   AGT-0105               Analizador De Gases Combustion #2 AG1
+   AWTS-0105              Transmisor De Ph Combustion #2
+   CAV1I-0105             Camara #1 Nivel Domo Combustion #2
+   CAV2I-0105             Camara #2 Banda De Goma Conductor #6
+   CAV3I-0105             Cámara De Video #3 Molino 5
+   CAV4I-0105             Camara De Video Conductor #4 Bagazera
+   CC750C-0105            Sistema De Control Distribuido  Honeywell HC900 COMB.2
+   CCMC-0105              Panel De Control Combustion 2
+   COMP750-0105           Computadora Con Soft SCADA P/HC900 Cal 750
+   FARRANQUEV-0105        Valvula De Arranque Caldera Combustion #2
+   FVT-0105               Trans. Flujo Vapor Combustion # 2
+   FVTDV-0105             Valvula Flujo Vapor Desairador  VC4
+   FW25V-0105             Valv.  Flujo De Agua  Atemperadora Red 250
+   FW65BV-0105            Valvula Flujo De Agua Atemperadora #2 CC#2
+   FW65V-0105             Valvula Flujo De Agua Atemperadora #1 CC#2
+   FWAV-0105              Atemperador Para La Red 250
+   FWC2V-0105             Valv. Revalse Desaireador Combustion#2 V12
+   FWSDV-0105             Válv. Flujo De Agua Solidos Disueltos VC5
+   FWT-0105               Trans. Flujo Agua Combustión #2
+   FWTD-0105              Valvula Flujo de Agua Desaireador CC#2 V4
+   FWTD2V-0105            Valv. Inversa Nivel Desaireador Comb.#2 V3
+   FWV-0105               Valvula Alimentacion Agua Domo CC#2 VC1
+   FWV1A-0105             Atemperador #1 Combustion #2
+   FWV2A-0105             Atemperador #2 Combustion #2
+   LW1S-0105              Trans. Nivel Mínimo Desaireador Comb. #2
+   LW1T-0105              Trans. Nivel Domo Reduntante Combustion 2
+   LW2S-0105              Trans. Nivel Máximo Desaireador Comb. #2
+   LW2T-0105              Trans. Nivel Redundante Agua Combustion #2
+   LWCT-0105              Trans Nivel Agua Condenso Tanque #4
+   LWT-0105               Trans. Nivel Domo Caldera Combustion #2
+   LWTD-0105              Trans. Nivel Tanque Agua Desairador CC#2
+   OGI-0105               Indicdor Digital O2 Combustion 2
+   PABPT-0105             Trans. Presión Aire Bajo Parrilla
+   PAET-0105              Trans. Presion Entrada Aire A Calentador
+   PAFD-0105              Actuador Damper Aire Forzado Comb # 2
+   PAHT-0105              Trans. Presion Hogar Combustion #2 PT1
+   PAID-0105              Actuador Tiro Inducido Combustion #2
+   PAIT-0105              Trans. Presion Aire Instrumentos Combustion #2
+   PASCT-0105             Trans. Aire Salida Calentador Combustion#2
+   PAST-0105              Trans. Presion Aire Sobre Fuego Comb#2
+   PDBC7V-0105            Piston De Desvio De Bagazo De CC2 A CMITRE
+   PGET-0105              Trans. Presión Entrada Calentador Comb.#2
+   PGST-0105              Trans. Presion Gases Salida Combustion #2
+   PTURBD-0105            Actuador Aire Turbulencia Comb # 2
+   PV1T-0105              Trans. Presion Vapor 800 PSI CC2
+   PV25T-0105             Transmisor Presion Vapor Red 250 PT10
+   PV2T-0105              Trans. Presion Vapor Redun. Combustion #2
+   PV65-25AV-0105         Valvula Reductora De Presion 750-250 Psi
+   PV75-25BV-0105         Valv. Reductora #2 De Presion De 750 A 250
+   PVI-0105               Indicador De Presion De Vapor
+   PVM-0105               Manometro Presion Vapor Comb. #2
+   PVT-0105               Transmisor Presion Vapor PT8 Combustion #2
+   PWAT-0105              Trans. Presion Agua Alivio Combustion #2
+   PWAV-0105              Valvula Alivio Presion Agua Alimen. VC2
+   PWDT-0105              Transmisor De Presion Desaireador PT12
+   SFREC1C-0105           Variador De Velocidad Alimentador #1
+   SFREC2C-0105           Variador De Velocidad Alimentador #2
+   SFREC3C-0105           Variador De Velocidad Alimentador #3
+   SFREC4C-0105           Variador De Velocidad Alimentador #4
+   SFREC5C-0105           Variador De Velocidad Alimentador #5
+   TAECTS-0105            Temp. Aire Entrada Calentador TT3
+   TAHTS-0105             Sensor Temperatura Hogar Combustion #2
+   TASCTS-0105            Temperatura Aire Salida Calentador TT4
+   TGECTS-0105            Temperatura Gases Entrada Calentador TT5
+   TGSC-2TS-0105          TEMP.2 SALIDA GASES CALENTADOR
+   TGSCTS-0105            Temperatura Gases Salida Calentador TT6
+   TJT-0501A              TRANSMISOR TEMPERATURA JUGO EVAPORADOR 1A
+   TV25TS-0105            Temp. Vapor Red 250 Psi TT10
+   TV80TS-0105            Temperatura Vapor Red 800psi TT12
+   TVESTS-0105            Temp. Vapor Entrada Sobrecalentador TT7
+   TVET-0501A             TRANSMISOR TEMPERATURA VAPOR EVAPORADOR 1A
+   TVSSTS-0105            Temp. Vapor Salida Sobrecalentador TT8
+   TWDALBAT-0105          Trans. Nivel Puntual Domo Combustion #2
+   TWEETS-0105            Temp. Agua Entrada Al Economizador TT1
+   TWSETS-0105            Temp. Agua Salida Economizador TT2
+
+   TWTDTS-0105            Temperatura Agua Tanque Desaireador TT9
+   UPSCeniza-0105         Sistema De Alimentacion Ininterrumpida. Comb. 2
+   USDTS-0105             Transmisor de Conductividad Solidos Disueltos
+   UX06-0105              Switch Ethernet Administrable Combustion 2
+
+--------------------------------------------------------------------------------
+4. AREA CORREGIDA: Caldera Mitre - Tratamiento de Agua
+   Valores originales erroneos: 'ra Mitre - Tratamiento de Agua'
+   Instrumentos en esta area actualmente: 5
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FCV-0503               Valvula Flujo Tq #4 A Desaireador Mitre
+   LCV-0501               Valvula De Nivel Tanque Agua Bruta
+   LCV-0502               Valv. De Nivel Tanque Agua Desmineralizada
+   LIT-0501               Nivel Tanque #5 Agua Bruta Mitre
+   LIT-0502               Nivel Tanque #6 Agua Desmineralizada Mitre
+
+--------------------------------------------------------------------------------
+5. AREA CORREGIDA: Calderas
+   Valores originales erroneos: 'ras'
+   Instrumentos en esta area actualmente: 37
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CC250C-0100            Panel De Control  Caldera 17 Bar
+   COMP250-0100           Computadora Software SCADA HC900 C250
+   FVET-0100              Flujo Vapor Escape Mitre A Fabrica
+   FWAV-0100              Valvula Alivio De Presion Agua Cal 17Bar
+   FWC1V-0100             Valvula Revalse Desairador Cal. 17Bar(V13)
+   FWC2V-0100             Val. Inversa Desairador Cal. 17Bar (V2)
+   FWC3V-0100             Valvula Condeso A Zanja Red 17Bar
+   FWCT-0100              Flujo De Agua A Desaireador Calderas 250
+   FWCV-0100              Valvula Control Nivel Agua Desairador (V1)
+   IE1T-0100              Transmisor de Corriente Conductor de Bagazo #1
+   IE2T-0100              Transmisor de Corriente Conductor de Bagazo #2
+   IE3T-0100              Transmisor de Corriente Conductor de Bagazo #3
+   IE4T-0100              Transmisor de Corriente Conductor de Bagazo #4
+   IE5T-0100              Transmisor de Corriente Conductor de Bagazo #5
+   IE6T-0100              Transmisor de Corriente Conductor de Bagazo #6
+   IE7T-0100              Transmisor de Corriente Conductor de Bagazo #7
+   IE9T-0100              Transmisor de Corriente Conductor de Bagazo #9
+   LW1S-0100              Sensor #1 Nivel Puntual Tanque Desairador
+   LW2S-0100              Sensor #2 Nivel Puntual Tanque Desairador
+   LWTDT-0100             Trans. Nivel Tanque Desairador Caldera 250
+   LWTQ3T-0100            Trans. Nivel Tanque #3 Condenso Cald 250
+   PBD-0100               Piston Conductor De Bagazo #4
+   PMBD-0100              Piston de Muestreo de Bagazo Conductor #3
+   PWAT-0100              Trans. Presion Agua Alivio Calderas 17Bar
+   ST1I-0100              Indicador de  Velocidad Conductor de Bagazo #1
+   ST2I-0100              Indicador de  Velocidad Conductor de Bagazo #2
+   ST3I-0100              Indicador de  Velocidad Conductor de Bagazo #3
+   ST4I-0100              Indicador de  Velocidad Conductor de Bagazo #4
+   ST5I-0100              Indicador de  Velocidad Conductor de Bagazo #5
+   ST6I-0100              Indicador de  Velocidad Conductor de Bagazo #6
+   ST7I-0100              Indicador de  Velocidad Conductor de Bagazo #7
+   ST9I-0100              Indicador de  Velocidad Conductor de Bagazo #9
+   TSGS-0100              Sensor Temp Manifold Salida General Vapor
+   TVETGMT-0100           Transmisor De Temperatura Vapor Escape TGM (PITOT)
+   USDT-0100              Conductividad Agua Red 17Bar
+   UX07-0100              Switch Ethernet Administrable Calderas De Baja
+   WBI-0100               Bascula De Biomasa
+
+--------------------------------------------------------------------------------
+6. AREA CORREGIDA: Calderas - Caldera Mitre
+   Valores originales erroneos: 'ras - Caldera Mitre'
+   Instrumentos en esta area actualmente: 6
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   37-PS-301              Presión Aire Osmosis Set 5.52 Bar (80 Psi)
+   UX150-0107             Switch Ethernet Administrable Servidor 1 Mitre
+   UX151-0107             Switch Ethernet Administrable Servidor 2 Mitre
+   UX152-0107             Switch Ethernet Administrable Caldera Mitre
+   UX155-0107             Switch Ethernet Administrable ETA
+   UX158-0107             Switch Ethernet Administrable Camaras Mitre
+
+--------------------------------------------------------------------------------
+7. AREA CORREGIDA: Calderas -Planta de tratamiento de agua
+   Valores originales erroneos: 'Planta de tratamiento de agua', 'ras -Planta de tratamiento de agua'
+   Instrumentos en esta area actualmente: 16
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CFILOXC-0108           Controlador Planta filox
+   CFMC-0108              Controlador Retrolavado FiltroMultimedia
+   FINBWFILOV-0108        Valvula Flujo de Agua Entrada Retrolavado Filox
+   FINBWFMV-0108          Valvula Flujo de Agua Entrada Retrolavado FiltroMultimedia
+   FINFILOXV-0108         Valvula Flujo de Agua Entrada Filox
+   FINFMT-0108            Transmisor de Flujo de Agua FiltroMultimedia
+   FINFMV-0108            Valvula Flujo de Agua Entrada FiltroMultimedia
+   FOUTBWFILV-0108        Valvula Flujo de Agua Salida Retrolavado Filox
+   FOUTBWFMV-0108         Valvula Flujo de Agua Salida Retrolavado FiltroMultimedia
+   FOUTFILOXV-0108        Valvula Flujo de Agua Salida Filox
+   FOUTFMV-0108           Valvula Flujo de Agua Salida FiltroMultimedia
+   FOUTRFILOV-0108        Valvula Flujo de Agua Salida Enjuague Filox
+   FOUTRFMV-0108          Valvula Flujo de Agua Salida Enjuague FiltroMultimedia
+   LMINFILOXT-0108        Transmisor on/off nivel minimo tq externo FILOX
+   LWDLMT-0108            Transmisor de Nivel Tanque Agua Desmineralizada Lecho Mixto
+   PSWT-0109              Presostato De Disparo Alta Presion FILOX
+
+--------------------------------------------------------------------------------
+8. AREA CORREGIDA: Calentadores de Jugo - Calentador #2
+   Valores originales erroneos: 'Jugo - Calentador #2'
+   Instrumentos en esta area actualmente: 12
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FBAIPASSV-0402         VALVULA BYPASS DE JUGO DE CALENTADOR#2
+   FCONDV-0402            VALVULA DE CONDENSO DE CALENTEDOR #2
+   FEJ1V-0402             VALVULA DE ENTRADA DE JUGO DE CALENTADOR#2
+   FER3V-0402             VALVULA DE ENTRADA  DE JUGO DE RETROLAVADO DE CALENTADOR#2
+   FEV1V-0402             VALVULA DE ENTRADA DE VAPOR DE CALENTADOR #2
+   FSJ2V-0402             VALVULA DE SALIDA DE JUGO DE CALENTEDOR#2
+   FSR4V-0402             VALVULA DE SALIDA DE JUGO DE RETROLAVADO DE CALENTADOR#2
+   FWCV-0402              Valvula Automatica Flujo Agua Condensos
+   LWCT-0402              Transmisor De Nivel De Condenso De Calentador De Jugo #2
+   LWCV-0402              Valvula Nivel Condeso Calentador #2
+   SRSR4V-0402            VALVULA DE SALIDA DE JUGO DE RETROLAVADO DE CALENTADOR#2
+   TJE-0402               Termometro Salida Jugo Calentador #2
+
+--------------------------------------------------------------------------------
+9. AREA CORREGIDA: Centrifugas - Centrifugas de Primera
+   Valores originales erroneos: 'ifugas - Centrifugas de Primera', 'ifugas - Centrifuga 1a', 'ifugas - Centrifugas 1a'
+   Instrumentos en esta area actualmente: 18
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CCC1C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 1
+   CCC2C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 2
+   CCC3C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 3
+   CCC4C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 4
+   CCC5C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 5
+   CCC6C-0801             Controlador Maraca FESTO Para Control De Centrifuga # 6
+   CCC7C-0801             Controlador Maraca ALLEN BRADLEY Para Control De Centrifuga # 1
+   FCMC1-0801             Valvula De Corte De masa Centr. #1 de primera  "10"
+   FCMC2V-0801            VALVULA DE CORTE FLUJO DE MASA
+   FCMC3V-0801            Valvula De Corte De masa Centr. #3 de primera  "10"
+   FCMC6V-0801            VALVULA DE CORTE FLUJO DE MASA
+   FMASAV-0801            Valvula Control Masa Centrifuga 3 De 1Ra
+   FMC1V-0801             Valvula De Control flujo De masa Centr. #1 de primera  "12"
+   FMC2V-0801             Valvula De Control flujo De masa Centr. #2 de primera  "12"
+   FMC4.V-0801            Valvula De Corte Flujo Masa Centrifuga 4
+   FMC4V-0801             Valvula De Control Flujo Centrifuga #4
+   HMIC1-0801             PANTALLA DE CONTROL CENTRIFUGAS # 1
+   UX159-0801             Switch Ethernet Administrable Centrifugas De Primera
+
+--------------------------------------------------------------------------------
+10. AREA CORREGIDA: Centrifugas - Centrifugas de Segunda
+   Valores originales erroneos: 's - Centrifugas de Segunda'
+   Instrumentos en esta area actualmente: 14
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FFM2SV-0802            Valvula Flujo Masa 2Da Silver 2
+   FM3V-0802              Valvula De Control Flujo Masa Centrifuga DUQMAG De 2Da.
+   FMASA 2DAV-0802        Valvula Masa 2Da Centrifuga Silver 2
+   FMC2V-0802             VALVULA DE CONTROL FLUJO DE MASA
+   FMC4V-0802             Valvula Corte Masa Centrifuga BMA De 2Da
+   FMSBMAV-0802           Valvula Flujo Msa Centrifuga BMA 2DA
+   FMSDUGV-0802           Valvula Control Flujo Masa Centrifuga DUGMAN 2DA
+   HMIC2-0802             PANTALLA DE CONTROL CENETRIFUGAS #2
+   HMIC3-0802             PANTALLA DE CONTROL CENETRIFUGAS # 3
+   IM3T-0802              Transmisor De Corriente Centrifuga SILVER De 2Da # 1
+   IM3T-0803              Transmisor De Corriente Centrifuga 3ra BMA #3
+   IM4T-0802              Transmisor De Corriente Centrifuga SILVER De 2Da # 2
+   IM4T-0803              Transmisor De Corriente Centrifuga 4 BMA 2da
+   IM5T-0802              Trasnmisosor De Corriente De Centrifuga 5 BMA De 2Da
+
+--------------------------------------------------------------------------------
+11. AREA CORREGIDA: Clarificacion - Clarificador Rapido
+   Valores originales erroneos: 'ficacion - Clarificador Rapido', 'ion - Clarificador Rapido'
+   Instrumentos en esta area actualmente: 24
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   F(CACH)T-1007          Transmisor De Flujo Cachaza A Tanque Cachazon
+   FCACH2T-1007           Trans Flujo Cachaza A Tq Cachazon Clari 2
+   FFLOC2T-1007           Trans. Flujo Floculante Hacia Clari2
+   FFLOCT-1007            Transmisor flujo floculante clarificador rapido
+   FJC1V-1007             Valvula Flujo Jugo Entrada Tanque Flash
+   FJFT-1007              Transmisor De Jugo Filtrado
+   FJIC2T-1007            Trans Flujo Jugo Entrada Clarif 2
+   FJINC2V-1007           Valula De Entrada De Jugo A Clarificador #2
+   FW2T-1007              Flujometro agua dilucion Clarificador 2
+   FWT-1007               Transmisor Flujo Agua Dilucion Clarificador
+   FWV-1007               Valvula Dilucion  Floculante Clarificador
+   LFLOC1T-1007           Transmisor Nivel Mezcla Floculante
+   LFLOC1V-1007           VAL.ON/OFF  TQ. MEZCLA A TQ STOK
+   LFLOC2T-1007           Transmisor Nivel Tq Stock Floculante #2
+   LJ1V-1007              Valv.  Decantacion Clarificador Rapido
+   LJ2V-1007              Val. On/Off Corte Decantador Clarificacion
+   LJ3V-1007              Val. On/Off Corte Decantador Clarificacion
+   LJC21V-1007            VALVULA CONTROL NIVEL DECANTACION CLARIFICADOR 2
+   LJC2T-1007             Transmisor De Nivel De Clarificador #2
+   TCC2T-1007             Temperatura De Cuerpo De Clarificador #2
+   TFLOC2T-1007           Trans. Temp. Tq. De Mezcla Floculante
+   TJCLARI2T-1007         Temperatura Flujo Jugo Entrada Calrificador 2
+   TJIT-1007              TX. Tempertura Entrada Jugo  Clarificador 2
+   TJOT-1007              TX. Temperatura Salida Clarificador 2
+
+--------------------------------------------------------------------------------
+12. AREA CORREGIDA: Clarificacion - Clarificador de Meladura
+   Valores originales erroneos: 'Clarificador de Meladura', 'ficacion - Clarificador de Meladura', 'ion - Clarificador de Meladura'
+   Instrumentos en esta area actualmente: 41
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   AMECT-1010             Transmisor De PH Meladura Clarificada E+H
+   CMELC-1010             SISTEMA DE CONTROL HC-900CLARIFICADOR DEMELADURA
+   F(MEC)T-1010           Flujometro  Meladura Cruda Clarificador
+   F(MSC)T-1010           Flujometro meladura clarificada
+   FAFT-1010              Transmisor Agua Dilucion Floculante
+   FAMV-1010              Valvula Muestreador  Meladura Clarificada
+   FFLOCT-1010            Flujometro floculante clarificador meladura
+   FISMV-1010             VALVULA DE FLLUJO INYECCION DE SACARATO AMELADURA
+   FMEC1V-1010            Val. Flujo Mel. Clarificada A Tanque Clari
+   FMECV-1010             Válv. Flujo Meladura Clarificada A Tachos
+   FMERV-1010             Valv. Flujo Recircualción De Meladura
+   FMEV-1010              Valv Flujo Mel. A Clarific (Cabeza Const.)
+   FRSMV-1010             VALVULA FLUJO RETORNO DE SACARTO A MELADURA
+   FV1V-1010              Val. Flujo De Vapor Calentador Meladura #1
+   FV2V-1010              Vál. Flujo De Vapor Calentador Meladura #2
+   FV3V-1010              Val.Flujo Vapor Calentaador De Meladura #3
+   FV4V-1010              Val. Flujo De Vapor Calentador De Mela #4
+   FWDT-1010              Trans flujo dilucion floc clari meladura
+   FWDT-1010              Flujo Agua Dilucion Floculante
+   FWDTT-1010             Flujometro Mag. Flujo Agua Dilucion
+   FWV-1010               FLUJO AGUA DILUCION FLOCULANTE
+   LMEC1T-1010            Transmisor Nivel Meladura Clarificada
+   LMEC2T-1010            Nivel Máximo Tanque Meladura Clarificada
+   LMES1T-1010            Trans. Nivel Tanque Meladura Sulfitada
+   LMES2T-1010            Nivel Máximo Tanque Meladura Sulfitada
+   LWC1T-1010             Tran Nivel Condenso Calentador Meladura #1
+   LWC1V-1010             Valv. Nivel Condenso Calentador Meladura 1
+   LWC2T-1010             Trans.Nivel Condenso Calentador Meladura2
+   LWC2V-1010             Valv. Nivel Condenso Calentador Meladura 2
+   LWC3T-1010             Trans.Nivel Condenso Calentador Meladura 3
+   LWC3V-1010             Valv. Nivel Condenso Calentador Meladura 3
+   LWC4T-1010             Trans Nivel Condenso Calentador Meladura 4
+   LWC4V-1010             Valv. Nivel Condenso Calentador Meladura 4
+   PIJR3T-1010            Trans. De Presion Entrada Jugo Recalentador 3
+   PSJR3T-1010            Trans. Presion Salida Jugo Recalentador 3
+   TCM1T-1010             Temperatura Calentador De Meladura #1
+   TCM2T-1010             Temperatura Calentador De Meladura #2
+   TCM3T-1010             Temperatura Calentador De Meladura #3
+   TCM4T-1010             Temperatura Calentador De Meladura #4
+   TEMT-1010              Temp Entrada Meladura A Tq. Flash Meladura
+   TGT-1010               Trans Temp Entrada Gases Torre Sulfitación
+
+--------------------------------------------------------------------------------
+13. AREA CORREGIDA: Clarificacion - Filtro de Banda
+   Valores originales erroneos: 'ficacion - Filtro de Banda', 'ion - Filtro de Banda'
+   Instrumentos en esta area actualmente: 39
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   AJF2T-1008             Transmisor De Ph Jugo Filtrado Banda #2
+   AJFT-1008              Transmisor De PH Filtro De Banda E+H
+   AWRT-1008              TRANSMISOR DE PH AEGUA RESIDUALES
+   FCACHF1BV-1008         ACTUADOR DESCARGA DE CACHAZA FILTRO DE BANDA 1
+   FCACHFB2V-1008         ACTUADOR DESCARGA DE CACHAZA FILTRO DE BANDA 2
+   FCALDWRV-1008          VALCULA FLUJO DESVIO DE CAL A AGUA RESIDUALES
+   FCALWRV-1008           VALVULA FLUJO INYECCION CAL AGUA RECIDUALES
+   FFLOCT-1008            Transmisor flujo floculante filtro banda
+   FWCFBV-1008            Valvula De Flujo De Agua De Condenso Hacia Tanque Filtro De Banda
+   FWSV-1008              VAL.ON/OFF DESVIO AGUA LAVADO TELA
+   FWT-1008               Flujo agua dilucion filtro banda
+   FWV-1008               Valv Agua Dilucion Floculante Filtro Banda
+   LCALT-1008             TRNS. ULTRA. CAL HACIA FILTRO
+   LCALV-1008             VAL. CONTROL DE NIVEL TQ. LECHADA A FILTRON BANDA
+   LFLOC2V-1008           valvula on/off nivel tq floc.filtro banda
+   LFLOC3T-1008           Transmisor Nivel Tanque Floc. Filtro Banda
+   LSFB1_1T-1008          Limit Switch 1 Encarrilamiento De Banda 1
+   LSFB1_2T-1008          Limit Switch 2 Encarrilamiento Banda 1
+   LSFB1_3T-1008          Limit Switch 3 Encarrilamiento Banda 1
+   LSFB1_4T-1008          Limit Switch 4 Encarrilamiento Banda 1
+   LSFB2_1T-1008          Limit Switch 1 Encarrilamiento Banda 2
+   LSFB2_2T-1008          Limit Switch 2 Encarrilamiento Banda 2
+   LSFB2_3T-1008          Limit Switch 3 Encarrilamiento Banda 2
+   LSFB2_4T-1008          Limit Switch 4 Encarrilamiento Banda 2
+   LWRV-1008              Valvula Desvio De Agua A Tanque Residual
+   LWST-1008              Nivel Agua Sucia Lavado De Telas
+   LWSV-1008              VAL. ON/OFF DESVIO HACIA TQ AGUA SUCIA LAVADO DE TELAS.
+   LWT-1008               Nivel Tanque Agua Limpia Lavado De Telas
+   LWV-1008               VALVULA NIVEL LAVADO DE TELAS FILTRO BANDA
+   PAT-1008               Transmisor De Presion Suministro General
+   TFLOC3T-1008           Trans. Temp. Tq. Floculante Filtro De Banda
+   TWCTS-1008             Temperatura Agua  Limpia Lavado De Telas
+   UPS1-1008              UPS1 FILTRO DE BANDA
+   UX10-1008              Switch Ethernet Administrable Filtro de Banda
+   VG2T-1008              Transmisor De Vacío(2) Filtro De Banda #2
+   VGF1T-1008             TRANSMISOR VACIO GENARAL FILTRO DE VANDA # 1
+   VGT-1008               Transmisor De Vacio(1) Filtro de Banda #2
+   VHT-1008               Transmisor De Vacio Filtro de Banda #1
+   VLT-1008               Transmisor De Vacio Bajo
+
+--------------------------------------------------------------------------------
+14. AREA CORREGIDA: Clarificacion - Jugo Filtrado
+   Valores originales erroneos: 'ficacion - Jugo Filtrado'
+   Instrumentos en esta area actualmente: 2
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FJFT-1003              Transmisor Flujometro Jugo Filtrado
+   FJT-1003               Flujometro jugo filtrado
+
+--------------------------------------------------------------------------------
+15. AREA CORREGIDA: Clarificacion - Recalentadores de Jugo
+   Valores originales erroneos: 'ficacion - Recalentadores de Jugo'
+   Instrumentos en esta area actualmente: 49
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   ASD-PHT-1009           ANALIZADOR DE CONDUCTIVIDAD Y PH EN LINEA DE RECALENTADOR # 2 DE  JUGO CLARO
+   FBYPASS12V-1009        VALVULA BYPASS DE JUGO ENRTE RECALENTADOR 1 Y 2
+   FBYPASS51V-1009        VALVULA BYPASS DEL RECALENTADOR #1
+   FBYPASS52V-1009        VALVULA BYPASS DE JUGO RECALENTADOR #2
+   FBYPASS53V-1009        Valvula Bypass Recalentador 3
+   FEJ11V-1009            VALVULA DE ENTRADA DE JUGO DE RECALENTADOR#1
+   FEJ12V-1009            VALVULA DE ENTRADA DE JUGO RECALENTADOR #2
+   FEJ13V-1009            Valvula Entrada Jugo Recalentador 3
+   FER31V-1009            VALVULA ENTRADA RETROLAVADO DE JUGO RECALENTADOR #1
+   FER32V-1009            VALVULA ENTRADA RETROLAVADO DE JUGO RECALENTADOR #2
+   FER33V-1009            Valvula entrada retrolavado jugo recalentador
+   FSJ21V-1009            VALVULA SALIDA DE JUGO DE RECALENTADOR #1
+   FSJ22V-1009            VALVULA DE SALIDA DE JUGO DE RECALENTADOR #2
+   FSJ23V-1009            Valvula Salida Jugo Recalentador 3
+   FSR41V-1009            VALVULA SALIDA RETROLAVADODE JUGO RECALENTADOR #1
+   FSR42V-1009            VALVULA SALIDA RETROLAVADO DE JUGO RECALENTADOR #2
+   FSR43V-1009            Valvula Salida Retro Lavado Jugo  Recalentador 3
+   FVER1-1009             Valvula Flujo Vapor Escape Recalentador #1
+   FVVEV-1009             Valvula Vapor Vegetal  Recalentador #2
+   FVVR1-1009             VALVULA FLUJO VEJETAL A RECALENTADOR #2
+   FVVV-1009              VALVULA DE VAPOR VEJETA Y ESCAPE DE RECALENTADOR #1
+   FWCDESV-1009           VALVULA DESVIO AGUA CONDENSO TQ.IMBIBICION RECALENTADOR #2
+   FWCLIMPV-1009          VALVULA FLUJO AGUA CONDENSO TQ.PRIMER EFECTO RECALENTADOR #2
+   LWC1T-1009             Trans Nivel Condenso Recalentador  Jugo #1
+   LWC1V-1009             Valvula Nivel Condenso Recalentador #1
+   LWC2T-1009             TRANS NIVEL CONDENSO RECALENTADOR DE JUGO #2
+   LWC2V-1009             Val Control Agua Condensos Recalentado # 2
+   PAJIRV-1009            VALVULA CONTROL PRESION  ALIVIO ENTRADA JUGO A RECALENTADORES
+   PALIVV-1009            Valvula Control Press. Alivio
+   PIJR1T-1009            TRANSMISOR PRESION ENTRADA JUGO RECALENTADOR 1
+   PIJR2T-1009            PRESION ENTRADA JUGO RECALENTADOR 2
+   PINT-1009              Transmisor Presion Entrada Recalentadores
+   PJ1M-1009              Manometro Salida Jugo Recalentador #1
+   PJIN1M-1009            MANOMETRO PRESION ENTRADA JUGO RECALENTADOR 1
+   PJIN2M-1009            MANOMETRO PRESION ENTRADA JUGO RECALENTADOR 2
+   PSJR1T-1009            Trans Presion Salida Jugo Recalentador #1
+   PSJR2M-1009            Manometro Salida Jugo Recalentador #2
+   PSJR2T-1009            Trans Presion Salida Jugo Recalentador #2
+   PVVET-1009             Trans Pres Vapor Entrada A Recalentadores
+   TJ1E-1009              Termometro Salida Jugo Recalentador #1
+   TJ2E-1009              Termometro Salida Jugo Recalentador #2
+   TJ2T-1009              Trans temp Salida Recalentador #2
+   TJIN2T-1009            Trans. Temp. Jugo Entrada recalentador 2
+   TJINE-1009             Termometro Entrada Jugo A Recalentadores
+   TJINRC3T-1009          TRANSMISOR DE TEMPERATURA ENTRADA RECALENTADOR 3
+   TJINT-1009             Trans. Temp. Jugo Entrada recalentador 1
+   TJOUTRC3T-1009         TRANSMISOR DE TEMPERATURA DE SALIDA RECALENTADOR 3
+   TSJR1T-1009            Trans Temp Salida Recalentador #1
+   TVET-1009              Trans Temp. Vapor Vegetal  Recalentadores
+
+--------------------------------------------------------------------------------
+16. AREA CORREGIDA: Clarificacion- Jugo Claro
+   Valores originales erroneos: 'Claro'
+   Instrumentos en esta area actualmente: 8
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   APHJCT-1005            Analizador De Ph De Jugo Claro
+   ATJCT-1005             Analizador De Turbidez De Jugo Claro
+   F(JC)T-1005            Trans. Flujo Magnetico Jugo Claro
+   FJFT-1005              Trans. De Flujo De Jugo Claro  Tipo Magnet
+   LJC1S-1005             Sensor De Nivel Medio Tq. Jugo Claro
+   LJC2S-1005             Sensor De Nivel Minimo Tanque Jugo Claro
+   LJCMAXS-1005           Sensor De Nivel Maximo Tq. Jugo Claro
+   LJCT-1005              Transmisor Nivel Tanque Jugo Claro
+
+--------------------------------------------------------------------------------
+17. AREA CORREGIDA: Cristalizadores
+   Valores originales erroneos: 'alizadores'
+   Instrumentos en esta area actualmente: 17
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CCMRC-0400             SISTEMA DE CONTROL DISTRIBUIDOR REDONDANTE  SIEMENS-SIMATIC
+   CCRISTALC-0700         Panel De Control Cristalizadoras
+   CCVCC-0700             Sistema De Control Distribuido HC-900 Cristalizador Vertical
+   COMP-0700              Comp.Software SCADA  HC900 Cristalizado Vertical
+   COMP-CLARI-1008        Computadora Control Clarificador Rapido
+   COMP-CRIST-0700        Computadora Con Software SCADA P/HC900 De Cristalizadoras
+   LCRIS2T1T-0700         Trans. Nivel Cristalizadora Segunda #1
+   LCRIS2T2T-0700         Trans.. Nivel Cristalizadora De 2 #2
+   LCRIS2T3T-0700         Trans. Nivel Cristalizadora De 2#3
+   LCRIS3T7T-0700         Trans.Nivel Cristalizadores Tercera #7
+   LGRAC1T-0700           Transmisor Nivel Granero C1
+   LMEZ1BT-0700           Transmiso Nivel Mezclador primera blanco
+   LMEZICT-0700           Trans Nivel Mezclador 1Ra Crudo
+   LREC1B1T-0700          Trans. Nivel Recibidores Primera Blanco 1
+   LREC1B2T-0700          Nivel Recibidores Primera Blanco #2
+   LREC1CT-0700           Trans. Nivel Recibidor Primera Crudo
+   LREC3T-0600            Trans. Nivel Recibidor  Masa 3ra
+
+--------------------------------------------------------------------------------
+18. AREA CORREGIDA: Cristalizadores - Cristalizador Vertical
+   Valores originales erroneos: 'alizadores - Cristalizador Vertical'
+   Instrumentos en esta area actualmente: 25
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FDTRV-0701             Valvula On/Off Desvio De Agua A Torre De Enfriamiento
+   FDTTV-0701             Valvula On/Off Desvio Agua Caliente A Tanque De Tachos
+   FHWV-0701              Valvula On/Off Flujo Agua Caliente Tercera Etapa Cristalizador Vertical
+   FTHWV-0701             Valvula On/Off Nivel De Tanque De Agua Caliente Cristalizador Vertical
+   FWE1V-0701             Valvula On/Off Flujo De Agua Fria A Primera Etapa Crist. Vertical
+   FWE2V-0701             Valvula Proporcional Flujo De Agua Fria A Segunda Etapa Crist. Vertical
+   FWE3V-0701             Valvula Control Flujo De Agua Fria A Primera Etapa Crist Vertical
+   FWRV-0701              Valvula Flujo Agua Retorno Enfriamiento Cristalizador Vertical
+   FWT-0701               Flujometro agua a cristalizador vertical
+   FWV-0701               Valvula Flujo Agua Enfriamiento Cristalizador Vertical
+   LHWT-0701              Transmisor Nivel Tq. Agua Caliente Crist. Vertical
+   LIMCVT-0701            Transmisor Nivel Entrada Masa A Cristalizador Vertical
+   LOMCVT-0701            Transmisor Nivel Salida Masa Cristalizador Vertical
+   PHWM-0701              Manometro De Pres. De Agua Fria A Crst. Vertical
+   PHWT-0701              Trans. Pres. De Agua Fria A Crist. Vertical
+   TIMCVT-0701            Trans. Temperatura Entrada Masa A Crist, Vertical
+   TM1S-0701              Sensor De Temperatura RTD Pt100 Entrada A Cristalizador  Vertical
+   TM2S-0701              Sensor De Temperatura RTD Pt100 Intermedia De Cristalizador  Vertical
+   TM3S-0701              Sensor De Temperatura RTD Pt100 Tope De Cristalizador  Vertical
+   TOMCVT-0701            Transmisor De Temperatura Salida De Masa De Cristalizador Vertical
+   TWCT-0701              Trans. Temp. Agua Fria A Cristalizador Vertical
+   TWE1T-0701             Trans. Temp. Agua Etapa 1 Crist. Vertical.
+   TWE2T-0701             Trans. Temp. De Agua 2Da Etapa Crist. Vertical
+   TWE3T-0701             Trans. Temp. Agua Etapa 3 Crist. Vertical
+   TWES-0701              Sensor De Temperatura RTD Pt100 Agua De Enfriamiento De Cristalizador  Vertical
+
+--------------------------------------------------------------------------------
+19. AREA CORREGIDA: Cristalizadores - Cristalizadora #2
+   Valores originales erroneos: 'alizadores - Cristalizadora #2'
+   Instrumentos en esta area actualmente: 12
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FHWV-0702              Valv. On/Off Nivel Tanque Agua Caliente A Crist. Vertical
+   FVV-0702               Valvula De Control Flujo Vap. A Intercambiador De Rec, De Masa C
+   FWT-0702               Flujometro agua a recalentador masa C
+   FWV-0702               Valvula Control Flujo de Agua Entrando A Recalentador De Masa C
+   LIWV-0702              Valvula On/Off De Nivel Tanque Relleno De Agua A Circuito Recalentador Mas C
+   LWT-0702               Trans. Nivel Tanque Relleno De Agua A Circuito Rec. Masa C
+   PVT-0702               Trans. Pres. Vap. A Intercamb. De Recalentador Masa C
+   PWT-0702               Trans. Pres. De Agua A Intercamb. De Recalentador Masa C
+   TIMRT-0702             Trans. Temp. Entrada De Masa A Recalentador
+   TMS-0702               Sensor De Temperatura RTD Pt100 Crista # 2
+   TOMRT-0702             Trans. De Temp. Salida De Masa Rec. Masa C
+   TWT-0702               Trans, Temp. Agua Saliendo De Intercamb. De Rec. Masa C
+
+--------------------------------------------------------------------------------
+20. AREA CORREGIDA: Evaporacion
+   Valores originales erroneos: 'racion', 'racion - Evaporador #8', 'radores'
+   Instrumentos en esta area actualmente: 46
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CJ2C-0500              Sistema Honeywell De Control Distribuido Evaporadores #2
+   CJC-0500               Panel De Control Evaporadores
+   COMP-0500              Computadora evaporadores Scada Siemens
+   FJV-0508               Valvula Flujo De Jugo Evaporador #8
+   FM1TACHOSV-0500        Valvula Flujo Miel A Tachos Control Brix
+   FM2REV-0500            Valula Flujo De Retorno Miel Control Brix
+   FMRV-0500              Valvula Flujo De Retorno Miel Control Brix
+   FMTV-0500              Valvula Flujo Miel A Tachos Control Brix
+   FVAPV-0500             Valvula Vapor De Relleno
+   FVE1V-0500             Val Flujo Vapor Escape A La Atmosfera # 1
+   FVE2V-0500             Valvula Flujo Vapor Escape Atmosfera #2
+   FVE3V-0500             VALVULA FLUJO ESCAPE ATMOSFERA # 3
+   FVEFV-0500             Valvula Flujo Vapor Escapefabrica  30"
+   FVFT-0500              Trans. Flujo Vapor Consumo Fabrica
+   FVMT-0500              Trans. Flujo Vapor Consumo Molinos
+   FVT-0500               Tx Flujo Consumo Molinos
+   FVT-0500               Trans. Flujo Consumo Molinos
+   FWC3V-0500             Valvula Condesos Pre A Zanja (V11)
+   FWCV-0500              Valvula  flujo de agua  a atemperador evapoaradores
+   FWTET-0500             FLUJO AGUA TORRE ENFRIAMIENTO AGUA CONDENSADA
+   FWVA-0500              Saturador De Vapor (Atemperador)
+   FWVV-0500              Valvula Atemperadora Evaporadores
+   HMIEVAPCI-0500         HMI EVAPORADORES
+   LWC4EFT-0500           TRASMISOR NIVEL 4To EFECTO
+   LWCFT-0500             Trans. Nivel Tanque  Condensos Fabrica
+   LWCT-0500              Transmisor Nivel Tanq.Condenso Pre´S
+   LWCT-0501A             Transmisor Nivel Condenso Evaporador 1A
+   LWCTT-0500             TRANSMISOR NIVEL TANQ CONDENSO FABRICA
+   LWPT-0500              Transmisor Nivel Tanque Aereo
+   LWRT-1011              Transmisor De Nivel Tanque De Aguas Residuales Fabrica
+   LWTBT-0500             TRANSMISOR DE NIVEL TANQUE BUFER AGUA CONDENSADA
+   LWTET-0500             Trans Nivel Torre Enfriamiento 
+Agua Condensada de Fabrica
+   LWTRT-0500             Transmisor Nivel Tq Recerva Zona Calderas
+   LWV-0500               Valvula Corte De Agua Tanque Aereo
+   PAIRT-0500             Presión Aire Compresor FABRICA
+   PVAPT-0500             Trans Vapor Alta Presion (red 17-24 Bar)
+   PVAPT-0500             Transmisor De Vapor Alta Presion
+   PVET-0500              Trans. Presion Vapor Escape Fabrica
+   PVVM-0500              Manómetro presion Vapor Vivo
+   PVVT-0500              Transmisor Presion Vapor Vivo
+   TINWTET-0500           TRANSMISOR TEMPERATURA ENTRADA TORRE ENFRIAMIENTO CONDENSO
+   TOUTWTET-0500          TRANSMISOR TEMPERATURA SALIDA TORRE ENFRIAMIENTO CONDENSADO
+   TWSS-0500              Temperatura Vapor Escape
+   UPS-0500               UNIDAD DE RESPALDO ELECTRICOPARA CUARTO DE CONTRO EVAPORADORES
+   USD1T-0500             Transmisor de Conductividad Condenso Evaporadores
+   UX09-0500              Switch Ethernet Administrable Evaporadores
+
+--------------------------------------------------------------------------------
+21. AREA CORREGIDA: Evaporacion - Melador #3
+   Valores originales erroneos: 'racion - Melador #3'
+   Instrumentos en esta area actualmente: 17
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0500               Transmisor De Brix Meladura A Tachos
+   FENVV4V-0508           VALVULA ENTRADA VAPOR VEGETAL4 EVAPORADOR #8
+   FMT-0500               Transmisor de flujo meladura  a tachos
+   FSVV5V-0508            VALVULA SALIDA VAPOR VEGETAL5 EVAPORADOR #8
+   FWCV-0508              Val Control Agua Condensos Meladores#3
+   LJT-0508               Transmisor De Nivel Jugo Evaporador #8
+   LWCFT-0508             Trams Nivel Tanq Cond Fabrica
+   LWCT-0508              Trans. Nivel Tanque Condensos Melador #3
+   PVT-0508               Transmisor Presion Vapor Melador #3
+   TJE-0508               Termometro Jugo Melador #3
+   TJT-0508               Trans. Temperatura Jugo Melador #3
+   TVE-0508               Termometro Vapor Melador #3
+   TVT-0508               Trans. Temperatura Vapor Melador #3
+   VAFM-0508              VACUOMETRO DE MELADOR #3
+   VAM-0508               Vacuometro Melador #3
+   VAT-0508               Trans. De Vacio Melador #3
+   VPVM-0508              Vacuometro/Manometro Melador #3
+
+--------------------------------------------------------------------------------
+22. AREA CORREGIDA: Evaporacion - Pre-Evaporador #1
+   Valores originales erroneos: 'racion - Pre-Evaporador #1'
+   Instrumentos en esta area actualmente: 26
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   ASD-PHT-0501           ANALIZADOR DE CONDUCTIVIDAD Y PH EN LINEA DE EVAPORADOR #1
+   ASD-PHT-0501A          ANALIZADOR DE CONDUCTIVIDAD Y PH EN LINEA EVAPORADOR 1A
+   FENVV1AV-051A          ENTRADA VAPOR VEGETAL1 A EVA 
+
+
+
+
+
+
+
+
+
+ENTRADA VAPOR VEGETAL EVA #1A
+   FENVV1V-0501           Entrada De Vapor Vegetal #1 A Evaporador #1
+   FJBV-0501              Valvula Control Flujo Bypass Jugo Evaporador #1
+   FJV-0501               Valvula Flujo De Jugo Pre-Evaporador #1
+   FVEV-0501              VALVULA ENTRADA VAPOR ESCAPE EVEPORADOR  #1
+   FVEV-0501A             Valvula Entrada De Vapor Escape Evaporador 1A
+   FVVV-0501              VALVULA SALIDA VAPOR VEGETAL1 EVAPORADOR #1
+   FWCDESV-0501           VALVULA DESVIO AGUA CONDENSO TQ. IMBIBICION EVAPORADOR #1
+   FWCLIMPV-0501          Valvula Flujo Agua Condensada.Tq Primer Efecto Evaporador #1
+   FWCV-0501              Val Auto Control Agua Condensos Pre#1
+   FWCV-0501A             Valvula Flujo Agua Condensada A Tanque Primer Efecto Evaporador 1A
+   LJT-0501               Transmisor De Nivel Jugo Evaporador #1
+   LJT-0501A              TRANSMISOR NIVEL JUGO EVAPORADOR 1A
+   LWCT-0501              Transmisor Nivel Agua Condenso Pre 1
+   LWCV-0501              Valvula De Nivel Condenso Evaporador 1
+   PVET-0501              Trans Presion Vap Escape Preevaporador #1
+   PVET-0501A             TRANSMISOR DE PRESION VAPOR ESCAPE EVAP 1A
+   PVM-0501A              Manometro Preevaporador 1A
+   PVT-0501               Transm. Presion De Vapor Vaso 1
+   TJE-0501               Termometro Jugo Evaporador #1
+   TJT-0501               Trans. Temperatura Jugo Pre-Evaporador #1
+   TVE-0501               Termometro Vapor Pre-Evaporador #1
+   TVE-0501A              Termometro Vapor Pre-Evaporador #1A
+   TVT-0501               Trans. Temperatura Vapor Pre-Evaporador #1
+
+--------------------------------------------------------------------------------
+23. AREA CORREGIDA: Extraccion
+   Valores originales erroneos: 'ccion'
+   Instrumentos en esta area actualmente: 36
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CANVRC-0902            Controlador NVR Camaras Secadora
+   CAV2I-0200             Camara # 2 Conductor Principal
+   CAV4I-0200             Camara Mesa # 2
+   CAV5I-0200             Camara Plantel Camiones
+   CCM2C-0200             Panel De Control Extraccion #2
+   CCMC-0200              Panel De Control Extraccion
+   CJT-0200               Transmisor De Densidad Jugo Mezclado
+   COMPEXT-0200           Computadora de Control Extraccion
+   FWCV-0200              Valvula Control Nivel Tanque Imbibicion
+   FWDV-0200              Valvula De Descarga Tanque Agua Imbibicion
+   HMIMCI-0200            Pantalla HMI Tanques de Maceracion
+   IE2T-0200              Transmisor Corriente Motor Pre-Picadora #2
+   IET-0200               Transmisor De Corriente pre- picadora Conductor Auxiliar
+   LJM2T-0200             Trans. Nivel Maximo Tanque Jugo Mezclado
+   LJMAT-0200             Transmisor De Nivel Tanque Jugo Maceracion Amarillo
+   LJMAV-0200             Valvula De Control Nivel Tanque De Maceracion Amarillo
+   LJMCT-0200             Transmisor De Nivel Tanque Jugo Mezclado
+   LJMNT-0200             Transmisor De Nivel Tanque Jugo Maceracion Naranja
+   LJMNV-0200             Valvula De Control Nivel Tanque De Maceracion Naranja
+   LJMRT-0200             Transmisor De Nivel Tanque Jugo Maceracion Rojo
+   LJMRV-0200             Valvula De Control Nivel Tanque De Maceracion Rojo
+   LJMT-0200              Transmisor de Nivel Tanque Jugo Mezclado (Tanque Pequeño)
+   LWCT-0200              Transmisor de Nivel Agua Condenso Molinos Imbibicion
+   PDTD-0200              Piston De Disparo Por Sobre RPM De Turbina Picadora Cond Auxiliar
+   PHM-0200               Manometro de Presion Hidraulica General Molinos
+   PHT-0200               Transmisor De Presion Hidraulica Molinos
+   PVEM-0200              Manometro Presion Vapor Escape Molinos
+   SAUXC-0200             Controlador Conductor Auxiliar
+   SFREC1C-0200           Variador  Frecuencia Bomba #1 Tanque Jugo Mezclado
+   ST1I-0200              Medidor De RPM Nivelador
+   ST1I-0201              Medidor RPM Banda De Hule
+   STI-0200               Medidor De RPM Turbina Pre-Picadora #2
+   STMI-0200              Medidor De RPM Motor Pre-Picadora Cond. Auxiliar
+   TMUESV-0200            Toma Muestra Jugo Mezclado
+   TWCT-0200              Transmisor De Temperatura Agua De Condenso
+   UX08-0200              Switch Ethernet Administrable Extraccion
+
+--------------------------------------------------------------------------------
+24. AREA CORREGIDA: Extraccion - Agua Imbibicion
+   Valores originales erroneos: 'ccion - Agua Imbibicion'
+   Instrumentos en esta area actualmente: 5
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FWIT-0209              flujometro agua imbibicion
+   FWIV-0209              Valvula Control Flujo Agua Imbibicion
+   LWIT-0209              Transmisor Nivel Agua Imbibicion
+   TWE-0209               Termometro Agua Imbibicion
+   TWIT-0209              Transmisor Temperatura Agua Imbibicion
+
+--------------------------------------------------------------------------------
+25. AREA CORREGIDA: Extraccion - Conductor Principal
+   Valores originales erroneos: 'ccion - Conductor Principal'
+   Instrumentos en esta area actualmente: 6
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   WC1T-0208              Celda #1 Bacula Pesa Caña
+   WC2T-0208              Celda #2 Bacula Pesa Caña
+   WC2T-0208              Bascula Control  Mesas Alimentacion
+   WC3T-0208              Celda #3 Bacula Pesa Caña
+   WC4T-0208              Celda #4 Bacula Pesa Caña
+   WCT-0208               Sistema Pesa Caña En Linea Conductor Principal
+
+--------------------------------------------------------------------------------
+26. AREA CORREGIDA: Extraccion - Desfibradora
+   Valores originales erroneos: 'ccion - Desfibradora'
+   Instrumentos en esta area actualmente: 3
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   IET-0211               Transmisor De Corriente Motor Desfibradora
+   S2TI-0211              Medidor De RPM Motor Desfibradora
+   STTI-0211              Medidor De RPM Turbina Desfibradora
+
+--------------------------------------------------------------------------------
+27. AREA CORREGIDA: Extraccion - Molino #5
+   Valores originales erroneos: 'ccion - Molino #5'
+   Instrumentos en esta area actualmente: 16
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FWIV-0205              Valvula Control Flujo Desvio Agua Imbibicion Molino #5
+   HLM-0205               Manometro Presion Hidraulica Lado "L"Mol 5
+   HRM-0205               Manometro Presion Hidraulica Lado "R"Mol 5
+   IET-0205               Transmisor De Corriente Donelly Molino #5
+   LCT-0205               Transmisor De Nivel De Chute Molino #5
+   LFMLT-0205             Transmisor de Flotacion De Masa Molino #5  Lado "L"
+   LFMRT-0205             Transmisor de Flotacion De Masa Molino #5  Lado "R"
+   PHLT-0205              Trans. Presion Hidraulica Lado "L" Mol. 5
+   PHM-0205               MANOMETRO PRESION ACEITE REDUCTOR PLANETARIO MOLINO #5
+   PHMAT-0205             TRANS. PRESON ACEITE REDUCTOR MASA ASISTIDA MOL. 5
+   PHRT-0205              Trans. Presion Hidraulica Lado "R" Mol. 5
+   PHT-0205               Transmisor  Presion Aceite Reductor Mol#5
+   STI-0205               Medidor De RPM Motor Molino #5
+   TAHT-0205              Trans. Temp. Aceite Alta Reductor Molino 5
+   TALT-0205              Trans. Temp. Aceite Baja Reductor Molino 5
+   THMAT-0205             TRANS. TEM. ACEITE REDUCTOR MASA ASISTIDA MOL. 5
+
+--------------------------------------------------------------------------------
+28. AREA CORREGIDA: Extraccion - Picadora
+   Valores originales erroneos: 'ccion - Picadora'
+   Instrumentos en esta area actualmente: 5
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   IET-0212               Transmisor De Corriente Motor Picadora
+   PHT-0212               Transmisor De Presion Aceite Reductor Picadora
+   S2TI-0212              Medidor De RPM Motor Picadora
+   STI-0212               Medidor De RPM Turbina Desfibradora
+   TREDT-0212             Sensor Temperatura Reductor Picadora
+
+--------------------------------------------------------------------------------
+29. AREA CORREGIDA: Extraccion - PrePicadora
+   Valores originales erroneos: 'ccion - PrePicadora'
+   Instrumentos en esta area actualmente: 4
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   IET-0213               Transmisor De Corriente Motor Prepicadora #1
+   PDTD-0213              Piston Disparo Por Sobre RPM De Turbina Pre-Picadora
+   STMI-0213              Medidor De RPM Motor Pre-Picadora
+   STTI-0213              Medidor RPM Turbina Pre-Picadora
+
+--------------------------------------------------------------------------------
+30. AREA CORREGIDA: Generacion Electrica - TurboGenerador NG
+   Valores originales erroneos: 'acion Electrica - TurboGenerador NG'
+   Instrumentos en esta area actualmente: 23
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CNGC-1204              Sistema De Control Distribuido Allen Bradley Turbogenerador NG
+   GLA-1204               Lado Cojinete G.L. A Turbo NG
+   HMI NG C-1204          Pantalla HMI Control Turbo NG
+   LNA-1204               Temperatura cojinete lado exitacion L.N.A Turbo N.G
+   PACT-1204              Transmisor Presion Aceite Control
+   PALT-1204              Transmisor Presion Aceite Lubricacion
+   PSW1-1204              Switch#1 Pres. Diferencial Filtros Aceite mca. ASCHROFT
+   PSW2-1204              Switch#2 Pres. Diferencial Filtros Aceite
+   PSW3-1204              Switch De Presion Vapor Escape
+   PSW4-1204              Switch De Presion de Aceite Lubricacion
+   PSWV-1204              Switch Presion Vapor Escape
+   PVAT-1204              Transmisor Presion Vapor De Admision
+   PVET-1204              Transmisor Presion Vapor Escape
+   T1S-1204               Sensor de Temperatura Cojinete Axial Turbina
+   T2S-1204               Sensor de Temperatura Cojinete Radial Frontal Turbina
+   T3S-1204               Sensor de Temperatura Cojinete Radial Posterior Turbo
+   T4S-1204               Sensor Temperatura Piñon Reductor Lado Turbina
+   T5S-1204               Sensor de Temperatura Piñon Reductor Lado Generador
+   T6S-1204               Sensor de Temperatura Cojinete Engranaje Reductor Lado Turbo
+   T7S-1204               Sensor de Temperatura Cojinete Engranaje Reductor Lado Genenerador
+   T8S-1204               Sensor de Temperatura Aceite Despues Intercambiador de Calor
+   TVATST-1204            Transmisor y TC Vapor De Admision
+   TVETS-1204             Transmisor y TC Vapor De Escape
+
+--------------------------------------------------------------------------------
+31. AREA CORREGIDA: No Existe
+   Valores originales erroneos: 'iste', 'v'
+   Instrumentos en esta area actualmente: 106
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   34-PS-301              PRESION BAJA ENTRADA PASO 2
+   37-FT-201              TRASMISOR FLUJO PRODUCTO EDI
+   47-PT-501              TRASMISOR DE PRESION SALIDA ELECTRODOS EDI
+   AE-102                 Sensor De Ph Salida Lecho Mixto-Producto
+   AGPPMI-0221            Analizador E Indicador De Gases De Combustion En PPM Caldera MITRE
+   CBRECHC-0615           SISTEMA DE CONTROL DISTRIBUIDO HC-900 BOMBAS DE RECHAZO
+   CE-101                 Sensor De Conductividad De Alimentacion A Lecho Mixto
+   CE-102                 Sensor De Conductividad Salida Lecho Mixto-Producto
+   CE-301                 Sensor De Conductividad Inyeccion De Acido
+   CE-401                 Sensor De Conductividad Inyeccion De Sosa
+   COMP-TGM-1205          Computadora De Control Turbo TGM.
+   FABIV-0615             Valvula De Control Alivio De Manifold De Bombas De Inyeccion
+   FAESPUMAV-1329         Valvula Flujo Antiespumante Fermentador D
+   FE-102                 Sensor De Flujo Salida Lecho Mixto
+   FJT-0501A              Trans Flijo Jugo Evap 1A
+   FJV-0501A              Valvula Automatica Flujo Jugo Pre Evaporador N° 1A
+   FOSMOSIS V-0204        Valvula Agua Osmosis A Dearador Mitre
+   FPBI1V-0615            Valvula De Control Presion De Manifold Bomba De Inyeccion 1
+   FPBI2.V-0615           VAL CONTROL PRESION MANIFOLD BB INYECCION # 2
+   FPGBV-0612             VALVULA DE PASE SEMILLA GRANERO B
+   FPGC1V-0612            VALVULA PASE SEMILLA GRANERO C1
+   FPGC2V-0612            VALVULA PASE SEMILLA GRANERO C2
+   FPM2V-0612             Valvula De Pase Semilla Granero A2
+   FPM3V-0612             Valvula De Pase Semilla ON//OF
+   FPM4V-0612             Valvula De Pase Semilla ON//OF
+   FPMBV-0612             Valvula De Pase Semilla Granero B
+   FPMCV-0612             VALVULA PASE SEMILLA  ON/OFF MAGMA C
+   FPMV-0612              VALVULA DE PASE SEMILLERO MAGMA C
+   FT-201                 Sensor Flujo Linea De Retrolavado
+   FT-301                 Flujo Inyeccion De Acido
+   FT-401                 Semsor De Flujo Inyeccion De Sosa Caustica
+   FVENT1V-0612           Valvula Venteo Granero "C"
+   FVENT2V-0612           Valvula De Venteo Granero 2°
+   FVENT3V-0612           Valvula de Venteo Tanque de Magma "C"
+   FVGBV-0612             VALVULA DE VENTEO GRANERO B1 Y B2
+   FVGCV-0612             VALVULA DE VENTEO GRANERO C1 Y C2
+   FVMBV-0612             VALVULA DE VENTEO MAGMA B
+   FVT-1328               TRANSMISOR FLUJO VAPOR A RECT. B3
+   FVV-1328               VALVULA CONTROL FLUJO VAPOR RB3
+   FVVVV-0501A            Valvula Salida De Vapor Vegetal 1 De Evaporador 1A
+   FW2V-1007              VALVULA AGUA DILUCION CLARIFICADOR #2
+   FWC1EFV-0501A          Valvula Flujo Agua Condensada A Tanque 1 Efecto Eva 1A N/C
+   FWCDESV-0501A          VALVULA CONDENSO DESVIO AGUA IMBIBICION EVAP1A
+   FWRPIV-0615            VALVULA DE FLUJO RELLENO PILA BBA INYECCION
+   FWT-1329               FLUJO DE AGUA  TORRE ENF. SALIDA RE-PROCESO
+   HMI-1205               Pantalla HMI Turbogenerador TGM CTE 40
+   LCV-004                Valvula Recirculacion Bombas de Condensado
+   LFONT-1328             Transmisor Nivel Fondo B3
+   LFONV-1328             VALVULA NIVEL FONDO B3
+   LIT-301                Interruptor De Nivel Tanque De Acido
+   LIT-401                Interruptor De Nivel Tanque Sosa
+   LJC22V-1007            VALVULA OF/ON DE CORTE CLARIFICADOE # 2
+   LMAXT-0109             Nivel Maximo tanque 10 m3 planta FILOX
+   LMINT-0109             Nivel minimo tanque 10 m3 planta FILOX
+   LMT-1329               Transmisor De Nivel Tq. Fermentador D
+   LREFT-1328             TRANSMISOR NIVEL REFLUJO B3
+   LREFV-1328             VALVULA NIVEL REFLUJO B3
+   LT-006                 Nivel Hotwell
+   LWCV-0501A             VALVULA AGUA CONDENSO EVAPORADOR 1A
+   LWPIT-0615              Transmisor de  Nivel Pila Bombas De Inyeccion
+   PCV-0248               Valvula Reductora Baypass De La Turbina Tgm
+   PFONT-1328             TRANSMISOR PRECION FONDO RB3
+   PIT-0338               Presion Vapor Admision
+   PIT-0339               Presion Vapor Camara De La Rueda
+   PMBR T-0615            Transmisor De Presion De Agua De Manifold De Bombas De Rechazo
+   PMCT-0615              Transmisor De Presion De Manifold Condensadores
+   PT-101                 Transmisor De Presion Entrada A Lecho Mixto
+   PT-102                 Tramsmision De Presion Salida Lecho Mixto
+   PWALIV-0615            Valvula De Alivio De Manifold De Bombas De Rechazo
+   PWOBRT-0615            Transmisor De Presion Salida Bombas De Rechazo
+   SAZT-0905              Sensor De Llenado Elevador De Azucar Secadora
+   SBST-0905              Sensor De Atoramiento De Elevador De Azucar (BINATOL)
+   STI-0905               Sensor De Velocidad Elevador De Azucar
+   TCH1T-0905             Transmisor De Temperatura Chumacera 1 Elevador De Azucar
+   TCH2T-0905             Transmisor De Temperatura Chumacera 2 Elevador De Azucar
+   TE-0397                Temperatura Vapor Estanquiadad 32.42.1
+   TFONT-1328             TRANSMISOR TEMPERATURA FONDO RB3
+   THTQ1-1327             TRANSMISOR DE NIVEL TQ #2 AGUA ARDIENTE
+   TINCB3T-1328           TRANSMISOR TEM ENTRADA CONDENSADOR B3
+   TINIT-1328             TRANSMISOR TEMPERATURA INTERMEDIA RB3
+   TINT-1326              Transmisor De Temperatura Entrada A Condensador B2
+   TINT-1328              TRANSMISOR TMPERATURA ENTRADA CONDENSADOR RB3
+   TJE-0501A              Termometro Jugo Evaporador #1 A
+   TMS-1329               TRANSMISOR DE TEMPERATURA FERMENTADOR 4 "D"
+   TOUTT-1328             TRANSMISOR TEMPERATURA SALIDA CONDENSADOR RB3
+   TT-007                 Temperatura Hotwell
+   TTOPT-1328             TRANSMISOR TEMPERATURA TOPE RB3
+   TTSCT-05MTT            Temperatura Salida Caldera Mitre TT100
+   TWINT-0615             Temperatura Entrada Agua  A Condensadores
+   TWOUTT-0615            Temperatura Salida Agua A Condensadores
+   XV-100                 Valvula Desfogue Lecho Mixto
+   XV-101                 Valvula Alimentacion Lecho Mixto
+   XV-103                 Valvula Entrada Retrolavado Lecho Mixto
+   XV-104                 Valvula Salida Retrolavado Lecho Mixto
+   XV-105                 Valvula Entrada Enjuegue Lecho Mixto
+   XV-106                 Valvula Salida De Enjuega Lecho Mixto
+   XV-107                 Valvula Entrada HCL Lecho Mixto
+   XV-108                 Valvula Entrada Sosa Caustica Lecho Mixto
+   XV-109                 Valvula Entrada Aire Lecho Mixto
+   XV-110                 Valvula Salida Regenerante Lecho Mixto
+   XV-111                 Valvula Drenaje Superior Lecho Mixto
+   XV-112                 Valvula Drenaje Inferior Lecho Mixto
+   ZS1T-0905              Sensor 1 Descarrilamiento Elevador De Azucar
+   ZS2T-0905              Sensor 2 De Descarrilamiento Elevador De Azucar
+   ZS3T-0905              Sensor 3 De Descarrilamiento Elevador De Azucar
+   ZS4T-0905              Sensor 4 De Descarrilamiento Elevador De Azucar
+
+--------------------------------------------------------------------------------
+32. AREA CORREGIDA: Planta Osmosis
+   Valores originales erroneos: 'cion'
+   Instrumentos en esta area actualmente: 6
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   34-AT-201              TRANSMISOR DE PH ENTRADA PASO1
+   34-FV-101              Valvula Entrada Feed Osmosis
+   34-PS-207              High Concetr Presion Pass 1
+   37-PT-401              TRANSMISOR DE PRESION SALIDA CONCENTRADOR E
+   CETAC-300              Sistema de control distribuido Allen-Bradley planta osmosis(ETA)
+   HMI-0425               pantalla HMI control ETA
+
+--------------------------------------------------------------------------------
+33. AREA CORREGIDA: Planta de Alcohol - Dilucion
+   Valores originales erroneos: 'a de Alcohol - Dilucion'
+   Instrumentos en esta area actualmente: 11
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-1301               Transmisor De Brix Dilucion De Miel
+   CMT-1301               Trans. De Brix Dilucion De Miel
+   CMT-1301               Trans. Brix  DT - 301 Didolucion De Miel
+   FM1T-1301              Flujometro melaza a PAL
+   FVV-1301               Valvula De Vapor Tanque Reactor
+   FWFV-1301              Valv. Flujo Agua Dilucion Miel
+   FWV-1301               Valvula Automatica Agua Dilucion De Miel
+   LMT-1301               Trans. De  Nivel Tanque Reactor
+   PMM-1301               Manometro Presion Bomba Reactor
+   TM2S-1301              Temp. Miel Diluida
+   TMT-1301               RTD  REACTOR
+
+--------------------------------------------------------------------------------
+34. AREA CORREGIDA: Planta de Alcohol - Tanque Alcohol Final #3
+   Valores originales erroneos: 'a Alcohol - Tanque Alcohol Final #3'
+   Instrumentos en esta area actualmente: 2
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FHT-1318               Flujometro Masico Tanque #3
+   FHT-1325               Transmisor Alcohol Neutro Tanque 4
+
+--------------------------------------------------------------------------------
+35. AREA CORREGIDA: Secadora - Azucar Blanca
+   Valores originales erroneos: 'ora - Azucar Blanca'
+   Instrumentos en esta area actualmente: 7
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CADVRC-0902            Control Cámaras De Video Tipo DVR
+   CSCI-0902              Controlador Para Sistema De Pesaje De Azucar Con Servomotores Linea #1
+   FDAL1V-0902            Piston Y Electrovalvula Diverter Desviador De Azucar A Linea #1
+   FDAL2V-0902            Piston Y Electrovalvula Diverter Desviador De Azucar A Linea #2
+   LAT1T-0902             Transmisor De Nivel Proporcional De Tolva Linea #1
+   QHMII-0902             Pantalla HMI Contador De Sacos Linea #1
+   WSRI-0902              Sistema Comparacion Reg Y Chequeo Pesos
+
+--------------------------------------------------------------------------------
+36. AREA CORREGIDA: Secadora - Empaqsa
+   Valores originales erroneos: 'ora - Empaqsa'
+   Instrumentos en esta area actualmente: 11
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   LAT2T-0903             Transmisor De Nivel Proporcional Tolva De Linea #2
+   LS1T-0903              Transmisor On/Off Nivel Minimo Tolva Azucar Linea 2
+   LS2S-0903              Transmisor Nivel Maximo Tolva Azucar
+   LS2T-0903              Transmisor Nivel On/Off Intermedio Tolva Azucar Linea 2
+   LS3S-0903              Transmisor Nivel Minimo Tolva Azucar
+   LS3S-0903              Transmisor Nivel Minimo Tolva
+   LS3T-0903              Transmisor Nivel On/Off Maximo Tolva Azucar Linea 2
+   LS4S-0903              Trans On/Off De Nivel Lleno De Cajilones
+   QHMII-0903             Pantalla HMI Contador De Sacos Linea #2
+   W1S3CI-0903            Sistema Pesaje Para Despa. Azucar Empaqsa
+   WS3CI-0903             Sistem. Para Despacho Azucar Empaqsa
+
+--------------------------------------------------------------------------------
+37. AREA CORREGIDA: Tachos - Disolutores
+   Valores originales erroneos: 's - Disolutores'
+   Instrumentos en esta area actualmente: 8
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CM1AT-0610             Transmisor de Brix Disolutor Miel 1A
+   CM2AT-0610             Transmisor Nivel Disolutor Miel 2A
+   FV1V-0610              Valvula Proporcional  Flujo Vapor Disol #1
+   FV2V-0610              Valvula Proporcional Flujo Vapor Disolutor #2
+   FW1V-0610              Valv. Control Flujo de Agua Disolutor #1
+   FW2V-0610              Valv. Flujo Alimentacion de Agua Disol #2
+   TM1T-0610              Transmisor De Temperatura Disolutor #1
+   TM2T-0610              Transmisor De Temperatura Disolutor #2
+
+--------------------------------------------------------------------------------
+38. AREA CORREGIDA: Tachos - Tacho #1
+   Valores originales erroneos: 's - Tacho #1'
+   Instrumentos en esta area actualmente: 38
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0601               Transmisor Brix Tacho # 1
+   CMT-0608               Transmisor De Brix Tacho #8
+   FAV-0601               Valvula Rompe Vacio Tacho # 1
+   FAWV-0601              VALVULA DE CONTROL DE AGUA VACIO TACHO #1
+   FCBN1T-0601            Valvula De Corte BBA Nach Tacho 1
+   FCBNV-0601             valvula de corte bba nash t1
+   FCMAV-0601             Valvula De Corte Miel A Tacho # 1
+   FCMBV-0601             Valvula De Corte De Miel B Tacho # 1
+   FCMV-0601              Valvula De Corte De Meladura Tacho # 1
+   FCMZV-0601             Valvula De Corte De Mezcla Tacho # 1
+   FCWV-0601              Valvula De Corte De Agua Tacho # 1
+   FDEV-0601              VALVULA DE DESCARGA TACHO #1
+   FIDEV-0601             VALVULA INTERMEDIA DESCARGA C
+   FINV-0601              VALVULA INTERMEDIO PASE TACHO 1
+   FMCV-0601              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 1
+   FMSV-0601              Valvula Semilla Tacho #1
+   FMV-0601               Valvula Flujo de Miel Tacho #1
+   FPAV-0601              VALVULA DE PASE TACHO 1
+   FPMT1V-0601            Valvula De Pase Flujo De Masa Tacho # 1
+   FVEV-0601              Valvula Vapor  Escoba  Tacho #1
+   FVST1V-0601            VALVULA DE SOPLADURA TACHO # 1
+   FVV-0601               Valvula Flujo Vapor Tacho # 1
+   FWAV-0601              Valv. Control Agua Vacio Tacho # 1
+   FWV-0601               Valvula Flujo Agua Tacho #1 Diametro 2"
+   HM-0601                Manometro Presion Hidraulica Tacho #1
+   IAGIT-0601             Transmisor De Corriente Agitador Tacho 1
+   LMT-0601               Transmisor Nivel Masa Tacho #1
+   LWCT-0601              Trans. Nivel Control De Condensos Tacho #1
+   LWCV-0601              Valvula Nivel Condenso Tacho #1
+   PVM-0601               Manometro Presion Vapor Tacho #1
+   PVT-0601               Transmisor Presion Vapor Tacho #1
+   TCOND2T-0601           Trans. Temp. Salida  Condensador Tacho #1
+   TIWCT-0601             Trans. Temp. Entrada Condensador Tacho #1
+   TME-0601               Termometro Tacho #1
+   TMT-0601               Transmisor De Temperatura Masa Tacho #1
+   TOWCT-0601             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #1
+   VAM-0601               Vacuometro Tacho #1
+   VAT-0601               Transmisor De Vacio Tacho #1
+
+--------------------------------------------------------------------------------
+39. AREA CORREGIDA: Tachos - Tacho #2
+   Valores originales erroneos: 's - Tacho #2'
+   Instrumentos en esta area actualmente: 36
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0602               Transmisor Brix Tacho # 2
+   FAV-0602               Valvula Rompe Vacio Tacho # 2
+   FCMAV-0602             VALVULA DE CORTE DE MIEL A TACHO # 2
+   FCMBV-0602             VALVULA DE CORTE DE MIEL B TACHO # 2
+   FCMV-0602              VALVULA DE CORTE MELADURA TACHO # 2
+   FCMZV-0602             VALVULA DE CORTE DE MEZCLA TACHO # 2
+   FCWV-0602              VALVULA DE CORTE DE AGUA TACHO # 2
+   FDEV-0602              VALVULA DESCARGA TACHO #2
+   FIDEM2V-0602           VALVULA DESCARGA MASA 2° A CRISTALIZADORAS
+   FIDEV-0602             VALVULA INTERMEDIA DESCARGA A Y B
+   FINV-0602              VALVULA INTERMEDIO TACHO 2
+   FMCV-0602              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 2
+   FMSV-0602              Valvula De Semilla Tacho#2
+   FMV-0602               VALVULA FLUJO MIEL TACHO #2
+   FMVV-0602              Valvula De Flujo de Miel Tacho #2
+   FPAV-0602              VALVULA DE PASE TACHO #2
+   FPMT2V-0602            Valvula De Pase Flujo De Masa Tacho # 2
+   FVEV-0602              Valvula Vapor  Escoba  Tacho #2
+   FVST2V-0602            VALVULA DE SOPLADURA TACHO # 2
+   FVV-0602               Valvula Flujo Vapor Tacho # 2
+   FWAV-0602              Valvula Control Agua Vacio Tacho 2
+   FWV-0602               Valvula Flujo Agua Tacho #2
+   HM-0602                Manometro Presion Hidraulica Tacho #2
+   LMT-0602               Transmisor Nivel Masa Tacho #2
+   LWCT-0602              Trans. Nivel Control De Condensos Tacho #2
+   LWCV-0602              Valvula Nivel Agua Condenso Tacho #2
+   PDEV-0602              VALVULA DE DESCARGA TACHO #2
+   PVM-0602               Manometro Presion Vapor Tacho #2
+   PVT-0602               Transmisor Presion Vapor Tacho #2
+   TCOND2T-0602           Trans. Temp. Salida Condensador Tacho #2
+   TIWCT-0602             Trans. Temp. Entrada Condensador Tacho #2
+   TME-0602               Termometro Tacho #2
+   TMT-0602               Transmisor De Temperatura Masa Tacho #2
+   TOWCT-0602             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #2
+   VAM-0602               Vacuometro Tacho #2
+   VAT-0602               Transmisor De Vacio Tacho #2
+
+--------------------------------------------------------------------------------
+40. AREA CORREGIDA: Tachos - Tacho #3
+   Valores originales erroneos: 's - Tacho #3'
+   Instrumentos en esta area actualmente: 32
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0603               Transmisor Brix Tacho # 3
+   FAV-0603               Valvula Rompe Vacio Tacho # 3 On/ Off
+   FAWV-0603              Val. Control Agua Vacio Tacho #3
+   FCMAV-0603             VALVULA DE CORTE DE MIEL A TACHO # 3
+   FCMBV-0603             VALVULA DE CORTE DE MIEL B TACHO # 3
+   FDEV-0603              VALVULA DE DESCARGA DE TACHO #3
+   FDRA3V-0603            VALVULA DESCARGA DE RECIBIDOR A3
+   FIDEV-0603             VALVULA INTERMEDIA DE DESCARGA TACHO 3
+   FINP3V-0603            VALVULA INTERMEDIA PASE TACHO 3
+   FM3V-0803              Valvula control flujo masa 3ra centrifuga BMA #3
+   FMCV-0603              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 3
+   FMV-0603               Valvula Flujo Miel Tacho #3
+   FPAV-0603              VALVULA DE PASE TACHO #3
+   FPMT3V-0603            Valvula De Pase Flujo De Masa Tacho # 3
+   FVEV-0603              Valvula Vapor  Escoba  Tacho #3
+   FVST3V-0603            VALVULA DE SOPLADURA TACHO # 3
+   FVV-0603               Valvula Control Vapor Tacho # 3
+   FWAV-0603              VALVULA CONTROL VACIO TACHO 3
+   FWV-0603               Valvula Flujo Agua Tacho #3
+   HM-0603                Manometro Presion Hidráulica Tacho # 3
+   LMT-0603               Transmisor Nivel Masa Tacho #3
+   LWCT-0603              Trans. Nivel Control De Condensos Tacho #3
+   LWCV-0603              Valvula Control Agua Condenso Tacho # 3
+   PVM-0603               Manometro Presion Vapor Tacho #3
+   PVT-0603               Transmisor Presion Vapor Tacho #3
+   TCOND2T-0603           Trans. Temp. Salida Condensador Tacho #3
+   TIWCT-0603             Trans. Temp. Entrada Condensador Tacho #3
+   TME-0603               Termometro Tacho #3
+   TMT-0603               Transmisor De Temperatura Masa Tacho #3
+   TOWCT-0603             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #3
+   VAM-0603               Vacuometro Tacho #3
+   VAT-0603               Tansmisor De Vacio Tacho #3
+
+--------------------------------------------------------------------------------
+41. AREA CORREGIDA: Tachos - Tacho #4
+   Valores originales erroneos: 's - Tacho #4'
+   Instrumentos en esta area actualmente: 29
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0604               Transmisor Brix Tacho # 4
+   FAV-0604               Valvula Rompe Vacio Tacho # 4
+   FCBNV-0604             VALVULA DE CORTE DE BOMBA NASH TACHO # 4
+   FCMV -0604             VALVULA DE CORTE DE MELADURA TACHO # 4
+   FDEV-0604              VALVULA DE DESCARGA DE TACHO #4
+   FMCV-0604              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 4
+   FMV-0604               Valvula Flujo Miel Tacho # 4 Fisher "4"
+   FPAV-0604              VALVULA DE PASE TACHO 4
+   FPMBT-0604             Valvula De Pase Magma B Tacho N°4
+   FPMT4V-0604            Valvula De Pase Flujo De Masa Tacho # 4
+   FPV-0604               Valvula De Pase Tacho N° 4
+   FVEV-0604              Valvula Vapor  Escoba  Tacho #4
+   FVST4V-0604            VALVULA DE SOPLADURA TACHO # 4
+   FVV-0604               Valvula Control Vapor Tacho #4
+   FWAV-0604              Valvula Control Vacio Tacho N° 4
+   FWV-0604               Valvula Flujo De Agua Tacho #4
+   HM-0604                Manometro Presion Hidráulica Tacho  # 4
+   LMT-0604               Transmisor De Nivel Masa Tacho #4
+   LWCT-0604              Trans. Nivel Condensos #4
+   LWCV-0604              Valvula Agua Condeso Tacho # 4
+   PVM-0604               Manometro Presion Vapor Tacho #4
+   PVT-0604               Transmisor Presion Vapor Tacho #4
+   TCOND2T-0604           Trans. Temp. Salida Condensador Tacho #4
+   TIWCT-0604             Trans. Temp. Entrada Condensador Tacho #4
+   TME-0604               Termometro Tacho #4
+   TMT-0604               Tranmisor De Temperatura Masa Tacho #4
+   TOWCT-0604             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #4
+   VAM-0604               Vacuometro Tacho #4
+   VAT-0604               Transmisor De Vacio Tacho #4
+
+--------------------------------------------------------------------------------
+42. AREA CORREGIDA: Tachos - Tacho #6
+   Valores originales erroneos: 's - Tacho #6'
+   Instrumentos en esta area actualmente: 30
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0606               Transmisor Brix Tacho # 6
+   FAV-0606               Valvula Rompe Vacio Tacho # 6
+   FCBNV-0606             VALVULA DE CORTE BOMBA NASH TACHO # 6
+   FCMV-0606              Valvula De Corte Meladura Tacho # 6
+   FCWV-0606              Valvula De Corte Agua Tacho # 6
+   FDEV-0606              VALVULA DESCARGA TACHO 6
+   FMCV-0606              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 6
+   FMV-0606               Valvula De Flujo De Miel Tacho # 6  "4"
+   FPAV-0606              VALVULA DE PASE TACHO 6
+   FPMBT-0606             Valvula De Pase De Magma B Tacho N° 6
+   FPMT6V-0606            Valvula De Pase Flujo De Masa Tacho # 6
+   FPV-0606               Valvula De Pase Tacho N° 6
+   FVEV-0606              Valvula Vapor  Escoba  Tacho #6
+   FVST6V-0606            VALVULA DE SOPLADURA TACHO # 6
+   FVV-0606               Valvula Flujo Vapor Tacho # 6
+   FWV-0606               Valvula Flujo De Agua Tacho #6
+   FWVV-0601              VALVULA CONTROL VACIO TACHO 1
+   HM-0606                Manometro Presion Hidráulica Tacho # 6
+   LMT-0606               Transmisor Nivel Masa Tacho #6
+   LWCT-0606              Trans. Nivel Control Condesos Tacho #6
+   LWCV-0606              Valvula Nivel Agua Condenso Tacho # 6
+   PVM-0606               Manometro Presion Vapor Tacho #6
+   PVT-0606               Transmisor Presion Vapor Tacho #6
+   TCOND2T-0606           Trans. Temp. Salida Condensador Tacho #6
+   TIWCT-0606             Trans. Temp. Entrada Condensador Tacho #6
+   TME-0606               Termometro Tacho #6
+   TMT-0606               Transmisor De Temperatura Masa Tacho #6
+   TOWCT-0606             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #6
+   VAM-0606               Vacuometro Tacho #6
+   VAT-0606               Transmisor De Vacio Tacho #6
+
+--------------------------------------------------------------------------------
+43. AREA CORREGIDA: Tachos - Tacho #7
+   Valores originales erroneos: 's - Tacho #7'
+   Instrumentos en esta area actualmente: 27
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   CMT-0607               Transmisor Brix Tacho # 7
+   FAV-0607               Valvula Rompe Vacio Tacho # 7
+   FAWV-0607              Valv. Control Agua Vacio Tacho #7
+   FCMAV-0607             VALVULA DE CORTE DE MIEL A TACHO # 7
+   FDEV-0607              Valvula De Descarga Tacho 7
+   FDMV-0607              Valvula De Descarga Tacho #7
+   FMCV-0607              VALVULA DE MUESTREO CONDUCTIVIDAD TACHO # 7
+   FMV-0607               Valvula  Flujo De Miel Tacho #7
+   FPAV-0607              VALVULA DE PASE TACHO 7
+   FPMT7V-0607            Valvula De Pase Flujo De Masa Tacho # 7
+   FVEV-0607              Valvula Vapor  Escoba  Tacho #7
+   FVST7V-0607            VALVULA DE SOPLADURA TACHO # 7
+   FVV-0607               Valvula Flujo De Vapor Tacho #7
+   FWAV-0607              Valvula Control Agua Vacio Tacho #7
+   HM-0607                Manometro Presion Hidráulica Tacho # 7
+   LMT-0607               Trans. Nivel TACHO #7
+   LWCT-0607              Trans. Nivel Control De Condensos Tacho #7
+   LWCV-0607              Valvula Nivel Agua Condeso Tacho # 7
+   PVM-0607               Manometro Presion Vapor Tacho #7
+   PVT-0607               Transmisor Presion Vapor Tacho #7
+   TCOND2T-0607           Trans. Temp. Salida Condensador Tacho #7
+   TIWCT-0607             Trans. Temp. Entrada Condensador Tacho #7
+   TME-0607               Termometro Tacho #7
+   TMT-0607               Transmisor De Temperatura Masa Tacho #7
+   TOWCT-0607             TEMPERATURA AGUA SALIDA A CONDESADOR TACHO #7
+   VAM-0607               Vacuometro Tacho #7
+   VAT-0607               Transmisor De Vacio Tacho #7
+
+--------------------------------------------------------------------------------
+44. AREA CORREGIDA: TermoElectrica Matizate - Generador TGM
+   Valores originales erroneos: 'Electrica Matizate - Generador TGM', 'rica Matizate - Generador TGM'
+   Instrumentos en esta area actualmente: 48
+
+   TAG                    DESCRIPCION
+   -------------------- --------------------------------------------------
+   FCV-0305               Valvula De Recirculacion Agua Hotwell
+   LCV-0304               Valv. Nivel Agua Hotwell  A Desaerador
+   LIT-0306               Transmisor Nivel Aceite TGM
+35.00.4
+   PCV-0346               Valvula Reductora Vapor De Sello
+   PCV-0347               Valvula Alivio Vapor Escape Mariposa
+   PCV-0351               Valvula De Control Vapor De Estanquidad Alta 40.44.1
+   PDIT-0302              Presion Diferencial Filtro De Aceite
+   PIT-0301               Presion Aceite P1 31.00.4
+   PIT-0307               Presion Aceite Elevacion Rotor 31.22.4
+   PIT-0308               Presion Aceite Lubricación 31.10.4
+   PIT-0336               Presion Aceite Regulaje P3 31.02.04
+   PIT-0340               Presion Vapor Escape 30.10.4
+   PIT-0342               Vapor Extraccion Turbina  30.21.4
+   PIT-0344               Transmisor De Presion Vapor Extraccion 30.20.4
+   PIT-0346               Transmisor Presion Vapor De Sello
+   PIT-0347               Transmisor Presion de Vapor linea 1.5Kgf/cm2 para Fabrica de Azucar
+   PIT-0355               Pres.Aceite Regulaje P3 Extraccion 31.80.4
+   PIT-30.42.4            Presion de sellado 30.42.4
+   PSHH-0376              Presion Muy Alta Vapor Extraccion 51.03
+   PSHH-0377              Presion Muy Alta Vapor Escape 51.00
+   PSL-0371               Pres Baja Aceite Bloqueo Virador 51.32
+   PSL-0396               Bloquea Bomba De Elevacion Rotor 51.31
+   PSLL-0370              Presion Bajo Aceite Principal P1 51.40
+   PSLL-0372              Presion Muy Baja Aceite  Lubricacion 51.34
+   PSLL-0373              Presion Muy Baja Aceite Lubricacion 51.30
+   PT-035                 Presion Hotwell
+   TCV-0345               Valvula de Control Temperatura Vapor de Sello
+   TE-0303                Temperatura Despues Enfriador 30.02.01
+   TE-0304                Temperatura Antes Enfriador 33.03.01
+   TE-0305                Temperatura Taque De Aceite 33.00.1
+   TE-0327                Temperatura Cojinete Radial L.N.A Turbina 33.10.1
+   TE-0328                Temperatura Cojinete Axial Externo Turbina 33.12.1
+   TE-0329                Temperatura Cojinete Axial Interno Turbina 33.13.1
+   TE-0330                Temperatura Cojinete Radial L.A Turbina 33.14.1
+   TE-0331                Temperatura Cojinete Eje Alta L.A Reductor 33.15.1
+   TE-0332                Temperatura Cojinete Eje Alta L.N.A Reductor 33.16.1
+   TE-0333                Temperatura Cojinete Eje Baja L.N.A Reductor 33.17.1
+   TE-0334                Temperatura Cojinete Eje Baja L.A Reductor 33.18.1
+   TE-0341                Temperatura Vapor Escape  32.10.1
+   TE-0343                Temperatura Vapor Extraccion 32.20.1
+   TIT-0337               Temperatura Vapor Vivo Admision 32.00.4
+   TIT-0345               Temperatura Vapor De Sello TGM
+   TIT-0347               Temperatura Carcasa Superior 32.62.4
+   TIT-0348               Temperatura Interna De La Carcasa  32.60.4
+   TIT-0349               Temperatura Carcasa Centro Turbina 32.61.4
+   TIT-0350               Temperatura Inferior Carcasa 32.63.4
+   TIT-0354               Temp. Block de valv. de regulación 32.09.4
+   TT-008                 Temp. Salida Agua Enfriamiento Hotwell
+
+================================================================================
+CORRECCIONES INDIVIDUALES POR TAG
+================================================================================
+
+   TAG                    AREA ORIGINAL        AREA CORREGIDA                                DESCRIPCION
+   -------------------- ------------------ ------------------------------------------- ----------------------------------------
+   COMP-0700              's'                  Cristalizadores                               Comp.Software SCADA  HC900 Cristalizado Vertical
+   FVVGCV-0600            's'                  Tachos                                        Valvula De Venteo Granero C
+   LMCLT-0600             's'                  Tachos                                        Nivel Tanque De Meladura Clara
+   LWT10T-0600            's'                  Tachos                                        Transmisor Nivel Tanque Agua Condenso Tachos T#10
+   PCV-0209               'ra Mitre'           Caldera Mitre                                 Valvula Presion Vapor Desaerador Mitre
+   FMFV-0800              'ifugas'             Centrifugas                                   VALVULA MIEL FINAL CENTRIFUGAS
+   LWCT-0501              'es'                 Evaporacion - Pre-Evaporador #1               Transmisor Nivel Agua Condenso Pre 1
+   LAZT-0900              'ora'                Secadora                                      Transmisor De Nivel Tolva De Azucar Entrada Secadora
+   LWRT-1011              'ca'                 Evaporacion                                   Transmisor De Nivel Tanque De Aguas Residuales Fabrica
+   COMP-0500              'n'                  Evaporacion                                   Computadora evaporadores Scada Siemens
+
+================================================================================
+RESUMEN: 1022 instrumentos en areas corregidas por patron truncado.
+         10 instrumentos corregidos individualmente por TAG.
+         TOTAL AFECTADOS: 1032 registros.
+================================================================================
