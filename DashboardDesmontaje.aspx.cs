@@ -416,6 +416,22 @@ namespace Rutinas
                     .ThenBy(x => x.Area)
                     .ToList();
 
+                // Nuevas declaraciones de hoy por área (delta vs día anterior)
+                var nuevosHoy = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                using (SqlConnection connDelta = new SqlConnection(ConnReportes))
+                {
+                    connDelta.Open();
+                    SqlCommand cmdDelta = new SqlCommand(
+                        @"SELECT RTRIM(Area) AS Area, COUNT(DISTINCT TAG) AS NuevosHoy
+                          FROM DesmontajeAvance
+                          WHERE Desmontado = 1
+                            AND FechaDeclaracion >= CAST(GETDATE() AS DATE)
+                          GROUP BY Area", connDelta);
+                    using (SqlDataReader drDelta = cmdDelta.ExecuteReader())
+                        while (drDelta.Read())
+                            nuevosHoy[drDelta["Area"].ToString().Trim()] = Convert.ToInt32(drDelta["NuevosHoy"]);
+                }
+
                 using (XLWorkbook wb = new XLWorkbook())
                 {
                     // ── HOJA 1: Equipos desmontados ──────────────────────────
@@ -500,7 +516,7 @@ namespace Rutinas
 
                     // Título
                     ws2.Cell(1, 1).Value = "AVANCE DE DESMONTAJE POR ÁREA";
-                    ws2.Range(1, 1, 1, 5).Merge();
+                    ws2.Range(1, 1, 1, 6).Merge();
                     ws2.Cell(1, 1).Style.Font.Bold = true;
                     ws2.Cell(1, 1).Style.Font.FontSize = 14;
                     ws2.Cell(1, 1).Style.Font.FontColor = XLColor.White;
@@ -509,13 +525,13 @@ namespace Rutinas
                     ws2.Row(1).Height = 28;
 
                     ws2.Cell(2, 1).Value = "Generado: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-                    ws2.Range(2, 1, 2, 5).Merge();
+                    ws2.Range(2, 1, 2, 6).Merge();
                     ws2.Cell(2, 1).Style.Font.Italic = true;
                     ws2.Cell(2, 1).Style.Font.FontColor = XLColor.FromHtml("#555555");
                     ws2.Cell(2, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                     // Encabezados columnas (fila 3)
-                    string[] h2 = { "Área", "Total Equipos", "Desmontados", "Pendientes", "% Avance" };
+                    string[] h2 = { "Área", "Total Equipos", "Desmontados", "Pendientes", "% Avance", "Δ Hoy" };
                     for (int col = 0; col < h2.Length; col++)
                     {
                         IXLCell cell = ws2.Cell(3, col + 1);
@@ -535,6 +551,7 @@ namespace Rutinas
                     {
                         var a = avancePorArea[row];
                         int xlRow = row + 4;
+                        int delta = nuevosHoy.TryGetValue(a.Area, out int nd) ? nd : 0;
 
                         ws2.Cell(xlRow, 1).Value = a.Area;
                         ws2.Cell(xlRow, 2).Value = a.Total;
@@ -543,21 +560,28 @@ namespace Rutinas
                         ws2.Cell(xlRow, 5).Value = a.Avance / 100.0;
                         ws2.Cell(xlRow, 5).Style.NumberFormat.Format = "0.0%";
 
+                        if (delta > 0)
+                        {
+                            ws2.Cell(xlRow, 6).Value = "+" + delta;
+                            ws2.Cell(xlRow, 6).Style.Font.Bold = true;
+                            ws2.Cell(xlRow, 6).Style.Font.FontColor = XLColor.FromHtml("#E65100");
+                        }
+
                         // Alineación numérica
-                        for (int c = 2; c <= 5; c++)
+                        for (int c = 2; c <= 6; c++)
                             ws2.Cell(xlRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                         // Paleta por nivel de avance — 0% sin color
                         XLColor rowColor;
-                        if (a.Avance == 0)         rowColor = XLColor.White;               // sin avance
-                        else if (a.Avance < 35)    rowColor = XLColor.FromHtml("#FFEBEE"); // rojo claro
-                        else if (a.Avance < 70)    rowColor = XLColor.FromHtml("#FFF8E1"); // ámbar claro
-                        else if (a.Avance < 100)   rowColor = XLColor.FromHtml("#E3F2FD"); // azul claro
-                        else                        rowColor = XLColor.FromHtml("#E8F5E9"); // verde claro (100%)
+                        if (a.Avance == 0)         rowColor = XLColor.White;
+                        else if (a.Avance < 35)    rowColor = XLColor.FromHtml("#FFEBEE");
+                        else if (a.Avance < 70)    rowColor = XLColor.FromHtml("#FFF8E1");
+                        else if (a.Avance < 100)   rowColor = XLColor.FromHtml("#E3F2FD");
+                        else                        rowColor = XLColor.FromHtml("#E8F5E9");
 
-                        ws2.Range(xlRow, 1, xlRow, 5).Style.Fill.BackgroundColor = rowColor;
-                        ws2.Range(xlRow, 1, xlRow, 5).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
-                        ws2.Range(xlRow, 1, xlRow, 5).Style.Border.BottomBorderColor = XLColor.FromHtml("#DDDDDD");
+                        ws2.Range(xlRow, 1, xlRow, 6).Style.Fill.BackgroundColor = rowColor;
+                        ws2.Range(xlRow, 1, xlRow, 6).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                        ws2.Range(xlRow, 1, xlRow, 6).Style.Border.BottomBorderColor = XLColor.FromHtml("#DDDDDD");
                     }
 
                     // Fila de totales
@@ -566,6 +590,7 @@ namespace Rutinas
                     int gtDesm   = avancePorArea.Sum(x => x.Desmontados);
                     int gtPend   = avancePorArea.Sum(x => x.Pendientes);
                     double gtPct = gtTotal > 0 ? Math.Round(gtDesm * 100.0 / gtTotal, 1) : 0;
+                    int gtDelta  = nuevosHoy.Values.Sum();
 
                     ws2.Cell(totalRow, 1).Value = "TOTAL GENERAL";
                     ws2.Cell(totalRow, 2).Value = gtTotal;
@@ -573,10 +598,12 @@ namespace Rutinas
                     ws2.Cell(totalRow, 4).Value = gtPend;
                     ws2.Cell(totalRow, 5).Value = gtPct / 100.0;
                     ws2.Cell(totalRow, 5).Style.NumberFormat.Format = "0.0%";
-                    ws2.Range(totalRow, 1, totalRow, 5).Style.Font.Bold = true;
-                    ws2.Range(totalRow, 1, totalRow, 5).Style.Fill.BackgroundColor = XLColor.FromHtml("#0D47A1");
-                    ws2.Range(totalRow, 1, totalRow, 5).Style.Font.FontColor = XLColor.White;
-                    for (int c = 2; c <= 5; c++)
+                    if (gtDelta > 0)
+                        ws2.Cell(totalRow, 6).Value = "+" + gtDelta;
+                    ws2.Range(totalRow, 1, totalRow, 6).Style.Font.Bold = true;
+                    ws2.Range(totalRow, 1, totalRow, 6).Style.Fill.BackgroundColor = XLColor.FromHtml("#0D47A1");
+                    ws2.Range(totalRow, 1, totalRow, 6).Style.Font.FontColor = XLColor.White;
+                    for (int c = 2; c <= 6; c++)
                         ws2.Cell(totalRow, c).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
 
