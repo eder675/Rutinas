@@ -18,7 +18,8 @@ namespace Rutinas
             string area = (context.Request.QueryString["area"] ?? "").Trim();
             if (string.IsNullOrEmpty(area)) { context.Response.Write("{}"); return; }
 
-            // 1. Todos los equipos del área en Vinetas
+            // 1. Todos los equipos del área en Vinetas (excluyendo los marcados como excluidos)
+            var keywords = EquipoExcluidoHelper.ObtenerKeywords();
             var todos = new List<string[]>(); // [tag, descripcion]
             string connVinetas = WebConfigurationManager.ConnectionStrings["VinetasConnectionString"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connVinetas))
@@ -31,7 +32,12 @@ namespace Rutinas
                 cmd.Parameters.AddWithValue("@Area", area);
                 using (var dr = cmd.ExecuteReader())
                     while (dr.Read())
-                        todos.Add(new[] { dr["TAG"].ToString().Trim(), dr["Descripcion"].ToString().Trim() });
+                    {
+                        string tag  = dr["TAG"].ToString().Trim();
+                        string desc = dr["Descripcion"].ToString().Trim();
+                        if (!EquipoExcluidoHelper.EsExcluido(tag, desc, keywords))
+                            todos.Add(new[] { tag, desc });
+                    }
             }
 
             // 2. Desmontados del área en REPORTES
