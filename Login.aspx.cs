@@ -12,6 +12,14 @@ namespace Rutinas
         protected void Page_Load(object sender, EventArgs e)
         {
             UnobtrusiveValidationMode = UnobtrusiveValidationMode.None;
+
+            if (Request.QueryString["timeout"] == "1")
+            {
+                Session.Abandon();
+                FormsAuthentication.SignOut();
+                MostrarNotificacion("⏱ Sesión cerrada por inactividad. Vuelve a iniciar sesión.", "#E65100");
+            }
+
             txtcodigo.Focus();
         }
 

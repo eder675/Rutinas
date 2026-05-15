@@ -64,6 +64,13 @@ namespace Rutinas
             string codigoEmpleado = Session["CodigoEmpleado"]?.ToString() ?? "";
             string nombreEmpleado = Session["NombreEmpleado"]?.ToString() ?? "";
 
+            if (string.IsNullOrEmpty(codigoEmpleado))
+            {
+                Page.ClientScript.RegisterStartupScript(GetType(), "toastSesion",
+                    "mostrarToast('La sesión ha expirado. Por favor vuelva a iniciar sesión.', 'error');", true);
+                return;
+            }
+
             const string sqlMerge = @"
                 MERGE DesmontajeAvance AS t
                 USING (SELECT @TAG AS TAG) AS s ON t.TAG = s.TAG

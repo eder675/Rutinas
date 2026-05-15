@@ -112,5 +112,6 @@
             });
         });
     </script>
+    <script src="shared.js"></script>
 </body>
 </html>
