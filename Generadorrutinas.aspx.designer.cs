@@ -123,6 +123,78 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.Label lblturno;
 
         /// <summary>
+        /// Control pnlOpcionAuxiliar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlOpcionAuxiliar;
+
+        /// <summary>
+        /// Control rdoRelevar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rdoRelevar;
+
+        /// <summary>
+        /// Control ddlInstrumentistas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlInstrumentistas;
+
+        /// <summary>
+        /// Control rdoTachos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rdoTachos;
+
+        /// <summary>
+        /// Control txtCantTachos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCantTachos;
+
+        /// <summary>
+        /// Control btnGenerarAuxiliar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGenerarAuxiliar;
+
+        /// <summary>
+        /// Control lblAuxMsg.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblAuxMsg;
+
+        /// <summary>
+        /// Control pnlInstrumentos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlInstrumentos;
+
+        /// <summary>
         /// Control rptRutina.
         /// </summary>
         /// <remarks>
@@ -130,6 +202,15 @@ namespace Rutinas
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptRutina;
+
+        /// <summary>
+        /// Control pnlObligatorios.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlObligatorios;
 
         /// <summary>
         /// Control rptObligatorios.
@@ -140,28 +221,22 @@ namespace Rutinas
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptObligatorios;
 
-        protected global::System.Web.UI.WebControls.Repeater rptObligatorios0;
-
-        protected global::System.Web.UI.WebControls.Panel pnlOpcionAuxiliar;
-
-        protected global::System.Web.UI.WebControls.RadioButton rdoRelevar;
-
-        protected global::System.Web.UI.WebControls.DropDownList ddlInstrumentistas;
-
-        protected global::System.Web.UI.WebControls.RadioButton rdoTachos;
-
-        protected global::System.Web.UI.WebControls.TextBox txtCantTachos;
-
-        protected global::System.Web.UI.WebControls.Button btnGenerarAuxiliar;
-
-        protected global::System.Web.UI.WebControls.Label lblAuxMsg;
-
-        protected global::System.Web.UI.WebControls.Panel pnlInstrumentos;
-
-        protected global::System.Web.UI.WebControls.Panel pnlObligatorios;
-
+        /// <summary>
+        /// Control pnlDesmontaje.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlDesmontaje;
 
+        /// <summary>
+        /// Control rptDesmontaje.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptDesmontaje;
     }
 }
