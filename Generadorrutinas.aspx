@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Generadorrutinas.aspx.cs" Inherits="Rutinas.Generadorrutinas" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Generadorrutinas.aspx.cs" Inherits="Rutinas.Generadorrutinas" %>
 
 <!DOCTYPE html>
 
@@ -32,14 +32,14 @@
 
         <div class="encabezado-rutina">
             &nbsp;<div class="encabezado-titulos">
-                <asp:Label ID="Label1" runat="server" Text="INGENIO LA CABAÑA"></asp:Label><br />
+                <asp:Label ID="Label1" runat="server" Text="INGENIO LA CABAÃ‘A"></asp:Label><br />
                 <asp:Label ID="Label2" runat="server" Text="DEPARTAMENTO DE TECNOLOGIA INDUSTRIAL"></asp:Label><br />
                 <asp:Label ID="Label3" runat="server" Text="LISTA DE VERIFICACION DE RUTINA DE INSTRUMENTISTA"></asp:Label>
             </div>
             <div class="encabezado-info">
                 <div class="fila-firma">
                     <span><asp:Label ID="Label6" runat="server" Text="Instrumentista:"></asp:Label>&nbsp;<asp:Label ID="lblname" runat="server" Text="Nombre" Font-Bold="True"></asp:Label></span>
-                    <span>Firma: __________________ Revisó y aprobó:___________________</span>
+                    <span>Firma: __________________ RevisÃ³ y aprobÃ³:___________________</span>
                     <asp:Label ID="Label7" runat="server" Text="Dia Zafra: "></asp:Label>
                     <asp:Label ID="lblzafra" runat="server" Text="Label"></asp:Label>
                 </div>
@@ -52,10 +52,10 @@
             </div>
         </div>
 
-    <%-- PANEL AUXILIAR: elección de tipo de rutina --%>
+    <%-- PANEL AUXILIAR: elecciÃ³n de tipo de rutina --%>
     <asp:Panel ID="pnlOpcionAuxiliar" runat="server" Visible="false" CssClass="aux-panel">
         <div class="aux-card">
-            <h3 class="aux-titulo">¿Qué tipo de rutina va a realizar?</h3>
+            <h3 class="aux-titulo">Â¿QuÃ© tipo de rutina va a realizar?</h3>
             <label class="aux-opcion-label">
                 <asp:RadioButton ID="rdoRelevar" runat="server" GroupName="grpTipoAux" CssClass="aux-rdo-relevar" />
                 Relevar a un instrumentista
@@ -85,7 +85,7 @@
                 <HeaderTemplate>
                     <thead>
                         <tr>
-                            <th class="col-area">ÁREA</th>
+                            <th class="col-area">ÃREA</th>
                             <th class="col-equipo">EQUIPO</th>
                             <th class="col-detalle">DETALLE A VERIFICAR</th>
                             <th class="col-lectura">LECTURA ACTUAL</th>
@@ -126,7 +126,7 @@
                 <HeaderTemplate>
                     <thead>
                         <tr>
-                            <th class="col-area">ÁREA</th>
+                            <th class="col-area">ÃREA</th>
                             <th class="col-equipo">EQUIPO</th>
                             <th class="col-lecturaeq">LECTURA EQUIPO</th>
                             <th class="col-lecturalab">LECTURA LAB</th>
@@ -168,10 +168,10 @@
                     <HeaderTemplate>
                         <thead>
                             <tr>
-                                <th class="col-area">ÁREA</th>
+                                <th class="col-area">ÃREA</th>
                                 <th class="col-equipo">EQUIPO</th>
                                 <th class="col-hora-d">HORA INICIO</th>
-                                <th class="col-hora-d">HORA FINALIZACIÓN</th>
+                                <th class="col-hora-d">HORA FINALIZACIÃ“N</th>
                                 <th class="col-obs-des">OBSERVACIONES</th>
                             </tr>
                         </thead>
@@ -261,6 +261,7 @@
             }
         });
     </script>
-    <script src="shared.js"></script>
+    <script src="shared.js?v=2"></script>
 </body>
 </html>
+

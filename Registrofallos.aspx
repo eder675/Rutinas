@@ -335,6 +335,7 @@
         setTimeout(function () { $t.fadeOut(400); }, 4000);
     }
     </script>
-    <script src="shared.js"></script>
+    <script src="shared.js?v=2"></script>
 </body>
 </html>
+

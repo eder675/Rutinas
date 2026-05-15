@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DashboardDesmontaje.aspx.cs"
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DashboardDesmontaje.aspx.cs"
     Inherits="Rutinas.DashboardDesmontaje" EnableEventValidation="false" %>
 
 <!DOCTYPE html>
@@ -7,7 +7,7 @@
 <head runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard de Desmontaje — Rutinas</title>
+    <title>Dashboard de Desmontaje â€” Rutinas</title>
     <link rel="stylesheet" href="styles-shared.css" />
     <link rel="stylesheet" href="stylesdashboarddesmontaje.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -18,9 +18,9 @@
 
         <div class="ddb-wrapper">
 
-            <!-- ════════════════════════════════════════════════
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                  ENCABEZADO
-            ═════════════════════════════════════════════════ -->
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
             <div class="ddb-header">
                 <asp:Button ID="btnSalir" runat="server" Text="&#8592; Salir"
                     CssClass="ddb-btn-salir" CausesValidation="false"
@@ -28,13 +28,13 @@
 
                 <div class="ddb-header-center">
                     <h1>DASHBOARD DE DESMONTAJE</h1>
-                    <p>Ingenio La Cabaña — Avance de desmontaje de instrumentos</p>
+                    <p>Ingenio La CabaÃ±a â€” Avance de desmontaje de instrumentos</p>
                 </div>
             </div>
 
-            <!-- ════════════════════════════════════════════════
-                 MÉTRICAS GLOBALES
-            ═════════════════════════════════════════════════ -->
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                 MÃ‰TRICAS GLOBALES
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
             <div class="ddb-metrics-grid">
 
                 <div class="ddb-metric-card">
@@ -65,11 +65,11 @@
 
             </div>
 
-            <!-- ════════════════════════════════════════════════
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                  FILTRO + EXPORTAR
-            ═════════════════════════════════════════════════ -->
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
             <div class="ddb-filter-panel">
-                <label for="<%= ddlAreaFiltro.ClientID %>">Filtrar por área:</label>
+                <label for="<%= ddlAreaFiltro.ClientID %>">Filtrar por Ã¡rea:</label>
                 <asp:DropDownList ID="ddlAreaFiltro" runat="server"
                     CssClass="ddb-filter-select"
                     AutoPostBack="true"
@@ -81,11 +81,11 @@
                     CausesValidation="false" />
             </div>
 
-            <!-- ════════════════════════════════════════════════
-                 AVANCE POR ÁREA
-            ═════════════════════════════════════════════════ -->
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                 AVANCE POR ÃREA
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
             <div class="ddb-section">
-                <h2>Avance por área</h2>
+                <h2>Avance por Ã¡rea</h2>
                 <div class="ddb-table-wrap">
                     <asp:GridView ID="gvAvanceAreas" runat="server"
                         AutoGenerateColumns="false"
@@ -95,10 +95,10 @@
                         <Columns>
                             <asp:TemplateField HeaderText="" ItemStyle-Width="28px">
                                 <ItemTemplate>
-                                    <span class="ddb-expand-icon">▶</span>
+                                    <span class="ddb-expand-icon">â–¶</span>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="Area"        HeaderText="Área" />
+                            <asp:BoundField DataField="Area"        HeaderText="Ãrea" />
                             <asp:BoundField DataField="Total"       HeaderText="Total"       ItemStyle-Width="70px" />
                             <asp:BoundField DataField="Desmontados" HeaderText="Desmontados" ItemStyle-Width="100px" />
                             <asp:BoundField DataField="Pendientes"  HeaderText="Pendientes"  ItemStyle-Width="90px" />
@@ -115,17 +115,17 @@
                             </asp:TemplateField>
                         </Columns>
                         <EmptyDataTemplate>
-                            <div class="ddb-empty-msg">No hay datos de áreas disponibles.</div>
+                            <div class="ddb-empty-msg">No hay datos de Ã¡reas disponibles.</div>
                         </EmptyDataTemplate>
                     </asp:GridView>
                 </div>
             </div>
 
-            <!-- ════════════════════════════════════════════════
-                 ÚLTIMOS 30 INSTRUMENTOS DECLARADOS
-            ═════════════════════════════════════════════════ -->
+            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                 ÃšLTIMOS 30 INSTRUMENTOS DECLARADOS
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
             <div class="ddb-section">
-                <h2>Últimos 30 instrumentos declarados</h2>
+                <h2>Ãšltimos 30 instrumentos declarados</h2>
                 <div class="ddb-table-wrap">
                     <asp:GridView ID="gvUltimos" runat="server"
                         AutoGenerateColumns="false"
@@ -133,13 +133,13 @@
                         GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="TAG"              HeaderText="TAG"            ItemStyle-Width="90px" />
-                            <asp:BoundField DataField="Descripcion"      HeaderText="Descripción" />
-                            <asp:BoundField DataField="Area"             HeaderText="Área"           ItemStyle-Width="160px" />
+                            <asp:BoundField DataField="Descripcion"      HeaderText="DescripciÃ³n" />
+                            <asp:BoundField DataField="Area"             HeaderText="Ãrea"           ItemStyle-Width="160px" />
                             <asp:BoundField DataField="FechaDeclaracion" HeaderText="Fecha"          ItemStyle-Width="130px" DataFormatString="{0:dd/MM/yyyy HH:mm}" />
                             <asp:BoundField DataField="NombreEmpleado"   HeaderText="Declarado por"  ItemStyle-Width="160px" />
                         </Columns>
                         <EmptyDataTemplate>
-                            <div class="ddb-empty-msg">No hay declaraciones registradas aún.</div>
+                            <div class="ddb-empty-msg">No hay declaraciones registradas aÃºn.</div>
                         </EmptyDataTemplate>
                     </asp:GridView>
                 </div>
@@ -179,11 +179,11 @@
                             html += '<div class="ddb-detail-item">';
                             html += '<span class="ddb-di-tag">'  + escHtml(eq.tag)         + '</span>';
                             html += '<span class="ddb-di-desc">' + escHtml(eq.descripcion) + '</span>';
-                            if (eq.fecha) html += '<span class="ddb-di-fecha">' + escHtml(eq.fecha) + ' — ' + escHtml(eq.nombre) + '</span>';
+                            if (eq.fecha) html += '<span class="ddb-di-fecha">' + escHtml(eq.fecha) + ' â€” ' + escHtml(eq.nombre) + '</span>';
                             html += '</div>';
                         });
                     } else {
-                        html += '<div class="ddb-detail-empty">Ninguno declarado aún.</div>';
+                        html += '<div class="ddb-detail-empty">Ninguno declarado aÃºn.</div>';
                     }
                     html += '</div></div>';
 
@@ -199,7 +199,7 @@
                             html += '</div>';
                         });
                     } else {
-                        html += '<div class="ddb-detail-empty">&#127881; ¡Área completamente desmontada!</div>';
+                        html += '<div class="ddb-detail-empty">&#127881; Â¡Ãrea completamente desmontada!</div>';
                     }
                     html += '</div></div>';
 
@@ -217,6 +217,7 @@
         </div><!-- /ddb-wrapper -->
 
     </form>
-    <script src="shared.js"></script>
+    <script src="shared.js?v=2"></script>
 </body>
 </html>
+

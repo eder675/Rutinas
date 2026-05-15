@@ -77,7 +77,7 @@
 <footer>
         <p>&copy; 2025 Departamento de Metrologia y Tecnologia Industrial - Todos los derechos reservados.</p>
     </footer>  
-    <script src="shared.js"></script>
+    <script src="shared.js?v=2"></script>
     <script type="text/javascript">
         function actualizarReloj() {
             var ahora = new Date();
@@ -95,3 +95,4 @@
     </script>
 </body>
 </html>
+

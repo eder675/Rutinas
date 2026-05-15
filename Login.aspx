@@ -42,6 +42,6 @@
         </div>
 
         </form>  
-    <script src="shared.js"></script>
+    <script src="shared.js?v=2"></script>
 </body>
 </html>
