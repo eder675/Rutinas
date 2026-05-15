@@ -136,6 +136,7 @@
     <Content Include="DashboardDesmontaje.aspx" />
     <Content Include="stylesdashboarddesmontaje.css" />
     <Content Include="Scripts\chart.umd.min.js" />
+    <Content Include="shared.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
