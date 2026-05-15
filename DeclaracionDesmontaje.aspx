@@ -7,7 +7,7 @@
 <head runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Declaracion de Desmontaje â€” Rutinas</title>
+    <title>Declaracion de Desmontaje — Rutinas</title>
     <link rel="stylesheet" href="styles-shared.css" />
     <link rel="stylesheet" href="stylesdeclaracion.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,7 +23,7 @@
                     CssClass="dd-btn-salir" CausesValidation="false"
                     OnClick="btnSalir_Click" />
                 <h1>DECLARACION DE DESMONTAJE</h1>
-                <p>Ingenio La CabaÃ±a â€” Departamento de Tecnologia Industrial</p>
+                <p>Ingenio La Cabaña — Departamento de Tecnologia Industrial</p>
             </div>
 
             <!-- INFO EMPLEADO -->
@@ -36,15 +36,15 @@
             <div class="dd-search-section">
                 <div class="dd-search-row">
                     <div class="dd-search-field">
-                        <label class="dd-label" for="ddlAreaFiltro">Filtrar por Ã¡rea</label>
+                        <label class="dd-label" for="ddlAreaFiltro">Filtrar por área</label>
                         <select id="ddlAreaFiltro" class="dd-input">
-                            <option value="">-- Todas las Ã¡reas --</option>
+                            <option value="">-- Todas las áreas --</option>
                         </select>
                     </div>
                     <div class="dd-search-field dd-search-field-grow">
-                        <label class="dd-label" for="txtBusqueda">Buscar por TAG o descripciÃ³n</label>
+                        <label class="dd-label" for="txtBusqueda">Buscar por TAG o descripción</label>
                         <input type="text" id="txtBusqueda" class="dd-input"
-                            placeholder="Opcional: escriba TAG o descripciÃ³n..." autocomplete="off" />
+                            placeholder="Opcional: escriba TAG o descripción..." autocomplete="off" />
                     </div>
                     <div class="dd-search-btn-wrap">
                         <label class="dd-label">&nbsp;</label>
@@ -85,7 +85,7 @@
 
         <script type="text/javascript">
 
-        // â”€â”€ CARRITO (acumulador de seleccionados) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── CARRITO (acumulador de seleccionados) ─────────────────
         var carrito = {}; // { tag: {tag, descripcion, area} }
         var hfSelId = '<%= hfSeleccionados.ClientID %>';
 
@@ -96,7 +96,7 @@
 
         function quitarDelCarrito(tag) {
             delete carrito[tag];
-            // Desmarcar el radio en resultados si estÃ¡ visible
+            // Desmarcar el radio en resultados si está visible
             var fn = 'rb_' + tag.replace(/[^a-zA-Z0-9]/g, '_');
             $('input[name="' + fn + '"][value="0"]').prop('checked', true);
             $('input[name="' + fn + '"]').closest('.dd-item').removeClass('dd-item-desmontado');
@@ -137,7 +137,7 @@
             $('#divLista').empty();
         }
 
-        // â”€â”€ CARGAR ÃREAS AL INICIAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── CARGAR ÁREAS AL INICIAR ───────────────────────────────
         $.getJSON('ObtenerAreas.ashx', function (areas) {
             var $ddl = $('#ddlAreaFiltro');
             $.each(areas, function (i, area) {
@@ -145,7 +145,7 @@
             });
         });
 
-        // â”€â”€ BUSQUEDA AJAX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── BUSQUEDA AJAX ──────────────────────────────────────────
         var busqTimer;
 
         function ejecutarBusqueda() {
@@ -200,7 +200,7 @@
                 });
         }
 
-        // BotÃ³n manual
+        // Botón manual
         $('#btnBuscarJS').on('click', function () {
             clearTimeout(busqTimer);
             ejecutarBusqueda();
@@ -215,13 +215,13 @@
             busqTimer = setTimeout(ejecutarBusqueda, 400);
         });
 
-        // Al cambiar el Ã¡rea busca inmediatamente
+        // Al cambiar el área busca inmediatamente
         $('#ddlAreaFiltro').on('change', function () {
             clearTimeout(busqTimer);
             ejecutarBusqueda();
         });
 
-        // â”€â”€ RADIO CHANGE: agregar/quitar del carrito â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RADIO CHANGE: agregar/quitar del carrito ──────────────
         $(document).on('change', 'input[type="radio"]', function () {
             var $item = $(this).closest('.dd-item');
             var esDesmontado = $(this).val() === '1';
@@ -237,12 +237,12 @@
             else              quitarDelCarrito(item.tag);
         });
 
-        // Enter fuerza bÃºsqueda inmediata sin esperar el debounce
+        // Enter fuerza búsqueda inmediata sin esperar el debounce
         $('#txtBusqueda').on('keydown', function (e) {
             if (e.key === 'Enter') { e.preventDefault(); clearTimeout(busqTimer); ejecutarBusqueda(); }
         });
 
-        // â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── TOAST ─────────────────────────────────────────────────
         function mostrarToast(msg, tipo) {
             var $t = $('#dd-toast');
             $t.removeClass('dd-toast-ok dd-toast-error')

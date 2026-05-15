@@ -6,7 +6,7 @@
 <head runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard de Fallos â€” Rutinas</title>
+    <title>Dashboard de Fallos — Rutinas</title>
     <link rel="stylesheet" href="styles-shared.css" />
     <link rel="stylesheet" href="stylesdashboard.css" />
 </head>
@@ -16,23 +16,23 @@
 
         <div class="db-wrapper">
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            <!-- ═══════════════════════════════════════════════
                  CABECERA
-            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            ════════════════════════════════════════════════ -->
             <div class="db-header">
                 <div class="db-header-left">
                     <asp:Button ID="btnSalir" runat="server" Text="&#8592; Salir"
                         CssClass="db-btn-salir" OnClick="btnSalir_Click" CausesValidation="false" />
                     <div>
                         <h1>Dashboard de Fallos de Instrumentos</h1>
-                        <p>Ingenio La CabaÃ±a â€” Departamento de Tecnologia Industrial</p>
+                        <p>Ingenio La Cabaña — Departamento de Tecnologia Industrial</p>
                     </div>
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 MÃ‰TRICAS
-            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ═══════════════════════════════════════════════
+                 MÉTRICAS
+            ════════════════════════════════════════════════ -->
             <div class="db-section">
                 <p class="db-section-title">Resumen General</p>
                 <div class="db-metrics-grid">
@@ -64,14 +64,14 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 FILTRO + BOTÃ“N EXPORTAR
-            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ═══════════════════════════════════════════════
+                 FILTRO + BOTÓN EXPORTAR
+            ════════════════════════════════════════════════ -->
             <div class="db-section">
                 <p class="db-section-title">Registros Detallados</p>
 
                 <div class="db-filter-panel">
-                    <label for="<%= ddlFiltroNivel.ClientID %>">Filtrar por Nivel de DaÃ±o:</label>
+                    <label for="<%= ddlFiltroNivel.ClientID %>">Filtrar por Nivel de Daño:</label>
                     <asp:DropDownList ID="ddlFiltroNivel" runat="server"
                         CssClass="db-filter-select"
                         AutoPostBack="true"
@@ -102,8 +102,8 @@
                                     </span>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="NivelDano"     HeaderText="Nivel DaÃ±o" />
-                            <asp:BoundField DataField="TipoDano"      HeaderText="Tipo DaÃ±o" />
+                            <asp:BoundField DataField="NivelDano"     HeaderText="Nivel Daño" />
+                            <asp:BoundField DataField="TipoDano"      HeaderText="Tipo Daño" />
                             <asp:BoundField DataField="PosibleCausa"  HeaderText="Posible Causa" />
                             <asp:TemplateField HeaderText="Reemplaza">
                                 <ItemTemplate>
@@ -127,16 +127,16 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 GRÃFICAS
-            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ═══════════════════════════════════════════════
+                 GRÁFICAS
+            ════════════════════════════════════════════════ -->
             <div class="db-section">
                 <p class="db-section-title">Analisis Visual</p>
                 <div class="db-charts-grid">
 
                     <!-- Dona: fallos por TipoDano -->
                     <div class="db-chart-card">
-                        <p class="db-chart-title">Fallos por Tipo de DaÃ±o</p>
+                        <p class="db-chart-title">Fallos por Tipo de Daño</p>
                         <div class="db-chart-canvas-wrap">
                             <canvas id="chartTipo"></canvas>
                         </div>
@@ -161,7 +161,7 @@
 
     <script type="text/javascript">
     (function () {
-        /* â”€â”€ Paleta de colores â”€â”€ */
+        /* ── Paleta de colores ── */
         var PALETTE = [
             '#388E3C','#2E7D32','#62D151','#1565C0','#0288D1',
             '#FBC02D','#E53935','#6D4C41','#00838F','#AD1457',
@@ -175,13 +175,13 @@
             return arr;
         }
 
-        /* â”€â”€ Datos inyectados desde el servidor â”€â”€ */
+        /* ── Datos inyectados desde el servidor ── */
         var tipoDanoLabels  = typeof _tipoDanoLabels  !== 'undefined' ? _tipoDanoLabels  : [];
         var tipoDanoValues  = typeof _tipoDanoValues  !== 'undefined' ? _tipoDanoValues  : [];
         var causaLabels     = typeof _causaLabels     !== 'undefined' ? _causaLabels     : [];
         var causaValues     = typeof _causaValues     !== 'undefined' ? _causaValues     : [];
 
-        /* â”€â”€ GrÃ¡fica 1: DONA â€” Fallos por TipoDano â”€â”€ */
+        /* ── Gráfica 1: DONA — Fallos por TipoDano ── */
         var ctxTipo = document.getElementById('chartTipo');
         if (ctxTipo && tipoDanoLabels.length > 0) {
             new Chart(ctxTipo, {
@@ -221,7 +221,7 @@
             });
         }
 
-        /* â”€â”€ GrÃ¡fica 2: BARRAS HORIZONTAL â€” Fallos por PosibleCausa â”€â”€ */
+        /* ── Gráfica 2: BARRAS HORIZONTAL — Fallos por PosibleCausa ── */
         var ctxCausa = document.getElementById('chartCausa');
         if (ctxCausa && causaLabels.length > 0) {
             new Chart(ctxCausa, {
