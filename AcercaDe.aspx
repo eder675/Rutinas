@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AcercaDe.aspx.cs" Inherits="Rutinas.AcercaDe" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AcercaDe.aspx.cs" Inherits="Rutinas.AcercaDe" %>
 
 <!DOCTYPE html>
 

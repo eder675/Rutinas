@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegistroDesmontaje.aspx.cs" Inherits="Rutinas.RegistroDesmontaje" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegistroDesmontaje.aspx.cs" Inherits="Rutinas.RegistroDesmontaje" %>
 
 <!DOCTYPE html>
 

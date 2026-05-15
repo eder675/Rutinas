@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Registrofallos.aspx.cs" Inherits="Rutinas.Registrofallos" EnableEventValidation="false" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Registrofallos.aspx.cs" Inherits="Rutinas.Registrofallos" EnableEventValidation="false" %>
 
 <!DOCTYPE html>
 

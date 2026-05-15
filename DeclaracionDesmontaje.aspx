@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DeclaracionDesmontaje.aspx.cs"
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DeclaracionDesmontaje.aspx.cs"
     Inherits="Rutinas.DeclaracionDesmontaje" EnableEventValidation="false" %>
 
 <!DOCTYPE html>

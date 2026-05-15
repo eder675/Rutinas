@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DashboardDesmontaje.aspx.cs"
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DashboardDesmontaje.aspx.cs"
     Inherits="Rutinas.DashboardDesmontaje" EnableEventValidation="false" %>
 
 <!DOCTYPE html>
