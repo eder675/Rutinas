@@ -29,6 +29,11 @@ namespace Rutinas
             Response.Redirect("DashboardDesmontaje.aspx");
         }
 
+        protected void lnkAvanceMantenimiento_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("DashboardMantenimiento.aspx");
+        }
+
         protected void lnk_Click(object sender, EventArgs e)
         {
             LinkButton lnb = (LinkButton)sender;
@@ -41,6 +46,7 @@ namespace Rutinas
             if (viewIndex == 3) gvinstrumentos.DataBind();
             if (viewIndex == 4) CargarConfigDesmontaje();
             if (viewIndex == 5) CargarEmpleadosBorrar();
+            if (viewIndex == 6) CargarAsignacionesMantenimiento();
         }
 
         #region config desmontaje
@@ -911,7 +917,232 @@ namespace Rutinas
                 lblMsgBorrar.Text = $"Error al borrar la rutina: {ex.Message}";
             }
         }
+
+        #endregion
+
+        #region configuracion mantenimiento
+
+        private void CargarAsignacionesMantenimiento()
+        {
+            // Empleados + keywords existentes
+            DataTable dtEmps = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(@"
+                    SELECT E.Codigo_empleado, E.Nombre,
+                           M.Keyword1,M.Keyword2,M.Keyword3,M.Keyword4,M.Keyword5,M.Keyword6,
+                           M.Keyword7,M.Keyword8,M.Keyword9,M.Keyword10,M.Keyword11,
+                           M.ExcludeKeyword1,M.ExcludeKeyword2,M.ExcludeKeyword3,
+                           M.ExcludeKeyword4,M.ExcludeKeyword5,M.ExcludeKeyword6,
+                           M.ExcludeKeyword7,M.ExcludeKeyword8,M.ExcludeKeyword9,
+                           M.ExcludeKeyword10,M.ExcludeKeyword11
+                    FROM Empleado E
+                    LEFT JOIN MantenimientoEmpleadoArea M ON E.Codigo_empleado = M.Codigo_empleado
+                    WHERE E.Cargo <> 'Administrador'
+                    ORDER BY E.Nombre", conn).Fill(dtEmps);
+            }
+
+            // Áreas disponibles desde Vinetas
+            var todasAreas = new List<string>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(VinetasConnString))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(
+                        "SELECT DISTINCT RTRIM(Area) FROM equipos WHERE Area IS NOT NULL AND RTRIM(Area)<>'' ORDER BY Area", conn))
+                    using (var dr = cmd.ExecuteReader())
+                        while (dr.Read())
+                            todasAreas.Add(dr.GetString(0));
+                }
+            }
+            catch { }
+
+            // Áreas ya asignadas por empleado
+            var areasAsignadas = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(
+                    "SELECT Codigo_empleado, Area FROM MantenimientoEmpleadoAreaDetalle", conn))
+                using (var dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        string cod  = dr.GetString(0);
+                        string area = dr.GetString(1);
+                        if (!areasAsignadas.ContainsKey(cod))
+                            areasAsignadas[cod] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        areasAsignadas[cod].Add(area);
+                    }
+                }
+            }
+
+            string btnUniqueId = btnGuardarAsignacionesMmto.UniqueID;
+            string onEnter = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
+            string iStyle  = "font-size:0.85em;width:155px;margin-top:3px;display:block;";
+
+            string Kw(DataRow r, string col) =>
+                r[col] != DBNull.Value ? System.Web.HttpUtility.HtmlAttributeEncode(r[col].ToString()) : "";
+
+            var sb = new System.Text.StringBuilder();
+            foreach (DataRow row in dtEmps.Rows)
+            {
+                string cod    = row["Codigo_empleado"].ToString();
+                string codEnc = System.Web.HttpUtility.HtmlEncode(cod);
+                string nombre = System.Web.HttpUtility.HtmlEncode(row["Nombre"].ToString());
+
+                var seleccionadas = areasAsignadas.ContainsKey(cod)
+                    ? areasAsignadas[cod]
+                    : new HashSet<string>();
+
+                sb.Append("<tr>");
+                sb.Append($"<td style='padding:5px 10px;border:1px solid #ccc;vertical-align:top;padding-top:10px;'>{nombre}</td>");
+
+                // Columna ÁREAS (multi-select Select2)
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;min-width:260px;'>");
+                sb.Append($"<select name=\"mmareas_{codEnc}\" class=\"mmto-areas-select\" multiple=\"multiple\" style=\"width:100%;\">");
+                foreach (string area in todasAreas)
+                {
+                    string areaEnc = System.Web.HttpUtility.HtmlEncode(area);
+                    string areaAttr = System.Web.HttpUtility.HtmlAttributeEncode(area);
+                    string sel = seleccionadas.Contains(area) ? " selected=\"selected\"" : "";
+                    sb.Append($"<option value=\"{areaAttr}\"{sel}>{areaEnc}</option>");
+                }
+                sb.Append("</select>");
+                sb.Append("</td>");
+
+                // Columna INCLUIR keywords
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;vertical-align:top;'>");
+                for (int i = 1; i <= 11; i++)
+                    sb.Append($"<input type=\"text\" name=\"mmkw{i}_{codEnc}\" value=\"{Kw(row, $"Keyword{i}")}\" placeholder=\"Incluir {i}\" maxlength=\"100\" style=\"{iStyle}\" onkeydown=\"{onEnter}\" />");
+                sb.Append("</td>");
+
+                // Columna EXCLUIR keywords
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;vertical-align:top;'>");
+                for (int i = 1; i <= 11; i++)
+                    sb.Append($"<input type=\"text\" name=\"mmex{i}_{codEnc}\" value=\"{Kw(row, $"ExcludeKeyword{i}")}\" placeholder=\"Excluir {i}\" maxlength=\"100\" style=\"{iStyle}color:#c00;\" onkeydown=\"{onEnter}\" />");
+                sb.Append("</td>");
+
+                sb.Append("</tr>");
+            }
+
+            litEmpleadosMmtoArea.Text = sb.ToString();
+        }
+
+        protected void btnGuardarAsignacionesMmto_Click(object sender, EventArgs e)
+        {
+            DataTable dtEmps = new DataTable();
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                new SqlDataAdapter(
+                    "SELECT Codigo_empleado FROM Empleado WHERE Cargo <> 'Administrador'", conn)
+                    .Fill(dtEmps);
+            }
+
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                foreach (DataRow empRow in dtEmps.Rows)
+                {
+                    string codigo = empRow["Codigo_empleado"].ToString();
+
+                    object Leer(string campo)
+                    {
+                        string v = Request.Form[campo + "_" + codigo];
+                        return string.IsNullOrWhiteSpace(v) ? (object)DBNull.Value : v.Trim();
+                    }
+
+                    object[] kw = new object[12];
+                    object[] ex = new object[12];
+                    for (int i = 1; i <= 11; i++)
+                    {
+                        kw[i] = Leer($"mmkw{i}");
+                        ex[i] = Leer($"mmex{i}");
+                    }
+
+                    bool todosVacios = true;
+                    for (int i = 1; i <= 11; i++)
+                        if (kw[i] != DBNull.Value || ex[i] != DBNull.Value) { todosVacios = false; break; }
+
+                    if (todosVacios)
+                    {
+                        var cmdDel = new SqlCommand(
+                            "DELETE FROM MantenimientoEmpleadoArea WHERE Codigo_empleado = @Codigo", conn);
+                        cmdDel.Parameters.AddWithValue("@Codigo", codigo);
+                        cmdDel.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        string sqlMerge = @"
+                            IF EXISTS (SELECT 1 FROM MantenimientoEmpleadoArea WHERE Codigo_empleado = @Codigo)
+                                UPDATE MantenimientoEmpleadoArea
+                                SET Keyword1=@K1,Keyword2=@K2,Keyword3=@K3,Keyword4=@K4,Keyword5=@K5,
+                                    Keyword6=@K6,Keyword7=@K7,Keyword8=@K8,Keyword9=@K9,Keyword10=@K10,Keyword11=@K11,
+                                    ExcludeKeyword1=@Ex1,ExcludeKeyword2=@Ex2,ExcludeKeyword3=@Ex3,
+                                    ExcludeKeyword4=@Ex4,ExcludeKeyword5=@Ex5,ExcludeKeyword6=@Ex6,
+                                    ExcludeKeyword7=@Ex7,ExcludeKeyword8=@Ex8,ExcludeKeyword9=@Ex9,
+                                    ExcludeKeyword10=@Ex10,ExcludeKeyword11=@Ex11
+                                WHERE Codigo_empleado = @Codigo
+                            ELSE
+                                INSERT INTO MantenimientoEmpleadoArea
+                                    (Codigo_empleado,Keyword1,Keyword2,Keyword3,Keyword4,Keyword5,Keyword6,
+                                     Keyword7,Keyword8,Keyword9,Keyword10,Keyword11,
+                                     ExcludeKeyword1,ExcludeKeyword2,ExcludeKeyword3,ExcludeKeyword4,ExcludeKeyword5,
+                                     ExcludeKeyword6,ExcludeKeyword7,ExcludeKeyword8,ExcludeKeyword9,
+                                     ExcludeKeyword10,ExcludeKeyword11)
+                                VALUES (@Codigo,@K1,@K2,@K3,@K4,@K5,@K6,@K7,@K8,@K9,@K10,@K11,
+                                        @Ex1,@Ex2,@Ex3,@Ex4,@Ex5,@Ex6,@Ex7,@Ex8,@Ex9,@Ex10,@Ex11)";
+
+                        var cmd = new SqlCommand(sqlMerge, conn);
+                        cmd.Parameters.AddWithValue("@Codigo", codigo);
+                        for (int i = 1; i <= 11; i++)
+                        {
+                            cmd.Parameters.AddWithValue($"@K{i}", kw[i]);
+                            cmd.Parameters.AddWithValue($"@Ex{i}", ex[i]);
+                        }
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            // Guardar áreas (DELETE + INSERT por empleado)
+            using (SqlConnection conn = new SqlConnection(ConnString))
+            {
+                conn.Open();
+                foreach (DataRow empRow in dtEmps.Rows)
+                {
+                    string codigo = empRow["Codigo_empleado"].ToString();
+                    string[] areasSeleccionadas = Request.Form.GetValues("mmareas_" + codigo);
+
+                    var cmdDel = new SqlCommand(
+                        "DELETE FROM MantenimientoEmpleadoAreaDetalle WHERE Codigo_empleado = @Cod", conn);
+                    cmdDel.Parameters.AddWithValue("@Cod", codigo);
+                    cmdDel.ExecuteNonQuery();
+
+                    if (areasSeleccionadas != null)
+                    {
+                        foreach (string area in areasSeleccionadas)
+                        {
+                            if (string.IsNullOrWhiteSpace(area)) continue;
+                            var cmdIns = new SqlCommand(
+                                "INSERT INTO MantenimientoEmpleadoAreaDetalle (Codigo_empleado, Area) VALUES (@Cod, @Area)", conn);
+                            cmdIns.Parameters.AddWithValue("@Cod", codigo);
+                            cmdIns.Parameters.AddWithValue("@Area", area.Trim());
+                            cmdIns.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+
+            lblAsignMmtoMsg.Text      = "Asignaciones de mantenimiento guardadas correctamente.";
+            lblAsignMmtoMsg.ForeColor = System.Drawing.Color.Green;
+            CargarAsignacionesMantenimiento();
+        }
+
+        #endregion
     }
 }
-        #endregion
 

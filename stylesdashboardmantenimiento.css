@@ -1,0 +1,258 @@
+/* ================================================================
+   ESTILOS — DashboardMantenimiento.aspx | Rutinas · Ingenio La Cabaña
+   Requiere: styles-shared.css cargado antes.
+   Prefijo: ddm-*
+   ================================================================ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--c-bg);
+    color: var(--c-text);
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.ddm-wrapper {
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 20px 56px;
+    box-sizing: border-box;
+}
+
+/* ── ENCABEZADO ── */
+.ddm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--c-border);
+}
+.ddm-header-center { flex: 1; min-width: 0; }
+.ddm-header h1 {
+    margin: 0 0 4px;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--c-primary-dark);
+    letter-spacing: 0.01em;
+}
+.ddm-header p { margin: 0; font-size: 0.84em; color: var(--c-text-muted); }
+
+.ddm-btn-salir {
+    padding: 6px 14px;
+    background: var(--c-bg-card);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+}
+.ddm-btn-salir:hover { background: var(--c-border); }
+
+/* ── TARJETAS DE MÉTRICAS ── */
+.ddm-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.ddm-metric-card {
+    background: var(--c-bg-card);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.ddm-metric-label { font-size: 0.75em; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.ddm-metric-value { font-size: 1.9em; font-weight: 700; line-height: 1.1; }
+.ddm-metric-sub   { font-size: 0.72em; color: var(--c-text-muted); }
+
+.ddm-verde  { border-left: 4px solid #22c55e; }
+.ddm-rojo   { border-left: 4px solid #ef4444; }
+.ddm-azul   { border-left: 4px solid #3b82f6; }
+.ddm-naranja { border-left: 4px solid #f59e0b; }
+.ddm-morado { border-left: 4px solid #8b5cf6; }
+
+.ddm-verde  .ddm-metric-value { color: #16a34a; }
+.ddm-rojo   .ddm-metric-value { color: #dc2626; }
+.ddm-azul   .ddm-metric-value { color: #2563eb; }
+.ddm-naranja .ddm-metric-value { color: #d97706; }
+.ddm-morado .ddm-metric-value { color: #7c3aed; }
+
+/* ── BARRA DE PROGRESO GLOBAL ── */
+.ddm-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--c-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.ddm-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    min-width: 2px;
+}
+
+/* ── PANEL DE FILTROS ── */
+.ddm-filter-panel {
+    background: var(--c-bg-card);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.ddm-filter-panel label { font-size: 0.85em; color: var(--c-text-muted); white-space: nowrap; }
+.ddm-filter-select {
+    padding: 5px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-size: 0.9em;
+    min-width: 200px;
+}
+.ddm-filter-sep {
+    width: 1px; height: 24px;
+    background: var(--c-border);
+    margin: 0 4px;
+}
+
+.ddm-sort-btn {
+    padding: 5px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-size: 0.82em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.ddm-sort-btn:hover { background: var(--c-border); }
+.ddm-sort-btn.ddm-sort-active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+/* ── SECCIÓN ── */
+.ddm-section { margin-bottom: 28px; }
+.ddm-section h2 {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--c-primary-dark);
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--c-border);
+}
+
+/* ── TABLA RANKING ── */
+.ddm-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--c-border); }
+
+.ddm-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+}
+.ddm-grid thead tr { background: var(--c-bg-card); }
+.ddm-grid th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--c-border);
+    white-space: nowrap;
+}
+.ddm-grid td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--c-border);
+    vertical-align: middle;
+}
+.ddm-grid tbody tr:last-child td { border-bottom: none; }
+.ddm-grid tbody tr:hover { background: var(--c-bg-hover, rgba(0,0,0,0.03)); }
+
+.ddm-cell-nombre { font-weight: 600; }
+.ddm-cell-num { text-align: center; font-variant-numeric: tabular-nums; }
+.ddm-num-alto   { color: #16a34a; font-weight: 700; }
+.ddm-num-medio  { color: #d97706; font-weight: 600; }
+.ddm-num-bajo   { color: #dc2626; font-weight: 600; }
+.ddm-num-zero   { color: var(--c-text-muted); }
+.ddm-sin-asignar { color: var(--c-text-muted); font-style: italic; font-size: 0.85em; }
+
+.ddm-pendiente-alto  { color: #dc2626; font-weight: 700; }
+.ddm-pendiente-medio { color: #d97706; font-weight: 600; }
+.ddm-pendiente-bajo  { color: #16a34a; font-weight: 600; }
+
+.ddm-btn-detalle {
+    padding: 4px 10px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.ddm-btn-detalle:hover { background: #2563eb; }
+
+/* ── PANEL DE DETALLE ── */
+.ddm-detalle-panel {
+    background: var(--c-bg-card);
+    border: 1px solid var(--c-border);
+    border-left: 4px solid #3b82f6;
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-top: 20px;
+}
+.ddm-detalle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.ddm-detalle-header h2 {
+    margin: 0;
+    font-size: 1em;
+    color: var(--c-primary-dark);
+    border: none;
+    padding: 0;
+}
+.ddm-btn-cerrar {
+    padding: 4px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    background: var(--c-bg);
+    color: var(--c-text-muted);
+    font-size: 0.82em;
+    cursor: pointer;
+}
+.ddm-btn-cerrar:hover { background: var(--c-border); }
+
+.ddm-detalle-sub {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 18px 0 8px;
+}
+
+.ddm-no-data  { color: var(--c-text-muted); font-style: italic; font-size: 0.9em; margin: 8px 0; }
+.ddm-ok       { color: #16a34a; font-weight: 600; font-size: 0.9em; margin: 8px 0; }
+.ddm-pending-count { color: #dc2626; font-weight: 700; margin: 0 0 10px; font-size: 0.9em; }

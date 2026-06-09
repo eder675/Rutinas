@@ -135,6 +135,8 @@
     <Content Include="Dashboard.aspx" />
     <Content Include="DashboardDesmontaje.aspx" />
     <Content Include="stylesdashboarddesmontaje.css" />
+    <Content Include="DashboardMantenimiento.aspx" />
+    <Content Include="stylesdashboardmantenimiento.css" />
     <Content Include="Scripts\chart.umd.min.js" />
     <Content Include="shared.js" />
     <Content Include="Web.config" />
@@ -239,6 +241,10 @@
     </Compile>
     <Compile Include="DashboardDesmontaje.aspx.designer.cs">
       <DependentUpon>DashboardDesmontaje.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DashboardMantenimiento.aspx.cs">
+      <DependentUpon>DashboardMantenimiento.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>

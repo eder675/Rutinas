@@ -80,6 +80,21 @@
         </li>
         <li>
             <asp:LinkButton
+            ID="lnkAvanceMantenimiento"
+            runat="server"
+            Text="Avance mantenimiento."
+            OnClick="lnkAvanceMantenimiento_Click" />
+        </li>
+        <li>
+            <asp:LinkButton
+            ID="lnkConfigMantenimiento"
+            runat="server"
+            Text="Configuracion mantenimiento."
+            OnClick="lnk_Click"
+            CommandArgument="6" />
+        </li>
+        <li>
+            <asp:LinkButton
             ID="lnkLogout"
             runat="server"
             Text="Cerrar sesion."
@@ -571,6 +586,52 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                         </tr>
                     </table>
                 </fieldset>
+            </asp:View>
+            <%-- VISTA 6: Configuración de keywords de Mantenimiento --%>
+            <asp:View ID="vmantenimientoconfig" runat="server">
+                <h2>Configuración de Áreas de Mantenimiento</h2>
+                <p style="font-size:0.87em;color:#555;">
+                    Asigna áreas y/o palabras clave por empleado. Los pendientes se calculan con
+                    equipos cuya área esté asignada <b>o</b> cuya descripción coincida con las
+                    palabras clave de incluir (menos las de excluir).
+                    Si varios empleados comparten las mismas áreas, verán los mismos pendientes.
+                </p>
+                <div style="overflow-x:auto;">
+                <table style="border-collapse:collapse;width:100%;min-width:900px;">
+                    <thead>
+                        <tr>
+                            <th style="padding:6px 10px;border:1px solid #ccc;text-align:left;min-width:130px;">Empleado</th>
+                            <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:260px;">Áreas asignadas</th>
+                            <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:170px;">Palabras clave (incluir)</th>
+                            <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:170px;color:#c00;">Palabras clave (excluir)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <asp:Literal ID="litEmpleadosMmtoArea" runat="server" />
+                    </tbody>
+                </table>
+                </div>
+                <br />
+                <asp:Button ID="btnGuardarAsignacionesMmto" runat="server"
+                    Text="GUARDAR ASIGNACIONES"
+                    OnClick="btnGuardarAsignacionesMmto_Click"
+                    Style="padding:8px 20px;" />
+                <asp:Label ID="lblAsignMmtoMsg" runat="server" Text="" ForeColor="Green" />
+                <script>
+                    function initSelect2Areas() {
+                        $('.mmto-areas-select').each(function () {
+                            if (!$(this).data('select2')) {
+                                $(this).select2({
+                                    placeholder: '— Sin áreas asignadas —',
+                                    allowClear: true,
+                                    width: '100%',
+                                    dropdownAutoWidth: true
+                                });
+                            }
+                        });
+                    }
+                    $(document).ready(function () { initSelect2Areas(); });
+                </script>
             </asp:View>
         </asp:MultiView>
         </p>
