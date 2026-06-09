@@ -258,5 +258,17 @@ namespace Rutinas
         protected global::System.Web.UI.WebControls.Button btnBorrarRutina;
 
         protected global::System.Web.UI.WebControls.Label lblMsgBorrar;
+
+        protected global::System.Web.UI.WebControls.LinkButton lnkAvanceMantenimiento;
+
+        protected global::System.Web.UI.WebControls.LinkButton lnkConfigMantenimiento;
+
+        protected global::System.Web.UI.WebControls.View vmantenimientoconfig;
+
+        protected global::System.Web.UI.WebControls.Literal litEmpleadosMmtoArea;
+
+        protected global::System.Web.UI.WebControls.Button btnGuardarAsignacionesMmto;
+
+        protected global::System.Web.UI.WebControls.Label lblAsignMmtoMsg;
     }
 }
