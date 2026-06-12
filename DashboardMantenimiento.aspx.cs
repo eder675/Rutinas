@@ -68,16 +68,32 @@ namespace Rutinas
                 {
                     conn.Open();
 
-                    using (var cmd = new SqlCommand(
-                        "SELECT COUNT(*) FROM equipos WHERE (EnUSO=1 OR EnUSO IS NULL) AND (Hibernacion=0 OR Hibernacion IS NULL)", conn))
-                        lblTotalEquipos.Text = cmd.ExecuteScalar().ToString();
+                    var areasExcluidas = AreaExcluidaMantenimientoHelper.ObtenerExcluidas();
 
+                    int total = 0;
+                    var tagsActivos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     using (var cmd = new SqlCommand(
-                        "SELECT COUNT(DISTINCT RTRIM(TAG)) FROM vinetas WHERE YEAR(Fecha)=2026", conn))
-                        lblVinetas2026.Text = cmd.ExecuteScalar().ToString();
+                        "SELECT ISNULL(RTRIM(TAG),''), ISNULL(LTRIM(RTRIM(Area)),'') FROM equipos WHERE (EnUSO=1 OR EnUSO IS NULL) AND (Hibernacion=0 OR Hibernacion IS NULL)", conn))
+                    using (var dr = cmd.ExecuteReader())
+                        while (dr.Read())
+                        {
+                            string tag  = dr.GetString(0);
+                            string area = dr.GetString(1);
+                            if (areasExcluidas.Contains(area)) continue;
+                            total++;
+                            if (tag.Length > 0) tagsActivos.Add(tag);
+                        }
+                    lblTotalEquipos.Text = total.ToString();
 
-                    int total  = int.Parse(lblTotalEquipos.Text);
-                    int v2026  = int.Parse(lblVinetas2026.Text);
+                    int v2026 = 0;
+                    using (var cmd = new SqlCommand(
+                        "SELECT DISTINCT ISNULL(RTRIM(TAG),'') FROM vinetas WHERE YEAR(Fecha)=2026", conn))
+                    using (var dr = cmd.ExecuteReader())
+                        while (dr.Read())
+                            if (tagsActivos.Contains(dr.GetString(0)))
+                                v2026++;
+                    lblVinetas2026.Text = v2026.ToString();
+
                     double pct = total > 0 ? (double)v2026 / total * 100.0 : 0;
                     lblPorcentajeGlobal.Text = $"{pct:F1}%";
                     int barW = Math.Min((int)Math.Round(pct), 100);
@@ -111,7 +127,7 @@ namespace Rutinas
                 {
                     conn.Open();
                     using (var cmd = new SqlCommand(
-                        "SELECT ID, RTRIM(Instrumentistas) as Nombre FROM Instrumentistas ORDER BY Instrumentistas", conn))
+                        "SELECT ID, RTRIM(Instrumentistas) as Nombre FROM Instrumentistas WHERE (Inactivo = 0 OR Inactivo IS NULL) ORDER BY Instrumentistas", conn))
                     using (var dr = cmd.ExecuteReader())
                     {
                         while (dr.Read())
@@ -136,7 +152,7 @@ namespace Rutinas
                 {
                     conn.Open();
                     new SqlDataAdapter(
-                        "SELECT ID, RTRIM(Instrumentistas) as Nombre, CodEmp FROM Instrumentistas", conn)
+                        "SELECT ID, RTRIM(Instrumentistas) as Nombre, CodEmp FROM Instrumentistas WHERE (Inactivo = 0 OR Inactivo IS NULL)", conn)
                         .Fill(dtInst);
                 }
             }
@@ -241,6 +257,10 @@ namespace Rutinas
             }
             catch { }
 
+            // Áreas adicionales que el empleado recibe por sus grupos asignados
+            try { GrupoAreaMantenimientoHelper.AplicarGruposAAreas(areasEmp); }
+            catch { }
+
             // 5. TAGs con viñeta en 2026
             var tagsConVineta = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             try
@@ -257,7 +277,8 @@ namespace Rutinas
             }
             catch { }
 
-            // 6. Todos los equipos activos no hibernados (con área)
+            // 6. Todos los equipos activos no hibernados (con área), sin las áreas excluidas del dashboard
+            var areasExcluidasRanking = AreaExcluidaMantenimientoHelper.ObtenerExcluidas();
             var todosEquipos = new List<(string tag, string descUpper, string area)>();
             try
             {
@@ -265,13 +286,17 @@ namespace Rutinas
                 {
                     conn.Open();
                     const string sql = @"
-                        SELECT RTRIM(TAG), UPPER(RTRIM(Descripcion)), ISNULL(RTRIM(Area),'')
+                        SELECT ISNULL(RTRIM(TAG),''), ISNULL(UPPER(RTRIM(Descripcion)),''), ISNULL(RTRIM(Area),'')
                         FROM equipos
                         WHERE (EnUSO=1 OR EnUSO IS NULL) AND (Hibernacion=0 OR Hibernacion IS NULL)";
                     using (var cmd = new SqlCommand(sql, conn))
                     using (var dr = cmd.ExecuteReader())
                         while (dr.Read())
-                            todosEquipos.Add((dr.GetString(0).Trim(), dr.GetString(1).Trim(), dr.GetString(2).Trim()));
+                        {
+                            string area = dr.GetString(2).Trim();
+                            if (areasExcluidasRanking.Contains(area)) continue;
+                            todosEquipos.Add((dr.GetString(0).Trim(), dr.GetString(1).Trim(), area));
+                        }
                 }
             }
             catch { }
@@ -454,7 +479,7 @@ namespace Rutinas
                 {
                     conn.Open();
                     var cmd = new SqlCommand(
-                        "SELECT CodEmp FROM Instrumentistas WHERE RTRIM(Instrumentistas) = @Nombre", conn);
+                        "SELECT CodEmp FROM Instrumentistas WHERE RTRIM(Instrumentistas) = @Nombre AND (Inactivo = 0 OR Inactivo IS NULL)", conn);
                     cmd.Parameters.AddWithValue("@Nombre", nombreEmpleado);
                     object val = cmd.ExecuteScalar();
                     if (val != null && val != DBNull.Value)
@@ -521,6 +546,17 @@ namespace Rutinas
             }
             catch { }
 
+            // Áreas adicionales que el empleado recibe por sus grupos asignados
+            try
+            {
+                var areasEmpDetalle = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
+                {
+                    [codEmp] = areasDetalle
+                };
+                GrupoAreaMantenimientoHelper.AplicarGruposAAreas(areasEmpDetalle);
+            }
+            catch { }
+
             if (inc.Count == 0 && areasDetalle.Count == 0)
             {
                 litPendientes.Text = "<p class='ddm-no-data'>No hay áreas ni palabras clave asignadas. Configúralas en la sección de administración.</p>";
@@ -544,6 +580,7 @@ namespace Rutinas
             catch { }
 
             // Equipos pendientes (área asignada OR keyword match, menos exclusiones)
+            var areasExcluidasDetalle = AreaExcluidaMantenimientoHelper.ObtenerExcluidas();
             var pendientes = new List<(string tag, string desc, string area)>();
             try
             {
@@ -551,7 +588,7 @@ namespace Rutinas
                 {
                     conn.Open();
                     const string sql = @"
-                        SELECT RTRIM(TAG), RTRIM(Descripcion), ISNULL(RTRIM(Area),'') AS Area
+                        SELECT ISNULL(RTRIM(TAG),''), ISNULL(RTRIM(Descripcion),''), ISNULL(RTRIM(Area),'') AS Area
                         FROM equipos
                         WHERE (EnUSO=1 OR EnUSO IS NULL) AND (Hibernacion=0 OR Hibernacion IS NULL)";
                     using (var cmd = new SqlCommand(sql, conn))
@@ -563,6 +600,9 @@ namespace Rutinas
                             string desc   = dr.GetString(1).Trim();
                             string area   = dr.GetString(2).Trim();
                             string descUp = desc.ToUpper();
+
+                            if (areasExcluidasDetalle.Contains(area))
+                                continue;
 
                             bool porArea     = areasDetalle.Count > 0 && areasDetalle.Contains(area);
                             bool porKeyword  = inc.Count > 0 && inc.Any(k => descUp.Contains(k));

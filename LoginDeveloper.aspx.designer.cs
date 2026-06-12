@@ -265,10 +265,22 @@ namespace Rutinas
 
         protected global::System.Web.UI.WebControls.View vmantenimientoconfig;
 
+        protected global::System.Web.UI.WebControls.Literal litGruposMmto;
+
+        protected global::System.Web.UI.WebControls.Button btnGuardarGruposMmto;
+
+        protected global::System.Web.UI.WebControls.Label lblGruposMmtoMsg;
+
         protected global::System.Web.UI.WebControls.Literal litEmpleadosMmtoArea;
 
         protected global::System.Web.UI.WebControls.Button btnGuardarAsignacionesMmto;
 
         protected global::System.Web.UI.WebControls.Label lblAsignMmtoMsg;
+
+        protected global::System.Web.UI.WebControls.CheckBoxList cblAreasExclMmto;
+
+        protected global::System.Web.UI.WebControls.Button btnGuardarAreasExclMmto;
+
+        protected global::System.Web.UI.WebControls.Label lblAreasExclMmtoMsg;
     }
 }

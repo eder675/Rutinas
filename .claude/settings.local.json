@@ -16,7 +16,23 @@
       "PowerShell($now = Get-Date; Write-Output \"Fecha y hora: $now\"; Write-Output \"Dia semana: $\\($now.DayOfWeek\\)\"; Write-Output \"Hora: $\\($now.TimeOfDay\\)\")",
       "PowerShell(sqlcmd *)",
       "Bash(pip show *)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" Rutinas.csproj /t:Build /p:Configuration=Debug /verbosity:minimal /nologo)",
+      "Skill(run)",
+      "Bash(\"/c/Program Files/IIS Express/iisexpress.exe\" /config:\".vs/Rutinas/config/applicationhost.config\" /site:Rutinas)",
+      "Bash(disown)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:58401/LoginDeveloper.aspx)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "Bash(curl -sv -o /dev/null http://localhost:58401/LoginDeveloper.aspx)",
+      "Bash(curl -sI http://localhost:58401/LoginDeveloper.aspx)",
+      "Bash(npx --yes playwright --version)",
+      "Read(//c/Users/WL/.cache/**)",
+      "Bash(chromium-cli --help)",
+      "Bash(npx --yes playwright install chromium)",
+      "Bash(NODE_PATH=\"/c/Users/WL/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules\" node *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" Rutinas.csproj /t:Build /p:Configuration=Debug /verbosity:minimal /nologo)"
     ]
   }
 }

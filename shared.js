@@ -39,14 +39,14 @@
 
 })();
 
-/* 3. TEMPORIZADOR DE INACTIVIDAD — cierre automático de sesión a los 3 min */
+/* 3. TEMPORIZADOR DE INACTIVIDAD — cierre automático de sesión a los 5 min */
 (function () {
     'use strict';
 
     var path = window.location.pathname.toLowerCase();
     if (path.indexOf('login') >= 0) return;
 
-    var TOTAL_MS   = 3 * 60 * 1000;   // 3 minutos total
+    var TOTAL_MS   = 5 * 60 * 1000;   // 5 minutos total
     var WARNING_MS = 30 * 1000;        // aviso 30 s antes del cierre
     var warningTimer, logoutTimer, countdownInterval;
     var overlay = null;

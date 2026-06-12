@@ -943,7 +943,8 @@ namespace Rutinas
                     ORDER BY E.Nombre", conn).Fill(dtEmps);
             }
 
-            // Áreas disponibles desde Vinetas
+            // Áreas disponibles desde Vinetas (sin las excluidas del dashboard de mantenimiento)
+            var areasExcluidas = AreaExcluidaMantenimientoHelper.ObtenerExcluidas();
             var todasAreas = new List<string>();
             try
             {
@@ -951,10 +952,14 @@ namespace Rutinas
                 {
                     conn.Open();
                     using (var cmd = new SqlCommand(
-                        "SELECT DISTINCT RTRIM(Area) FROM equipos WHERE Area IS NOT NULL AND RTRIM(Area)<>'' ORDER BY Area", conn))
+                        "SELECT DISTINCT LTRIM(RTRIM(Area)) AS Area FROM equipos WHERE Area IS NOT NULL AND RTRIM(Area)<>'' ORDER BY Area", conn))
                     using (var dr = cmd.ExecuteReader())
                         while (dr.Read())
-                            todasAreas.Add(dr.GetString(0));
+                        {
+                            string area = dr.GetString(0);
+                            if (!areasExcluidas.Contains(area))
+                                todasAreas.Add(area);
+                        }
                 }
             }
             catch { }
@@ -978,6 +983,10 @@ namespace Rutinas
                     }
                 }
             }
+
+            // Grupos de áreas y asignación de grupos por empleado
+            var grupos = GrupoAreaMantenimientoHelper.ObtenerGrupos();
+            var gruposEmpleado = GrupoAreaMantenimientoHelper.ObtenerGruposEmpleado();
 
             string btnUniqueId = btnGuardarAsignacionesMmto.UniqueID;
             string onEnter = $"if(event.key==='Enter'){{event.preventDefault();__doPostBack('{btnUniqueId}','');}}";
@@ -1013,6 +1022,22 @@ namespace Rutinas
                 sb.Append("</select>");
                 sb.Append("</td>");
 
+                // Columna GRUPOS asignados (multi-select Select2)
+                var gruposSel = gruposEmpleado.ContainsKey(cod)
+                    ? gruposEmpleado[cod]
+                    : new HashSet<int>();
+
+                sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;min-width:180px;'>");
+                sb.Append($"<select name=\"mmgrupos_{codEnc}\" class=\"mmto-grupos-select\" multiple=\"multiple\" style=\"width:100%;\">");
+                foreach (var g in grupos)
+                {
+                    string nombreEnc = System.Web.HttpUtility.HtmlEncode(g.Nombre);
+                    string sel = gruposSel.Contains(g.Id) ? " selected=\"selected\"" : "";
+                    sb.Append($"<option value=\"{g.Id}\"{sel}>{nombreEnc}</option>");
+                }
+                sb.Append("</select>");
+                sb.Append("</td>");
+
                 // Columna INCLUIR keywords
                 sb.Append("<td style='padding:5px 10px;border:1px solid #ccc;text-align:center;vertical-align:top;'>");
                 for (int i = 1; i <= 11; i++)
@@ -1029,6 +1054,196 @@ namespace Rutinas
             }
 
             litEmpleadosMmtoArea.Text = sb.ToString();
+
+            CargarGruposMmto(todasAreas, grupos);
+            CargarAreasExcluidasMmto();
+        }
+
+        private void CargarGruposMmto(List<string> todasAreas, List<(int Id, string Nombre, HashSet<string> Areas)> grupos)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            // Áreas que ya pertenecen a algún grupo (para no repetirlas en otros grupos)
+            var areasEnAlgunGrupo = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var g in grupos)
+                foreach (string area in g.Areas)
+                    areasEnAlgunGrupo.Add(area);
+
+            foreach (var g in grupos)
+            {
+                string nombreEnc = System.Web.HttpUtility.HtmlAttributeEncode(g.Nombre);
+                sb.Append("<div style='display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;'>");
+                sb.Append($"<input type=\"text\" name=\"mmgrupo_nombre_{g.Id}\" value=\"{nombreEnc}\" placeholder=\"Nombre del grupo\" style=\"width:180px;padding:4px;\" />");
+                sb.Append($"<select name=\"mmgrupo_areas_{g.Id}\" class=\"mmto-grupo-areas-select\" multiple=\"multiple\" style=\"flex:1;min-width:300px;\">");
+                foreach (string area in todasAreas)
+                {
+                    // Omitir áreas que ya pertenecen a otro grupo (pero no las del propio grupo)
+                    if (!g.Areas.Contains(area) && areasEnAlgunGrupo.Contains(area))
+                        continue;
+
+                    string areaEnc  = System.Web.HttpUtility.HtmlEncode(area);
+                    string areaAttr = System.Web.HttpUtility.HtmlAttributeEncode(area);
+                    string sel = g.Areas.Contains(area) ? " selected=\"selected\"" : "";
+                    sb.Append($"<option value=\"{areaAttr}\"{sel}>{areaEnc}</option>");
+                }
+                sb.Append("</select>");
+                sb.Append($"<label style='font-size:0.85em;color:#c00;white-space:nowrap;'><input type=\"checkbox\" name=\"mmgrupo_del_{g.Id}\" value=\"1\" /> Eliminar</label>");
+                sb.Append("</div>");
+            }
+
+            // Fila para crear un nuevo grupo
+            sb.Append("<div style='display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;'>");
+            sb.Append("<input type=\"text\" name=\"mmgrupo_nombre_nuevo\" value=\"\" placeholder=\"Nombre del nuevo grupo\" style=\"width:180px;padding:4px;\" />");
+            sb.Append("<select name=\"mmgrupo_areas_nuevo\" class=\"mmto-grupo-areas-select\" multiple=\"multiple\" style=\"flex:1;min-width:300px;\">");
+            foreach (string area in todasAreas)
+            {
+                // Omitir áreas que ya pertenecen a un grupo existente
+                if (areasEnAlgunGrupo.Contains(area))
+                    continue;
+
+                string areaEnc  = System.Web.HttpUtility.HtmlEncode(area);
+                string areaAttr = System.Web.HttpUtility.HtmlAttributeEncode(area);
+                sb.Append($"<option value=\"{areaAttr}\">{areaEnc}</option>");
+            }
+            sb.Append("</select>");
+            sb.Append("<span style='font-size:0.85em;color:#555;'>(nuevo grupo)</span>");
+            sb.Append("</div>");
+
+            litGruposMmto.Text = sb.ToString();
+        }
+
+        protected void btnGuardarGruposMmto_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var grupos = GrupoAreaMantenimientoHelper.ObtenerGrupos();
+
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+
+                    foreach (var g in grupos)
+                    {
+                        bool eliminar = Request.Form["mmgrupo_del_" + g.Id] == "1";
+                        string nombre = Request.Form["mmgrupo_nombre_" + g.Id];
+
+                        if (eliminar || string.IsNullOrWhiteSpace(nombre))
+                        {
+                            var cmdDel = new SqlCommand("DELETE FROM MantenimientoGrupoArea WHERE Id = @Id", conn);
+                            cmdDel.Parameters.AddWithValue("@Id", g.Id);
+                            cmdDel.ExecuteNonQuery();
+                            continue;
+                        }
+
+                        var cmdUpd = new SqlCommand("UPDATE MantenimientoGrupoArea SET Nombre = @Nombre WHERE Id = @Id", conn);
+                        cmdUpd.Parameters.AddWithValue("@Nombre", nombre.Trim());
+                        cmdUpd.Parameters.AddWithValue("@Id", g.Id);
+                        cmdUpd.ExecuteNonQuery();
+
+                        var cmdDelAreas = new SqlCommand("DELETE FROM MantenimientoGrupoAreaDetalle WHERE GrupoId = @Id", conn);
+                        cmdDelAreas.Parameters.AddWithValue("@Id", g.Id);
+                        cmdDelAreas.ExecuteNonQuery();
+
+                        string[] areasSel = Request.Form.GetValues("mmgrupo_areas_" + g.Id);
+                        if (areasSel != null)
+                            foreach (string area in areasSel)
+                            {
+                                if (string.IsNullOrWhiteSpace(area)) continue;
+                                var cmdIns = new SqlCommand(
+                                    "INSERT INTO MantenimientoGrupoAreaDetalle (GrupoId, Area) VALUES (@Id, @Area)", conn);
+                                cmdIns.Parameters.AddWithValue("@Id", g.Id);
+                                cmdIns.Parameters.AddWithValue("@Area", area);
+                                cmdIns.ExecuteNonQuery();
+                            }
+                    }
+
+                    string nombreNuevo = Request.Form["mmgrupo_nombre_nuevo"];
+                    if (!string.IsNullOrWhiteSpace(nombreNuevo))
+                    {
+                        var cmdIns = new SqlCommand(
+                            "INSERT INTO MantenimientoGrupoArea (Nombre) OUTPUT INSERTED.Id VALUES (@Nombre)", conn);
+                        cmdIns.Parameters.AddWithValue("@Nombre", nombreNuevo.Trim());
+                        int nuevoId = (int)cmdIns.ExecuteScalar();
+
+                        string[] areasSel = Request.Form.GetValues("mmgrupo_areas_nuevo");
+                        if (areasSel != null)
+                            foreach (string area in areasSel)
+                            {
+                                if (string.IsNullOrWhiteSpace(area)) continue;
+                                var cmdIns2 = new SqlCommand(
+                                    "INSERT INTO MantenimientoGrupoAreaDetalle (GrupoId, Area) VALUES (@Id, @Area)", conn);
+                                cmdIns2.Parameters.AddWithValue("@Id", nuevoId);
+                                cmdIns2.Parameters.AddWithValue("@Area", area);
+                                cmdIns2.ExecuteNonQuery();
+                            }
+                    }
+                }
+
+                lblGruposMmtoMsg.ForeColor = System.Drawing.Color.Green;
+                lblGruposMmtoMsg.Text = "Grupos guardados correctamente.";
+                CargarAsignacionesMantenimiento();
+            }
+            catch (Exception ex)
+            {
+                lblGruposMmtoMsg.ForeColor = System.Drawing.Color.Red;
+                lblGruposMmtoMsg.Text = "Error: " + ex.Message;
+            }
+        }
+
+        private void CargarAreasExcluidasMmto()
+        {
+            // Poblar CheckBoxList con todas las áreas de Vinetas
+            var todasAreas = new List<string>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(VinetasConnString))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(
+                        "SELECT DISTINCT LTRIM(RTRIM(Area)) AS Area FROM equipos WHERE Area IS NOT NULL AND RTRIM(Area)<>'' ORDER BY Area", conn))
+                    using (var dr = cmd.ExecuteReader())
+                        while (dr.Read())
+                            todasAreas.Add(dr.GetString(0));
+                }
+            }
+            catch { }
+
+            cblAreasExclMmto.Items.Clear();
+            foreach (string area in todasAreas)
+                cblAreasExclMmto.Items.Add(new ListItem(area, area));
+
+            var excluidas = AreaExcluidaMantenimientoHelper.ObtenerExcluidas();
+            foreach (ListItem item in cblAreasExclMmto.Items)
+                item.Selected = excluidas.Contains(item.Value);
+        }
+
+        protected void btnGuardarAreasExclMmto_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnString))
+                {
+                    conn.Open();
+                    new SqlCommand("DELETE FROM AreasMantenimientoExcluida", conn).ExecuteNonQuery();
+
+                    foreach (ListItem item in cblAreasExclMmto.Items)
+                    {
+                        if (!item.Selected) continue;
+                        var cmd = new SqlCommand(
+                            "INSERT INTO AreasMantenimientoExcluida (Area) VALUES (@Area)", conn);
+                        cmd.Parameters.AddWithValue("@Area", item.Value);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                lblAreasExclMmtoMsg.ForeColor = System.Drawing.Color.Green;
+                lblAreasExclMmtoMsg.Text = "Exclusiones guardadas correctamente.";
+                CargarAsignacionesMantenimiento();
+            }
+            catch (Exception ex)
+            {
+                lblAreasExclMmtoMsg.ForeColor = System.Drawing.Color.Red;
+                lblAreasExclMmtoMsg.Text = "Error: " + ex.Message;
+            }
         }
 
         protected void btnGuardarAsignacionesMmto_Click(object sender, EventArgs e)
@@ -1130,7 +1345,28 @@ namespace Rutinas
                             var cmdIns = new SqlCommand(
                                 "INSERT INTO MantenimientoEmpleadoAreaDetalle (Codigo_empleado, Area) VALUES (@Cod, @Area)", conn);
                             cmdIns.Parameters.AddWithValue("@Cod", codigo);
-                            cmdIns.Parameters.AddWithValue("@Area", area.Trim());
+                            cmdIns.Parameters.AddWithValue("@Area", area);
+                            cmdIns.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Guardar grupos asignados
+                    string[] gruposSeleccionados = Request.Form.GetValues("mmgrupos_" + codigo);
+
+                    var cmdDelGrupos = new SqlCommand(
+                        "DELETE FROM MantenimientoEmpleadoGrupo WHERE Codigo_empleado = @Cod", conn);
+                    cmdDelGrupos.Parameters.AddWithValue("@Cod", codigo);
+                    cmdDelGrupos.ExecuteNonQuery();
+
+                    if (gruposSeleccionados != null)
+                    {
+                        foreach (string grupoId in gruposSeleccionados)
+                        {
+                            if (string.IsNullOrWhiteSpace(grupoId)) continue;
+                            var cmdIns = new SqlCommand(
+                                "INSERT INTO MantenimientoEmpleadoGrupo (Codigo_empleado, GrupoId) VALUES (@Cod, @GrupoId)", conn);
+                            cmdIns.Parameters.AddWithValue("@Cod", codigo);
+                            cmdIns.Parameters.AddWithValue("@GrupoId", int.Parse(grupoId));
                             cmdIns.ExecuteNonQuery();
                         }
                     }

@@ -596,12 +596,31 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                     palabras clave de incluir (menos las de excluir).
                     Si varios empleados comparten las mismas áreas, verán los mismos pendientes.
                 </p>
+
+                <fieldset style="margin-bottom:20px; padding:12px;">
+                    <legend><b>Grupos de áreas</b></legend>
+                    <p style="margin:0 0 8px; font-size:0.9em; color:#555;">
+                        Define grupos de áreas (por ejemplo, una zona o sector) y luego asígnalos a varios empleados
+                        en la columna "Grupo(s)" de la tabla. Si editas las áreas de un grupo, el cambio aplica
+                        automáticamente a todos los empleados que tengan ese grupo asignado.
+                        Para eliminar un grupo, marca "Eliminar" o borra su nombre y guarda.
+                    </p>
+                    <asp:Literal ID="litGruposMmto" runat="server" />
+                    <br />
+                    <asp:Button ID="btnGuardarGruposMmto" runat="server"
+                        Text="GUARDAR GRUPOS"
+                        OnClick="btnGuardarGruposMmto_Click"
+                        Style="padding:8px 20px;" />
+                    <asp:Label ID="lblGruposMmtoMsg" runat="server" Text="" ForeColor="Green" Style="margin-left:10px;" />
+                </fieldset>
+
                 <div style="overflow-x:auto;">
                 <table style="border-collapse:collapse;width:100%;min-width:900px;">
                     <thead>
                         <tr>
                             <th style="padding:6px 10px;border:1px solid #ccc;text-align:left;min-width:130px;">Empleado</th>
                             <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:260px;">Áreas asignadas</th>
+                            <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:180px;">Grupo(s)</th>
                             <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:170px;">Palabras clave (incluir)</th>
                             <th style="padding:6px 10px;border:1px solid #ccc;text-align:center;min-width:170px;color:#c00;">Palabras clave (excluir)</th>
                         </tr>
@@ -617,12 +636,39 @@ INNER JOIN Rotaciongrupos G ON A.IDgrupo = G.IDgrupo" UpdateCommand="UPDATE [Are
                     OnClick="btnGuardarAsignacionesMmto_Click"
                     Style="padding:8px 20px;" />
                 <asp:Label ID="lblAsignMmtoMsg" runat="server" Text="" ForeColor="Green" />
+
+                <fieldset style="margin-top:20px; padding:12px;">
+                    <legend><b>Áreas excluidas del dashboard de mantenimiento</b></legend>
+                    <p style="margin:0 0 8px; font-size:0.9em; color:#555;">
+                        Las áreas marcadas no se tomarán en cuenta en el dashboard de mantenimiento (ni en pendientes, ni para asignar a empleados).
+                    </p>
+                    <asp:CheckBoxList ID="cblAreasExclMmto" runat="server"
+                        RepeatColumns="3"
+                        Style="margin-bottom:10px; font-size:0.9em;" />
+                    <br />
+                    <asp:Button ID="btnGuardarAreasExclMmto" runat="server"
+                        Text="GUARDAR EXCLUSIONES"
+                        OnClick="btnGuardarAreasExclMmto_Click"
+                        Style="padding:8px 20px;" />
+                    <asp:Label ID="lblAreasExclMmtoMsg" runat="server" Text="" ForeColor="Green" Style="margin-left:10px;" />
+                </fieldset>
+
                 <script>
                     function initSelect2Areas() {
-                        $('.mmto-areas-select').each(function () {
+                        $('.mmto-areas-select, .mmto-grupo-areas-select').each(function () {
                             if (!$(this).data('select2')) {
                                 $(this).select2({
                                     placeholder: '— Sin áreas asignadas —',
+                                    allowClear: true,
+                                    width: '100%',
+                                    dropdownAutoWidth: true
+                                });
+                            }
+                        });
+                        $('.mmto-grupos-select').each(function () {
+                            if (!$(this).data('select2')) {
+                                $(this).select2({
+                                    placeholder: '— Sin grupo —',
                                     allowClear: true,
                                     width: '100%',
                                     dropdownAutoWidth: true
